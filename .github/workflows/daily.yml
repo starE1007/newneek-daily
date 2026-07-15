@@ -40,4 +40,5 @@ jobs:
           curl -sf -X POST "https://api.anthropic.com/v1/claude_code/routines/trig_01JNriwuDkx88PEkcxC2Yrda/fire" \
             -H "Authorization: Bearer ${{ secrets.CLAUDE_ROUTINE_TOKEN }}" \
             -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
+            -H "anthropic-version: 2023-06-01" \
             -H "Content-Type: application/json"
