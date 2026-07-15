@@ -1,0 +1,40 @@
+name: Daily NewNeek Scrape
+
+on:
+  schedule:
+    - cron: '50 19 * * 0-4' # 04:50 KST, Mon-Fri
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Scrape NewNeek
+        run: node scripts/scrape.mjs
+
+      - name: Commit raw file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add raw/newneek.md
+          git diff --quiet --cached || git commit -m "chore: scrape $(date -u +%F)"
+          git push
+
+      - name: Trigger Claude routine
+        run: |
+          curl -sf -X POST "https://api.anthropic.com/v1/claude_code/routines/trig_01JNriwuDkx88PEkcxC2Yrda/fire" \
+            -H "Authorization: Bearer ${{ secrets.CLAUDE_ROUTINE_TOKEN }}" \
+            -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
+            -H "Content-Type: application/json"

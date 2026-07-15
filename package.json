@@ -1,0 +1,10 @@
+{
+  "name": "newneek-daily",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Scrapes NewNeek newsletter archives and stages the raw text for the daily digest routine",
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}
