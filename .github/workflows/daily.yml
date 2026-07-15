@@ -5,6 +5,9 @@ on:
     - cron: '50 19 * * 0-4' # 04:50 KST, Mon-Fri
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
