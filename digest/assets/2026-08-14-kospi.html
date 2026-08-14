@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>코스피, 왜 롤러코스터를 탔을까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 지수 30초 */
+  .idx-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .idx-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .idx-box b{display:block;font-size:20px;margin-bottom:2px}
+  .idx-box span{font-size:13px;color:var(--text2)}
+  .idx-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .idx-box.result{background:var(--red-soft);border-color:#F6D3CE}
+  .idx-box.result b{color:#C6493E}
+  .idx-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.14 데일리 뉴스 · 시각자료</div>
+  <h1>🎢 코스피, 왜 한 달 만에 롤러코스터를 탔을까</h1>
+  <div class="sub">사상 최고치에서 -22% 급락까지, 그리고 그 진폭을 키운 '단일종목 레버리지 ETF'</div>
+
+  <div class="section-title">지수 30초 정리</div>
+  <div class="idx-row">
+    <div class="idx-box"><b>9114.55</b><span>6월 22일 · 역대 최고치</span></div>
+    <div class="idx-op">→</div>
+    <div class="idx-box result"><b>5593.56</b><span>7월 30일 · 한 달 만의 저점</span></div>
+    <div class="idx-op">=</div>
+    <div class="idx-box result"><b>-22%</b><span>7월 한 달간 하락폭</span></div>
+  </div>
+  <div class="idx-note">2026년 상반기엔 +101.14%로 전 세계 주요 지수 중 상승률 1위였는데, 딱 한 달 만에 방향이 완전히 뒤집혔어.</div>
+
+  <div class="section-title">상승도 하락도 증폭시킨 메커니즘</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>반도체·AI 낙관론으로 사상 최고치</b><span class="mdesc">6월 22일 9114.55포인트, 상반기 상승률 세계 1위</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>3대 악재가 동시에 터짐</b><span class="mdesc">① 중국 AI 반도체 확산 쇼크 ② SA(시추에이셔널 어웨어니스) 헤지펀드 레버리지 청산 ③ 메타발 AI 공급망 우려</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>반도체 대장주 중심으로 급락 시작</b><span class="mdesc">외국인·개인 투자자 간 매매 공방까지 겹침</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>단일종목 레버리지 ETF가 낙폭을 증폭</b><span class="mdesc">기초주식이 내리면 배율(2배 등)을 맞추려 추가로 파는 구조라, 하락이 하락을 부름</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>7월 30일 5593.56까지 급락 (-22%)</b><span class="mdesc">"국내 증시가 카지노 같다"는 말까지 나옴</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 양방향 증폭 장치</b>이 ETF는 오를 때도 원래보다 더 오르게, 내릴 때도 원래보다 더 내리게 만들어. 상승장에서 인기를 끌었던 바로 그 구조가, 하락장에선 낙폭을 키우는 부메랑이 된 셈.</div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">6/22 → 7/30</div><div class="what">최고치 9114 → 저점 5593 (-22%)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">앞으로</div><div class="what"><b>정부 책임론 · 단일종목 레버리지 ETF 규제 강화 여부</b> 지켜볼 것</div></div>
+  </div>
+
+  <div class="foot">※ 그림은 이해를 돕기 위한 개략도 · 2026.08.14 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
