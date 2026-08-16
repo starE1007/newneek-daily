@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.08.17</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.17 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'greenbelt', variants:[
+    { q:'8·13 대책에서 그린벨트 해제 등을 통해 정부가 수도권에 추가 공급하겠다고 밝힌 최소 가구 수는?',
+      opts:['23만 가구','15만 가구','37만 가구','68만 가구'], answer:0,
+      explain:'정부는 그린벨트(개발제한구역) 해제 등을 통해 수도권에 최소 23만 가구를 추가 공급하겠다고 밝혔어. 37과 68은 착공 기간 단축과 관련된 개월 수라 헷갈리기 쉬워.' },
+    { q:'8·13 대책에서 우선 공급 지역으로 지정된 곳이 <b>아닌</b> 곳은?',
+      opts:['서울 강남구 대치동','서울 강서구 염창공원','경기 남양주 와부','경기 광주역세권'], answer:0,
+      explain:'우선 지정된 3곳은 서울 강서구 염창공원, 경기 남양주 와부, 경기 광주역세권이야. 대치동은 이번 대책에 포함되지 않았어.' },
+  ]},
+  { id:'speed_loan', variants:[
+    { q:"8·13 대책이 도입한 '최단기 착공모델'의 내용으로 옳은 것은?",
+      opts:['공공택지 조성 기간을 68개월에서 37개월로 단축','모든 재건축 규제를 즉시 전면 폐지','신규 분양가를 절반으로 강제 인하','주택담보대출 금리를 0%로 고정'], answer:0,
+      explain:"최단기 착공모델은 후보지 발표부터 착공까지 걸리던 기간을 68개월에서 37개월로 절반 가까이 줄이는 제도야. 나머지 보기는 실제 대책 내용이 아니야." },
+    { q:'8·13 대책에서 가계대출 총량규제 한도는 어떻게 바뀌었을까?',
+      opts:['1.5%에서 3%로 완화','3%에서 1.5%로 축소','한도를 전면 폐지','기존과 동일하게 유지'], answer:0,
+      explain:'가계대출 총량규제를 1.5%에서 3%로 완화해 대출 여력을 넓혔어. 이 부분이 "집값을 자극할 수 있다"는 논쟁의 핵심이 됐어.' },
+  ]},
+  { id:'criticism', variants:[
+    { q:'국민의힘이 8·13 대책을 비판하며 쓴 표현으로 알맞은 것은?',
+      opts:['서울 공급 빠진 3무(無) 맹탕 대책','청년 지원이 과도한 포퓰리즘 대책','그린벨트를 전혀 건드리지 않은 소극적 대책','대출 규제를 지나치게 강화한 대책'], answer:0,
+      explain:'국민의힘은 서울 도심 공급이 염창공원 한 곳뿐이라며 "서울 공급 빠진 3무(無) 맹탕 대책"이라고 비판했어.' },
+    { q:'8·13 대책을 둘러싼 핵심 쟁점으로 가장 알맞은 것은?',
+      opts:['대출 완화가 오히려 집값을 다시 자극할 수 있다는 우려','공급 물량이 지나치게 많다는 데 여야가 합의','그린벨트 해제가 위헌이라는 법적 다툼','대책 시행을 전면 보류하기로 여야가 합의'], answer:0,
+      explain:'공급을 서두르려 풀어준 대출 문턱이 오히려 집값을 다시 밀어올릴 수 있다는 우려가 핵심 쟁점으로 떠올랐어.' },
+  ]},
+  { id:'wisconsin', variants:[
+    { q:'미국 위스콘신 주지사 민주당 경선에서 한국계 프란체스카 홍 후보에게 일어난 일은?',
+      opts:['0.4%p 차이로 석패했다','압도적인 표차로 승리했다','경선을 중도 사퇴했다','무효표 논란으로 재선거가 확정됐다'], answer:0,
+      explain:'프란체스카 홍 주 하원의원은 0.4%p라는 초박빙 차이로 석패했어. 미국 역사상 첫 한국계 주지사 탄생은 무산됐지만, 진보 의제에 대한 지지는 확인됐다는 평가가 나와.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'8·13 대책에서 공공택지 착공까지 걸리는 기간을 68개월에서 몇 개월로 줄였을까? (숫자만)',
+    accept:['37','37개월'],
+    explain:"정답은 37개월이야. 기존 68개월에서 절반 가까이 단축한 '최단기 착공모델' 덕분이야." },
+  { q:'8·13 대책에서 정부가 수도권에 추가 공급하겠다고 밝힌 최소 가구 수는?',
+    accept:['23만','23만가구','23만 가구','230000'],
+    explain:'정답은 23만 가구야. 그린벨트 해제, 착공 기간 단축, 대출 확대가 함께 담겼어.' },
+  { q:'이란이 호르무즈 해협을 다시 열기 위해 미군 철수·제재 해제와 함께 미국에 요구한 것은?',
+    accept:['전쟁배상금','전쟁 배상금','배상금'],
+    explain:'정답은 전쟁 배상금이야. 요구 조건이 까다로워 협상이 난항을 겪으면서 유가가 다시 오르는 중이야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = item.accept.some(a=> val.includes(a.toLowerCase()) || a.toLowerCase().includes(val) && val.length>0);
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
