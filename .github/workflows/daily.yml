@@ -56,4 +56,4 @@ jobs:
           fi
         env:
           # 루틴을 다시 만들면 **여기 한 줄만** 바꾸면 된다
-          ROUTINE_ID: trig_01JNriwuDkx88PEkcxC2Yrda
+          ROUTINE_ID: trig_01HSPoznGipPbsLmMkxn3XCn
