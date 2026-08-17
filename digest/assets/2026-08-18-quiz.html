@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.08.18</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.18 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'dubai_reason', variants:[
+    { q:'오랫동안 국제선 여객 1위였던 두바이공항이 올해 상반기 5위권 밖으로 밀려난 핵심 이유는?',
+      opts:['미국-이란 전쟁 여파로 중동 노선이 줄어서','두바이공항 시설이 노후화돼서','두바이 정부가 공항 이용료를 대폭 인상해서','저비용항공사들이 두바이 취항을 자진 중단해서'], answer:0,
+      explain:'미국-이란 전쟁으로 호르무즈 해협 일대 긴장이 커지면서 중동 노선 운항이 줄었고, 중동 최대 환승 허브인 두바이가 직격탄을 맞았어.' },
+    { q:'두바이공항의 순위 하락을 가장 잘 설명하는 것은?',
+      opts:['항공사 서비스 경쟁이 아니라 전쟁이라는 지정학 변수 때문','두바이의 국제선 항공권 가격이 급등해서','두바이공항이 신규 터미널 공사로 일시 폐쇄돼서','승객들이 환경 문제로 두바이 경유를 기피해서'], answer:0,
+      explain:'두바이의 하락은 서비스 경쟁력 문제가 아니라, 미국-이란 전쟁이라는 지정학 변수가 항공망 지도를 바꾼 결과야.' },
+  ]},
+  { id:'incheon_win', variants:[
+    { q:'인천공항이 두바이가 놓친 국제선 여객 수요를 흡수한 방식으로 가장 알맞은 것은?',
+      opts:['아시아·유럽·미주로 노선을 다변화해 빈틈을 메움','항공권 가격을 대폭 인하해 손님을 끌어옴','국적 항공사를 강제로 통합해 노선을 재편함','환승객에게 세금을 감면해줌'], answer:0,
+      explain:'인천공항은 아시아·유럽·미주로 항공 노선을 다변화하며 두바이가 놓친 환승 수요의 빈틈을 메웠어.' },
+    { q:'인천공항의 이번 세계 1위 등극을 이해할 때 함께 짚어야 할 점은?',
+      opts:['인천의 실력보다 두바이의 불운(전쟁)에 기댄 반사이익 성격이 크다','인천공항이 앞으로도 영구히 1위를 유지할 게 확실하다','두바이공항이 이번 순위 발표에 항의해 재집계를 요구했다','국제공항협의회가 이번 집계에서 인천을 특별 우대했다'], answer:0,
+      explain:'이번 1위는 인천의 노선 유치 실력보다 두바이가 전쟁으로 밀려난 반사이익 성격이 커서, 중동 정세가 진정되면 순위가 다시 흔들릴 수 있어.' },
+  ]},
+  { id:'rank_numbers', variants:[
+    { q:'2026년 상반기 국제선 여객 순위에서 2위를 차지한 공항은?',
+      opts:['런던 히스로공항','싱가포르 창이공항','두바이공항','도쿄 나리타공항'], answer:0,
+      explain:'2위는 런던 히스로공항(3,779만 명)이야. 3위는 싱가포르 창이공항(3,453만 명)이고, 두바이는 5위권 밖으로 밀려났어.' },
+  ]},
+  { id:'jeonse_reg', variants:[
+    { q:'8·13 대책 후속으로 내년부터 수도권 1주택자에게 새로 생기는 제한은?',
+      opts:['그 집에 실제로 살지 않으면 전세대출을 원칙적으로 받을 수 없음','1주택자는 재산세를 두 배로 내야 함','1주택자의 청약 자격이 전면 박탈됨','1주택자는 주택을 5년간 팔 수 없음'], answer:0,
+      explain:'수도권에 집을 갖고 있으면서 그 집에 실제로 살지 않는 1주택자는 내년부터 원칙적으로 전세대출을 받을 수 없어져. 갭투자를 막으려는 조치야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'인천공항이 세계 1위로 도약하게 만든 근본 배경이 된 전쟁은? (두 나라만 답해줘)',
+    accept:['미국-이란','미국 이란','미국이란','이란-미국','이란 미국'],
+    explain:'정답은 미국-이란 전쟁이야. 이 전쟁이 호르무즈 해협 긴장으로 이어져 중동 노선을 줄였고, 그 빈틈을 인천공항이 메웠어.' },
+  { q:'2026년 상반기 인천공항의 국제선 여객수는 몇만 명일까? (숫자만, 반올림 가능)',
+    accept:['3839','3,839','3839만','3,839만'],
+    explain:'정답은 3,839만 명이야. 2위 히스로(3,779만 명)와 큰 격차 없이 1위에 올랐어.' },
+  { q:"8·13 대책에서 공공택지 착공까지 걸리는 기간을 68개월에서 몇 개월로 줄였을까? (숫자만)",
+    accept:['37','37개월'],
+    explain:"정답은 37개월이야. 기존 68개월에서 절반 가까이 단축한 '최단기 착공모델' 덕분이야." },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = item.accept.some(a=> val.includes(a.toLowerCase()) || a.toLowerCase().includes(val) && val.length>0);
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
