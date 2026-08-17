@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>인천공항, 어떻게 세계 1위가 됐을까</title>
+<title>두바이 대신 인천에서 갈아탄다 — 한눈에 보는 지도</title>
 <style>
   :root{
     --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
@@ -16,21 +16,37 @@
   .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
   h1{font-size:24px;line-height:1.3;margin-bottom:6px}
   .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
-  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
-  .section-title:first-of-type{margin-top:0}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .solid-sample{display:inline-block;width:34px;height:0;border-top:3px solid var(--blue)}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
 
-  /* 순위 바 차트 */
-  .rank-card{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
-  .rank-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-  .rank-row:last-child{margin-bottom:0}
-  .rank-label{flex:0 0 128px;font-size:13.5px;font-weight:700}
-  .rank-label small{display:block;font-weight:500;font-size:11.5px;color:var(--text2)}
-  .rank-bar-wrap{flex:1;background:var(--surface2);border-radius:7px;height:32px;overflow:hidden}
-  .rank-bar{height:100%;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:13px;font-weight:700;color:#fff}
-  .rank-bar.r1{background:var(--blue)}
-  .rank-bar.r2{background:#7FA8D6}
-  .rank-bar.r3{background:#A9C3E0}
-  .rank-fall{flex:1;border:1.5px dashed var(--red);border-radius:7px;height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--red-soft);color:#C6493E;font-size:12.5px;font-weight:700}
+  /* 순위 막대 */
+  .rank{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-name{flex:0 0 148px;font-size:13.5px;font-weight:600}
+  .bar-name small{display:block;font-weight:500;font-size:12px;color:var(--text2)}
+  .bar-track{flex:1;background:var(--surface2);border-radius:6px;height:26px;position:relative;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px}
+  .bar-fill.win{background:var(--blue)}
+  .bar-fill.mid{background:#A9CBEA}
+  .bar-fill.out{background:var(--red-soft);border:1px dashed var(--red)}
+  .bar-val{flex:0 0 84px;text-align:right;font-size:13.5px;font-weight:700}
+  .bar-val.muted{color:var(--red);font-weight:600;font-size:12.5px}
+
+  /* 사다리 */
+  .ladder{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .l-item{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .l-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .l-item .what{font-size:15px;font-weight:700}
+  .l-item .what small{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-top:2px}
+  .l-item.now{background:var(--blue-soft);border-color:#CBE3F8}
+  .l-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
 
   /* 메커니즘 */
   .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
@@ -40,73 +56,206 @@
   .mstep:last-of-type::before{display:none}
   .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
   .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
-  .mstep.win .mnum{background:var(--green-soft);color:#2F7A52}
+  .mstep.good .mnum{background:var(--green-soft);color:#2F7A52}
   .mtxt{padding-top:4px;font-size:14.5px}
   .mtxt b{font-size:15px}
   .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
-  .paradox{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
-  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+  .caveat{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .caveat b{display:block;margin-bottom:2px;font-size:14.5px}
 
   .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
   @media (max-width:640px){
     .wrap{padding:16px 16px 24px}
     h1{font-size:21px}
-    .rank-label{flex-basis:96px;font-size:12.5px}
+    .bar-name{flex:0 0 108px}
+    .bar-val{flex:0 0 68px}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">2026.08.18 데일리 뉴스 · 시각자료</div>
-  <h1>✈️ 인천공항, 어떻게 세계 1위가 됐을까</h1>
-  <div class="sub">2026년 상반기 국제선 여객 순위 — 두바이는 왜 밀려났고, 인천은 어떻게 그 자리를 채웠는지</div>
+  <h1>✈️ 두바이 대신, 인천에서 갈아탄다</h1>
+  <div class="sub">허브공항이 왜 '위치'로 정해지는지, 전쟁이 왜 그 순위를 뒤집었는지 지도 한 장으로 보기</div>
 
-  <div class="section-title">2026년 상반기 국제선 여객 순위</div>
-  <div class="rank-card">
-    <div class="rank-row">
-      <div class="rank-label">🇰🇷 인천<small>1위</small></div>
-      <div class="rank-bar-wrap"><div class="rank-bar r1" style="width:100%">3,839만 명</div></div>
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="유라시아 개략 지도: 두바이 경유 항로와 인천 경유·직항 항로 비교">
+      <defs>
+        <marker id="ao" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+        <marker id="ab" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#2783DE"/>
+        </marker>
+      </defs>
+
+      <!-- 바다 -->
+      <rect x="0" y="0" width="900" height="470" fill="#D8E9F7"/>
+
+      <!-- 유라시아 본토 -->
+      <path d="M62,152 Q70,74 196,64 L540,48 Q722,44 822,88 Q884,116 880,170 Q874,216 806,224
+               L560,234 L300,246 Q148,248 94,216 Q56,194 62,152 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 아프리카 -->
+      <path d="M178,242 Q250,236 302,248 L296,332 Q288,412 236,430 Q186,414 174,344 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 아라비아반도 -->
+      <path d="M330,238 L424,232 L438,286 Q414,332 372,326 Q332,300 330,238 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 인도 -->
+      <path d="M482,234 L558,230 L542,302 Q514,342 496,304 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 동남아 -->
+      <path d="M600,232 L652,230 L660,302 Q640,334 612,320 Q596,288 600,232 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 한반도 -->
+      <path d="M752,212 L752,264 Q752,290 772,294 Q792,288 792,258 L790,210 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 일본 -->
+      <path d="M822,220 Q852,250 866,296 L848,304 Q830,258 806,234 Z"
+            fill="#F0EFED" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 대륙 라벨 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="196" y="196" font-size="15">유 럽</text>
+        <text x="520" y="142" font-size="15">중  국</text>
+        <text x="230" y="300" font-size="14">아프리카</text>
+        <text x="514" y="266" font-size="13">인도</text>
+        <text x="628" y="282" font-size="13">동남아</text>
+        <text x="372" y="182" font-size="13">중  동</text>
+      </g>
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4" font-family="inherit">
+        <text x="776" y="316" font-size="13">한국</text>
+        <text x="864" y="326" font-size="13">일본</text>
+      </g>
+
+      <!-- 항로 ① 두바이 경유 (남쪽 우회) -->
+      <path d="M742,246 C640,330 520,336 440,300 C420,290 406,278 398,268" fill="none"
+            stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9"/>
+      <path d="M382,254 C330,222 280,180 216,146 L172,132" fill="none"
+            stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9" marker-end="url(#ao)"/>
+
+      <!-- 항로 ② 인천 경유·직항 (북쪽 지름길) -->
+      <path d="M756,196 C640,44 340,26 176,110" fill="none"
+            stroke="#2783DE" stroke-width="3.5" opacity="0.95" marker-end="url(#ab)"/>
+      <!-- 아시아발 인천 환승 유입 -->
+      <path d="M652,318 C712,300 742,270 754,248" fill="none" stroke="#2783DE" stroke-width="2.5" opacity="0.75" marker-end="url(#ab)"/>
+      <path d="M840,254 C812,242 786,238 768,240" fill="none" stroke="#2783DE" stroke-width="2.5" opacity="0.75" marker-end="url(#ab)"/>
+
+      <!-- 두바이 ⊘ 마커 -->
+      <g>
+        <circle cx="392" cy="262" r="23" fill="#E56458" opacity="0.15"/>
+        <circle cx="392" cy="262" r="12.5" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="385" y1="269" x2="399" y2="255" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <!-- 인천 ● 마커 -->
+      <g>
+        <circle cx="754" cy="232" r="23" fill="#2783DE" opacity="0.16"/>
+        <circle cx="754" cy="232" r="12.5" fill="#2783DE" stroke="#FFFFFF" stroke-width="3"/>
+      </g>
+      <!-- 히스로 -->
+      <circle cx="164" cy="126" r="8" fill="#7D7A75" stroke="#FFFFFF" stroke-width="2.5"/>
+      <!-- 창이 -->
+      <circle cx="654" cy="326" r="8" fill="#7D7A75" stroke="#FFFFFF" stroke-width="2.5"/>
+
+      <!-- 칩: 두바이 -->
+      <g font-family="inherit">
+        <line x1="392" y1="286" x2="400" y2="374" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="330" y="374" width="272" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="466" y="394" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">두바이 — 20년 가까이 1위였던 길목</text>
+        <text x="466" y="412" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">전쟁으로 환승 기능 위축 · 5위 밖으로</text>
+      </g>
+      <!-- 칩: 인천 -->
+      <g font-family="inherit">
+        <line x1="754" y1="209" x2="730" y2="172" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="600" y="122" width="266" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="733" y="142" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">인천 — 새로 뜬 갈아타기 길목</text>
+        <text x="733" y="160" font-size="12.5" font-weight="700" fill="#2783DE" text-anchor="middle">상반기 국제선 3839만 명 · 세계 1위</text>
+      </g>
+      <!-- 칩: 히스로 -->
+      <g font-family="inherit">
+        <text x="110" y="158" font-size="12.5" font-weight="700" fill="#2C2C2B" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">히스로 2위</text>
+      </g>
+      <!-- 칩: 창이 -->
+      <g font-family="inherit">
+        <text x="678" y="348" font-size="12.5" font-weight="700" fill="#2C2C2B" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4">창이 3위</text>
+      </g>
+
+      <!-- 항로 라벨 -->
+      <g font-family="inherit" font-style="italic" fill="#1B6BB8" font-size="13">
+        <text transform="translate(392,50)">지금: 북쪽 지름길로 인천 환승·직항</text>
+      </g>
+    </svg>
     </div>
-    <div class="rank-row">
-      <div class="rank-label">🇬🇧 런던 히스로<small>2위</small></div>
-      <div class="rank-bar-wrap"><div class="rank-bar r2" style="width:98.4%">3,779만 명</div></div>
-    </div>
-    <div class="rank-row">
-      <div class="rank-label">🇸🇬 싱가포르 창이<small>3위</small></div>
-      <div class="rank-bar-wrap"><div class="rank-bar r3" style="width:89.9%">3,453만 명</div></div>
-    </div>
-    <div class="rank-row">
-      <div class="rank-label">🇦🇪 두바이<small>오랜 1위였음</small></div>
-      <div class="rank-fall">⚠ 중동 노선 축소로 5위권 밖으로 밀려남</div>
+    <div class="legend">
+      <span class="item"><span class="dash-sample"></span> 두바이 경유 항로 (축소 중)</span>
+      <span class="item"><span class="solid-sample"></span> 인천 경유·직항 항로 (증가 중)</span>
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 기능이 막힌 길목</span>
     </div>
   </div>
 
-  <div class="section-title">순위가 뒤집힌 진짜 이유</div>
+  <div class="section-title">2026년 상반기 국제선 여객 순위</div>
+  <div class="rank">
+    <div class="bar-row">
+      <div class="bar-name">🇰🇷 인천<small>1위 · 개항 후 처음</small></div>
+      <div class="bar-track"><div class="bar-fill win" style="width:100%"></div></div>
+      <div class="bar-val">3839만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">🇬🇧 런던 히스로<small>2위</small></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:98.4%"></div></div>
+      <div class="bar-val">3779만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">🇸🇬 싱가포르 창이<small>3위</small></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:89.9%"></div></div>
+      <div class="bar-val">3453만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">🇦🇪 두바이<small>10년 넘게 1위였음</small></div>
+      <div class="bar-track"><div class="bar-fill out" style="width:34%"></div></div>
+      <div class="bar-val muted">5위 밖</div>
+    </div>
+  </div>
+
+  <div class="section-title">인천공항이 올라온 계단</div>
+  <div class="ladder">
+    <div class="l-item"><div class="when">2002년</div><div class="what">10위<small>개항 이듬해</small></div></div>
+    <div class="l-arrow">→</div>
+    <div class="l-item"><div class="when">2018년</div><div class="what">5위</div></div>
+    <div class="l-arrow">→</div>
+    <div class="l-item"><div class="when">2024년</div><div class="what">3위</div></div>
+    <div class="l-arrow">→</div>
+    <div class="l-item now"><div class="when">2026년 상반기</div><div class="what">1위<small>사상 처음</small></div></div>
+  </div>
+
+  <div class="section-title">전쟁이 어떻게 공항 순위를 바꿨을까</div>
   <div class="mech">
-    <div class="mstep">
+    <div class="mstep hot">
       <div class="mnum">1</div>
-      <div class="mtxt"><b>미국-이란 전쟁 발발</b><span class="mdesc">호르무즈 해협 일대 긴장 고조 (계속 다뤄온 그 이슈)</span></div>
+      <div class="mtxt"><b>미국·이란 전쟁으로 중동 노선·영공 축소</b><span class="mdesc">중동 상공을 지나는 길 자체가 위험해지고 편수가 줄어듦</span></div>
     </div>
     <div class="mstep hot">
       <div class="mnum">2</div>
-      <div class="mtxt"><b>중동 지역 항공 노선 운항 차질·축소</b><span class="mdesc">전쟁 리스크로 항공사들이 중동 경유·취항을 줄임</span></div>
-    </div>
-    <div class="mstep hot">
-      <div class="mnum">3</div>
-      <div class="mtxt"><b>중동 최대 환승 허브 두바이, 여객 이탈</b><span class="mdesc">오래 지켜온 국제선 여객 1위 자리에서 5위권 밖으로</span></div>
+      <div class="mtxt"><b>두바이의 '갈아타기 길목' 기능이 쪼그라듦</b><span class="mdesc">허브공항은 환승객이 여객 수의 큰 몫 — 그게 빠지면 순위가 무너짐</span></div>
     </div>
     <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>유럽 가려던 아시아 승객이 갈아탈 곳을 옮김</b><span class="mdesc">남쪽으로 돌아 두바이를 거치는 대신, 북쪽 지름길인 인천 직항·환승으로</span></div>
+    </div>
+    <div class="mstep good">
       <div class="mnum">4</div>
-      <div class="mtxt"><b>인천공항, 아시아·유럽·미주로 노선 다변화</b><span class="mdesc">두바이가 놓친 환승 수요의 빈틈을 메움</span></div>
+      <div class="mtxt"><b>인천 환승객 424만 명 (+18.1%)</b><span class="mdesc">특히 유럽 노선 환승객이 <b>+63.2%</b> — 여기에 방한 관광객 증가까지 겹침</span></div>
     </div>
-    <div class="mstep win">
+    <div class="mstep good">
       <div class="mnum">5</div>
-      <div class="mtxt"><b>인천공항, 개항 25년 만에 세계 1위</b><span class="mdesc">국제공항협의회 집계 기준 국제선 여객 세계 1위</span></div>
+      <div class="mtxt"><b>상반기 국제선 여객 세계 1위</b><span class="mdesc">2위 히스로와는 60만 명 차이, 아슬아슬한 1위</span></div>
     </div>
-    <div class="paradox"><b>⚠️ 반사이익이라는 점</b>인천이 잘해서라기보다 두바이의 불운(전쟁)이 만든 자리 — 중동 정세가 진정되면 순위는 다시 흔들릴 수 있어.</div>
+    <div class="caveat"><b>⚠️ 실력이자 반사이익</b>노선을 늘려온 인천의 준비도 있었지만, 결정적 계기는 경쟁자의 사고였어. 중동 정세가 안정되면 환승 수요가 두바이로 되돌아갈 수 있다는 뜻이기도 해.</div>
   </div>
 
-  <div class="foot">※ 그림은 이해를 돕기 위한 개략도 · 2026.08.18 오늘의 딥다이브 내용 기반</div>
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(실제 축척·국경과 다름) · 2026.08.18 딥다이브 내용 기반</div>
 </div>
 </body>
 </html>
