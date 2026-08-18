@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 데이터센터 청구서가 나한테 오는 길</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 반대 이유 3갈래 */
+  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .why{border:1px solid var(--border);border-radius:12px;padding:15px 16px;background:var(--soft)}
+  .why .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.power{background:var(--orange-soft);color:#B06426}
+  .badge.water{background:var(--blue-soft);color:#1B6BB8}
+  .badge.air{background:var(--red-soft);color:#C6493E}
+  .why h3{font-size:15px;margin-bottom:6px}
+  .why .num{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+  .why .num.p{color:#B06426}
+  .why .num.w{color:#1B6BB8}
+  .why .num.a{color:#C6493E}
+  .why p{font-size:13px;color:var(--text2)}
+  .why p b{color:var(--text)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 갈리는 청구서 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.gain{background:var(--green-soft);color:#2F7A52}
+  .badge.pay{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:8px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .why-grid{grid-template-columns:1fr}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.19 데일리 뉴스 · 시각자료</div>
+  <h1>🏭 AI 데이터센터 청구서가 나한테 오는 길</h1>
+  <div class="sub">미국 42개 주에서 반대 시위가 터진 이유 — 전기요금이 어떤 경로로 남의 집 고지서까지 올리는지 한 장으로 보기</div>
+
+  <div class="section-title">주민들이 드는 이유 세 가지</div>
+  <div class="why-grid">
+    <div class="why">
+      <span class="badge power">⚡ 전기</span>
+      <div class="num p">174%</div>
+      <h3>PJM 전력망 도매가 폭등</h3>
+      <p>AI 데이터센터는 일반 데이터센터보다 <b>최대 8배</b> 전기를 먹어. 미국 최대 전력망의 도매가가 뛰자 소비자 요금도 따라 올랐고, <b>매년 6%씩</b> 더 오른다는 전망도 나와.</p>
+    </div>
+    <div class="why">
+      <span class="badge water">💧 물</span>
+      <div class="num w">6.75억 ℓ</div>
+      <h3>40여 곳이 하루에 쓰는 냉각수</h3>
+      <p>올림픽 수영장 <b>270개</b>를 채우는 양. 뜨거운 서버를 식히려고 생활용수를 끌어 쓰면서 인근 지역에 <b>수압 저하·단수</b>가 실제로 벌어졌어.</p>
+    </div>
+    <div class="why">
+      <span class="badge air">🏭 공기</span>
+      <div class="num a">74곳</div>
+      <h3>전력 대려고 계획된 가스화력발전소</h3>
+      <p>여기서 나올 온실가스가 <b>호주가 1년간 배출하는 양</b>과 맞먹을 거라는 환경단체 추산. 데이터센터에 전기를 대는 발전소는 대부분 화력이야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">전기요금이 내 고지서까지 오는 경로</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>동네에 AI 데이터센터가 들어옴</b><span class="mdesc">한 단지가 도시 하나만큼의 전기를 쓰는 규모</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>전력망 전체의 수요가 갑자기 커짐</b><span class="mdesc">발전소·송전선은 몇 년 걸려 짓는데 수요만 먼저 뛰어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>전기 도매가격이 오름 — PJM 174%</b><span class="mdesc">도매가는 '가장 비싼 발전소'까지 돌려야 할 때 그 단가로 정해져서, 수요가 조금만 넘쳐도 크게 뛴다</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>전력회사가 오른 원가를 소매요금에 얹음</b><span class="mdesc">데이터센터 한 곳 때문에 오른 값이 지역 전체 요금표에 반영됨</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>데이터센터를 쓰지도 않는 집의 고지서가 오름</b><span class="mdesc">여기에 단수·소음·온실가스까지 겹치면서 반대 집회로</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 반대의 진짜 이유</b>이익(AI 매출)은 빅테크가 가져가는데 비용(요금·물·공기)은 동네가 나눠 낸다는 것. 고용 효과도 크지 않다는 지적이 붙으면서, 11월 중간선거 쟁점으로까지 커졌어.</div>
+  </div>
+
+  <div class="section-title">같은 AI 붐인데 청구서가 갈려</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge gain">💰 칩을 파는 쪽</span>
+      <h3>대만 11.05% 성장 · 1인당 44만 원</h3>
+      <p>AI·반도체 호황으로 올해 성장률이 <b>39년 만의 최고치</b>로 전망되자, 대만은 전 국민에게 1만 대만달러(약 44만 원)를 현금으로 나눠주기로 했어.</p>
+      <p>한국도 무디스가 올해 성장률 전망을 <b>3.5%</b>로 올렸는데, 이유가 똑같이 반도체 호황이야.</p>
+    </div>
+    <div class="vs">
+      <span class="badge pay">🧾 센터를 떠안는 쪽</span>
+      <h3>미국 42개 주 · 142건 반대 시위</h3>
+      <p>뉴욕주·시카고시는 신규 건설을 한시적으로 금지하는 <b>모라토리엄</b>을 내놨고, 시세 10배를 줘도 땅을 안 팔겠다는 농가까지 나왔어.</p>
+      <p>한국도 수도권을 중심으로 소음·전자파·용수·전력 부담을 이유로 <b>같은 갈등이 시작</b>됐어.</p>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.19 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
