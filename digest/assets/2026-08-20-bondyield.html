@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국채금리가 오른다는 게 무슨 뜻일까 — 한 장 정리</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 시소 30초 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--red-soft);border-color:#F3CFCA}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .tax-note b{color:var(--text)}
+
+  /* 3중 압박 카드 */
+  .press-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .press{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .press .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.b1{background:var(--orange-soft);color:#B06426}
+  .badge.b2{background:var(--red-soft);color:#C6493E}
+  .badge.b3{background:var(--blue-soft);color:#1B6BB8}
+  .press h3{font-size:15.5px;margin-bottom:6px}
+  .press p{font-size:13.5px;color:var(--text2)}
+  .press p b{color:var(--text)}
+  .press-foot{margin-top:12px;font-size:13px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .press-foot b{color:var(--text)}
+
+  /* 금리 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 132px;font-size:13.5px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:12px;color:var(--text2)}
+  .bar-track{flex:1;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden;min-width:120px}
+  .bar-fill{height:100%;border-radius:6px}
+  .bar-fill.now{background:var(--red)}
+  .bar-fill.line{background:var(--orange)}
+  .bar-fill.past{background:#B9B6B1}
+  .bar-val{flex:0 0 66px;text-align:right;font-size:14px;font-weight:700}
+  .bars-note{margin-top:12px;font-size:12.5px;color:var(--text2)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 나한테 오는 영향 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px 12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .press-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 104px;font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.20 데일리 뉴스 · 시각자료</div>
+  <h1>💰 "국채금리가 올랐다"는 게 대체 무슨 뜻일까</h1>
+  <div class="sub">채권값과 금리가 왜 반대로 움직이는지, 그게 왜 내 대출·환율·주식까지 오는지 한 장으로 보기</div>
+
+  <div class="section-title">채권 30초 정리 — 값과 금리는 시소야</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>국채</b><span>나라가 "돈 빌리고 나중에 갚을게" 하고 발행한 빚 문서</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box"><b>사려는 사람이 줄면</b><span>물량은 많은데 살 사람이 적어 <b>가격이 떨어짐</b></span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box result"><b>금리(수익률)는 올라감</b><span>싸게 산 만큼 되받는 비율이 커지니까</span></div>
+  </div>
+  <div class="tax-note">그래서 <b>"국채금리 급등"은 사실 "국채가 잘 안 팔린다"는 말</b>과 같아. 나라가 망해서가 아니라, 빌려주는 쪽이 "이 값엔 못 빌려줘" 하고 버티는 상황인 거야.</div>
+
+  <div class="section-title">왜 갑자기 안 팔릴까 — 세 가지가 한꺼번에</div>
+  <div class="press-grid">
+    <div class="press">
+      <span class="badge b1">① 물량</span>
+      <h3>재정적자를 메우는 국채 발행</h3>
+      <p>미국이 쓰는 돈이 걷는 돈보다 많아서 그 차액을 <b>국채를 찍어 메워</b>. 시장에 나오는 물량 자체가 계속 늘어나는 중.</p>
+    </div>
+    <div class="press">
+      <span class="badge b2">② AI 빚</span>
+      <h3>빅테크의 AI 회사채 대량 발행</h3>
+      <p>데이터센터 짓는 돈을 빚으로 조달하면서 <b>회사채 발행이 급증</b>했어. 채권시장에 들어온 돈을 국채와 나눠 먹는 셈이라, 국채도 이자를 더 얹어야 팔려.</p>
+    </div>
+    <div class="press">
+      <span class="badge b3">③ 기름값</span>
+      <h3>이란 전쟁 장기화 → 물가 기대</h3>
+      <p>유가가 오르면 앞으로 물가도 오를 거란 예상이 생겨. <b>30년 뒤에 돈을 돌려받을 사람</b>일수록 그 위험을 이자로 더 요구해.</p>
+    </div>
+  </div>
+  <div class="press-foot">여기에 <b>일본·중국 같은 큰손 보유국이 미 국채를 줄이는 흐름</b>까지 겹쳤어. 사겠다는 손이 빠지면 남은 사람들의 요구 금리는 더 올라가.</div>
+
+  <div class="section-title">지금 금리는 어디쯤이야?</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">미 30년물<small>지금</small></div>
+      <div class="bar-track"><div class="bar-fill now" style="width:96%"></div></div>
+      <div class="bar-val">5.33%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">미 10년물<small>시장이 보는 경계선</small></div>
+      <div class="bar-track"><div class="bar-fill line" style="width:90%"></div></div>
+      <div class="bar-val">5.0%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">한국 기준금리<small>비교용 · 7월 인상</small></div>
+      <div class="bar-track"><div class="bar-fill past" style="width:50%"></div></div>
+      <div class="bar-val">2.75%</div>
+    </div>
+    <div class="bars-note">※ 30년물 5.33%는 <b>2007년 6월 이후 19년 만의 최고</b>. 시장에서는 10년물이 5%를 넘느냐를 다음 발작의 방아쇠로 보고 있어.</div>
+  </div>
+
+  <div class="section-title">'AI 버블' 경고가 여기서 나오는 이유</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>AI 투자는 대부분 '빌린 돈'으로 굴러가</b><span class="mdesc">데이터센터·반도체 설비는 지금 돈을 왕창 쓰고 수익은 몇 년 뒤에 나오는 사업</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>장기금리가 오르면 그 빚의 이자가 비싸져</b><span class="mdesc">장기금리는 회사채·대출 금리의 기준선이라 조달비용이 통째로 올라감</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>동시에 '미래 이익'의 현재 몸값이 깎여</b><span class="mdesc">금리가 높을수록 먼 미래에 벌 돈을 오늘 가치로 환산할 때 더 크게 할인돼 — 성장주가 유독 약한 이유</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>AI·반도체 주식이 먼저, 크게 빠짐</b><span class="mdesc">17~18일 미국발 충격에 삼성전자·SK하이닉스도 급락, 코스피는 6800선이 흔들렸어</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 자기 발등 구조</b>AI 붐이 돈을 빌리려고 회사채를 쏟아내 → 시장 금리가 올라가 → 그 오른 금리가 다시 AI 투자의 이자와 주가를 때려. AI가 스스로 자기 자금줄의 값을 올리고 있는 셈이야.</div>
+  </div>
+
+  <div class="section-title">나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">미 장기금리 급등</div>
+    <div class="arrow">→</div>
+    <div class="step s2">달러 강세<small>원/달러 1410원대</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">수입물가·해외여행비 상승</div>
+    <div class="arrow">→</div>
+    <div class="step s4">국고채·주담대 금리 동조<small>시차 두고 대출이자로</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.20 오늘의 딥다이브 내용 기반 · 금리는 17~18일(현지시간) 장중 기준</div>
+</div>
+</body>
+</html>

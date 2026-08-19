@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.08.20</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.20 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'seesaw', variants:[
+    { q:'"국채금리가 급등했다"는 말을 채권시장의 언어로 바꾸면 가장 가까운 것은?',
+      opts:['국채를 사겠다는 수요가 약해 값이 밀렸고, 그만큼 되받는 비율이 커졌다',
+            '정부가 국채에 붙는 이자율을 직접 인상하기로 결정했다',
+            '국채를 사려는 사람이 몰려 값이 오르면서 수익률도 함께 올랐다',
+            '국채 발행이 중단돼 시장에 남은 물량의 가치가 뛰었다'], answer:0,
+      explain:'채권은 <b>값과 금리가 시소</b>야. 미리 정해진 만큼 되받는 문서라, 살 사람이 적어 값이 싸질수록 "산 값 대비 받는 비율"인 수익률은 올라가. 그래서 금리 급등은 <b>"국채가 잘 안 팔린다"</b>는 뜻에 가까워.' },
+    { q:'이번처럼 30년물 같은 초장기 국채의 금리가 특히 크게 뛰는 이유로 가장 알맞은 것은?',
+      opts:['돌려받기까지 기간이 길수록 그 사이 물가가 오를 위험을 더 크게 얹어 요구하기 때문',
+            '만기가 긴 채권일수록 정부가 갚지 않아도 되는 규정이 있기 때문',
+            '초장기 채권은 개인만 살 수 있어 거래량이 적기 때문',
+            '30년물은 발행량이 매우 적어 가격이 고정돼 있기 때문'], answer:0,
+      explain:'30년 뒤에 받을 돈은 그 사이 물가가 오르면 실제 가치가 깎여. 그래서 <b>기간이 길수록 인플레이션 위험에 대한 대가를 더 요구</b>해. 유가 상승이 30년물을 유독 세게 밀어 올린 배경이야.' },
+  ]},
+  { id:'ai_debt', variants:[
+    { q:'빅테크의 AI 회사채 발행 급증이 미 국채금리까지 밀어 올린 경로로 가장 알맞은 것은?',
+      opts:['채권을 살 돈은 한정돼 있는데 팔려는 채권이 늘어, 국채도 이자를 더 얹어야 팔리게 됐다',
+            '빅테크가 발행한 회사채를 미국 정부가 대신 갚아주기로 했기 때문',
+            'AI 기업들이 보유하던 미 국채를 전부 사들여 물량이 사라졌기 때문',
+            '회사채 금리가 오르면 국채 금리는 규정상 같은 폭으로 오르게 돼 있기 때문'], answer:0,
+      explain:'채권시장의 돈은 무한하지 않아. AI 투자금을 대려는 회사채가 쏟아지면 <b>같은 돈을 두고 국채와 경쟁</b>하게 돼. 그럼 국채도 더 좋은 조건(=높은 금리)을 내걸어야 팔리지.' },
+    { q:'금리 급등이 "AI 버블" 경고로 이어지는 흐름을 가장 잘 설명한 것은?',
+      opts:['AI 사업은 빌린 돈으로 먼저 짓고 수익은 나중에 나오는 구조라, 조달비용이 오르면 수익성 가정이 흔들린다',
+            'AI 기술의 성능이 금리가 오르면 떨어지기 때문',
+            'AI 기업들이 금리가 오르면 법적으로 투자를 중단해야 하기 때문',
+            '금리가 오르면 데이터센터의 전기요금이 자동으로 면제되기 때문'], answer:0,
+      explain:'AI 투자는 <b>지금 왕창 쓰고 몇 년 뒤 버는</b> 사업이야. 그 시차를 빚으로 메우는데, 금리가 오르면 이자 부담이 커지는 동시에 "나중에 벌 돈"의 현재 가치도 깎여. 두 방향에서 동시에 눌리는 셈이지.' },
+  ]},
+  { id:'discount', variants:[
+    { q:'금리가 오를 때 성장주(AI·반도체 등)가 유독 크게 빠지는 이유로 가장 알맞은 것은?',
+      opts:['이익 대부분이 먼 미래에 있어서, 금리가 높을수록 그 미래 이익을 오늘 가치로 환산할 때 더 크게 깎이기 때문',
+            '성장주는 금리가 오르면 거래가 금지되기 때문',
+            '성장주는 배당을 많이 줘서 금리와 직접 경쟁하기 때문',
+            '성장 기업은 현금을 전혀 보유하지 않는 것이 원칙이기 때문'], answer:0,
+      explain:'주식 값은 결국 <b>앞으로 벌 돈을 오늘 값으로 당겨온 것</b>이야. 금리가 높으면 당겨오는 과정에서 깎는 폭이 커지고, 이익이 먼 미래에 몰린 성장주일수록 그 타격이 커. 반대로 지금 당장 돈을 버는 기업은 상대적으로 덜 흔들려.' },
+    { q:'미 30년물 금리가 한국의 주택담보대출 금리까지 흔들 수 있는 이유로 가장 알맞은 것은?',
+      opts:['미 장기금리가 세계 자금 조달의 기준선 역할을 해서, 국내 채권금리와 대출금리도 시차를 두고 따라 움직이기 때문',
+            '한국의 대출금리를 미국 정부가 직접 정하기 때문',
+            '한국 은행들이 주택담보대출 자금을 전액 미 국채로 조달하기 때문',
+            '한국은행 기준금리가 미 30년물과 같은 값으로 고정돼 있기 때문'], answer:0,
+      explain:'미 장기금리는 <b>전 세계 돈값의 기준선</b>이야. 여기가 오르면 글로벌 자금 조달 비용이 전반적으로 올라가고, 국고채·은행 조달금리를 거쳐 시차를 두고 대출금리로 번져. 기계적으로 연동되는 건 아니고 <b>경로를 타고 전이</b>되는 거야.' },
+  ]},
+  { id:'yongsan', variants:[
+    { q:'용산공원에 공공임대주택을 지으려면 먼저 해결해야 할 절차상 문제로 알맞은 것은?',
+      opts:['이 땅의 용도 변경과 매각을 금지한 특별법이 있어 법을 먼저 바꿔야 한다',
+            '미군이 아직 부지 전체를 사용하고 있어 반환 협상을 새로 시작해야 한다',
+            '해당 부지가 개인 소유라 전부 매입해야 한다',
+            '서울시가 이미 그 자리에 다른 아파트를 짓고 있어 철거가 필요하다'], answer:0,
+      explain:'2007년 만들어진 <b>용산공원 조성 특별법</b>이 미군기지 본체 부지를 공원으로 정하고 용도 변경·매각을 막아뒀어. 그래서 주택을 지으려면 정책 결정만으로는 안 되고 <b>입법부터</b> 거쳐야 해. 여기에 정치적 부담이 얹히는 구조야.' },
+    { q:'정부가 서울 안 신규 택지로 용산공원까지 검토하게 된 배경으로 가장 알맞은 것은?',
+      opts:['8·13 대책으로 수도권 23만 채를 약속했지만 정작 서울 안에 새로 발표된 택지가 매우 적었기 때문',
+            '용산공원 부지가 서울에서 땅값이 가장 싸기 때문',
+            '서울시가 먼저 용산공원 개발을 정부에 요청했기 때문',
+            '수도권 주택 수요가 갑자기 사라져 부지가 남아돌기 때문'], answer:0,
+      explain:'공급 목표는 컸는데 <b>서울 안 신규 부지</b>는 염창공원 1000가구, LH 서울본부 250가구 수준에 그쳤어. "서울에 지을 땅이 더 있나"를 찾다 300만㎡짜리 용산공원이 후보로 떠오른 거야. 서울시·용산구는 반대하고 있고.' },
+  ]},
+  { id:'strike', variants:[
+    { q:'포스코 노조의 파업 가능성이 "창사 이후 처음"이라는 점에서 갖는 의미로 가장 알맞은 것은?',
+      opts:['1968년 설립 이래 한 번도 없던 일이라, 제조업 전반의 노사 갈등이 예년과 다른 국면임을 보여준다',
+            '포스코가 파업하면 법적으로 회사가 해산된다는 뜻이다',
+            '포스코 노조가 그동안 노동조합을 만들 수 없었다는 뜻이다',
+            '파업이 처음이라 다른 기업들은 영향을 받지 않는다는 뜻이다'], answer:0,
+      explain:'포인트는 <b>전례가 없다는 것 자체</b>야. 현대차의 10년 만 전면파업과 겹치면서, 개별 기업 문제라기보다 제조업 전반으로 번지는 흐름으로 읽히는 거지. 중노위 조정 중지로 쟁의권을 확보한 상태야.' },
+    { q:'중앙노동위원회의 "조정 중지" 결정이 노조에 갖는 의미로 알맞은 것은?',
+      opts:['노사 합의가 무산됐다는 판단으로, 노조가 합법적으로 파업할 수 있는 요건이 갖춰진다',
+            '노조가 앞으로 1년간 파업할 수 없게 된다',
+            '회사가 임금 인상안을 즉시 수용해야 한다는 뜻이다',
+            '노사 교섭이 정부 주도로 자동 타결됐다는 뜻이다'], answer:0,
+      explain:'조정 중지는 <b>"더 조정해봐야 안 되겠다"</b>는 판단이야. 이 절차를 거쳐야 쟁의행위가 합법이 되기 때문에, 노조 입장에선 파업 카드가 실제로 손에 쥐어지는 단계지. 포스코는 찬반투표에서도 92.2%가 찬성했어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'채권은 사려는 사람이 줄어 값이 떨어지면, 반대로 이것이 올라가. 값과 시소처럼 움직이는 이것은? (두 글자)',
+    accept:['금리','수익률','이자율'],
+    explain:'정답은 <b>금리</b>(수익률)야. 되받는 금액이 정해진 문서라, 싸게 살수록 산 값 대비 비율이 커져. 그래서 "금리 급등 = 채권이 안 팔린다"로 읽으면 돼.' },
+  { q:'AI 데이터센터 투자금을 대려고 빅테크가 대량 발행하면서, 채권시장에서 국채와 돈을 놓고 경쟁하게 된 이 채권의 이름은?',
+    accept:['회사채','기업채','회사 채권'],
+    explain:'정답은 <b>회사채</b>야. 기업이 돈을 빌리려 발행하는 빚 문서인데, 이게 쏟아지면 같은 자금을 두고 국채와 경쟁하게 돼 국채도 금리를 더 얹어야 팔려.' },
+  { q:'미 30년물 금리 5.33%는 몇 년 만의 최고치일까? (숫자만)',
+    accept:['19','19년','십구'],
+    explain:'정답은 <b>19년</b>이야. 2007년 6월 이후 가장 높은 수준으로, 금융위기 직전 이래 처음이라는 점에서 시장이 긴장한 거야.' },
+  { q:'용산공원에 주택을 지으려면 용도 변경·매각을 금지한 이 법부터 바꿔야 해. 2007년 만들어진 이 법의 이름은?',
+    accept:['용산공원 조성 특별법','용산공원조성특별법','용산공원 특별법','특별법'],
+    explain:'정답은 <b>용산공원 조성 특별법</b>이야. 미군기지 본체 부지를 공원으로 못 박고 용도 변경·매각을 막아둔 법이라, 주택 공급은 정책 결정이 아니라 입법 문제부터 넘어야 해.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
