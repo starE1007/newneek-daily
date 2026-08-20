@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자사주 소각이 뭐길래 — 40조를 태운다는 말의 뜻</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 숫자 카드 */
+  .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .num{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .num .v{font-size:20px;font-weight:700;line-height:1.2}
+  .num .k{font-size:12.5px;color:var(--text2);margin-top:3px}
+  .num.hi{background:var(--blue-soft);border-color:#CBE3F8}
+  .num.hi .v{color:#1B6BB8}
+
+  /* 피자 비교 */
+  .pizza-row{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}
+  .pizza{flex:1 1 260px;border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);text-align:center}
+  .pizza.after{background:var(--green-soft);border-color:#CBE4D6}
+  .pizza .label{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:99px;display:inline-block;margin-bottom:10px;background:var(--surface2);color:var(--text2)}
+  .pizza.after .label{background:#D6EBDF;color:#2F7A52}
+  .pizza svg{display:block;margin:0 auto 10px}
+  .pizza .cap{font-size:14px}
+  .pizza .cap b{font-size:15px}
+  .pizza .cap span{display:block;font-size:13px;color:var(--text2);margin-top:4px}
+  .pizza-op{align-self:center;font-size:22px;font-weight:700;color:#B9B6B1}
+  .pizza-note{margin-top:12px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:11px 14px}
+  .pizza-note b{color:var(--text)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.good .mnum{background:var(--green-soft);color:#2F7A52}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  /* 배당 vs 소각 */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  th{background:var(--soft);font-size:13px;color:var(--text2);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--text)}
+  td.dim{color:var(--text2)}
+
+  /* 함정 */
+  .trap{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:13px 16px;font-size:14px;color:#B23F34}
+  .trap b{display:block;margin-bottom:3px;font-size:14.5px}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--green-soft);color:#2F7A52}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .nums{grid-template-columns:1fr 1fr}
+    .pizza-op{align-self:center}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.21 데일리 뉴스 · 시각자료</div>
+  <h1>🔥 자사주 소각이 뭐길래, 40조를 '태운다'고 할까</h1>
+  <div class="sub">회사가 자기 주식을 사서 없애면 왜 주주한테 좋은지, 배당과는 뭐가 다른지 한 장으로 보기</div>
+
+  <div class="section-title">먼저 숫자 네 개</div>
+  <div class="nums">
+    <div class="num hi"><div class="v">40조 원</div><div class="k">취득·소각 규모 · 국내 상장사 역대 최대</div></div>
+    <div class="num"><div class="v">3.3%</div><div class="k">발행주식 총수 대비 없애는 비율</div></div>
+    <div class="num"><div class="v">69조 원</div><div class="k">2분기 말 순현금 — 태울 돈의 출처</div></div>
+    <div class="num"><div class="v">8/20~11/19</div><div class="k">시장에서 사들이는 기간(3개월)</div></div>
+  </div>
+
+  <div class="section-title">🍕 30초 비유 — 피자 조각을 태우면</div>
+  <div class="pizza-row">
+    <div class="pizza">
+      <span class="label">소각 전</span>
+      <svg width="130" height="130" viewBox="0 0 130 130" role="img" aria-label="12조각으로 나뉜 피자">
+        <circle cx="65" cy="65" r="58" fill="#FBEBDE" stroke="#D5803B" stroke-width="2"/>
+        <g stroke="#D5803B" stroke-width="1.6" opacity="0.75">
+          <line x1="65" y1="7" x2="65" y2="123"/>
+          <line x1="7" y1="65" x2="123" y2="65"/>
+          <line x1="24" y1="24" x2="106" y2="106"/>
+          <line x1="106" y1="24" x2="24" y2="106"/>
+          <line x1="36" y1="12" x2="94" y2="118"/>
+          <line x1="94" y1="12" x2="36" y2="118"/>
+        </g>
+        <text x="65" y="70" font-size="15" font-weight="700" fill="#9A5620" text-anchor="middle" font-family="inherit">12조각</text>
+      </svg>
+      <div class="cap"><b>내 몫 = 1/12</b><span>피자(회사)의 크기는 그대로</span></div>
+    </div>
+    <div class="pizza-op">→</div>
+    <div class="pizza after">
+      <span class="label">2조각 태운 뒤</span>
+      <svg width="130" height="130" viewBox="0 0 130 130" role="img" aria-label="2조각이 사라져 10조각이 된 피자">
+        <circle cx="65" cy="65" r="58" fill="#E8F1EC" stroke="#46A171" stroke-width="2"/>
+        <path d="M65,65 L65,7 A58,58 0 0,1 115,36 Z" fill="#FFFFFF" stroke="#C9C7C3" stroke-width="1.6" stroke-dasharray="4 3"/>
+        <g stroke="#46A171" stroke-width="1.6" opacity="0.75">
+          <line x1="65" y1="65" x2="123" y2="65"/>
+          <line x1="65" y1="65" x2="106" y2="106"/>
+          <line x1="65" y1="65" x2="65" y2="123"/>
+          <line x1="65" y1="65" x2="24" y2="106"/>
+          <line x1="65" y1="65" x2="7" y2="65"/>
+          <line x1="65" y1="65" x2="24" y2="24"/>
+          <line x1="65" y1="65" x2="36" y2="12"/>
+          <line x1="65" y1="65" x2="94" y2="118"/>
+          <line x1="65" y1="65" x2="36" y2="118"/>
+        </g>
+        <text x="65" y="86" font-size="15" font-weight="700" fill="#2F7A52" text-anchor="middle" font-family="inherit">10조각</text>
+      </svg>
+      <div class="cap"><b>내 몫 = 1/10</b><span>피자 크기는 그대로인데 내 몫이 커짐</span></div>
+    </div>
+  </div>
+  <div class="pizza-note">핵심은 <b>피자(회사의 가치)는 그대로인데 나누는 조각 수만 줄었다</b>는 것. 아무것도 안 했는데 내 지분율과 1주당 이익(EPS)이 함께 올라가. 다만 태우는 데 쓴 40조는 회사 통장에서 진짜로 빠져나가니까, <b>피자가 아주 조금은 작아진 채</b> 조각 수가 줄어드는 거야.</div>
+
+  <div class="section-title">⚙️ 그래서 주가로 가는 경로</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>AI 메모리 호황으로 현금이 쌓임</b><span class="mdesc">2분기 말 순현금 69조 원 — 빚 갚고도 남는 돈</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>"우리 주가가 값어치보다 싸다"고 판단</b><span class="mdesc">쌓인 현금으로 남의 회사를 사느니 우리 주식을 사는 게 낫다는 결정</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>3개월간 시장에서 자기 주식을 사들임</b><span class="mdesc">사는 동안에는 큰 매수 주체가 하나 생기는 셈이라 주가를 받쳐주는 효과도</span></div>
+    </div>
+    <div class="mstep good">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>사들인 주식을 전량 없앰(소각)</b><span class="mdesc">발행주식 3.3%가 영구히 사라짐 — 되돌릴 수 없는 조치</span></div>
+    </div>
+    <div class="mstep good">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>남은 주식 1주의 몫이 커짐</b><span class="mdesc">같은 이익을 더 적은 주식으로 나누니 주당순이익(EPS)·지분율 상승</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">💰 배당과 뭐가 다른데?</div>
+  <div class="tbl-scroll">
+  <table>
+    <tr><th>　</th><th>배당</th><th>자사주 소각</th></tr>
+    <tr><td class="dim">받는 방식</td><td>현금이 내 계좌로 들어옴</td><td><b>남은 주식의 값어치</b>가 올라감</td></tr>
+    <tr><td class="dim">세금</td><td>받을 때 <b>15.4%</b> 원천징수</td><td>팔아서 차익을 낼 때까지 <b>과세 이연</b></td></tr>
+    <tr><td class="dim">체감</td><td>바로 손에 쥐어짐</td><td>주가가 올라야 체감됨(시장이 안 믿으면 안 오름)</td></tr>
+    <tr><td class="dim">되돌리기</td><td>다음 해 줄이면 그만</td><td>없앤 주식은 <b>되살릴 수 없음</b></td></tr>
+  </table>
+  </div>
+  <div class="trap"><b>⚠️ '사기만 하고 안 태우면' 함정</b>자사주를 사놓고 소각하지 않으면 회사 금고에 그대로 남아. 그러다 나중에 다시 시장에 팔거나 우호세력에 넘기면 주식 수가 도로 늘어 주주 몫이 다시 희석돼. 한국 증시가 저평가된다는 이른바 '코리아 디스카운트' 논쟁의 단골 소재가 이거였어. 그래서 이번 발표에서 <b>'전량 소각'을 못 박은 것</b>이 규모만큼이나 중요한 대목이야.</div>
+
+  <div class="section-title">나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">시총 상위 기업의<br>역대급 소각<small>코스피 지수 자체에 영향</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">다른 기업에<br>압박<small>"삼성전자는?" 시선 이동</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">주주환원 경쟁<small>배당·소각 확대 흐름</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">내 연금·ETF에 반영<small>국민연금·지수 추종 펀드가 대량 보유</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.21 오늘의 딥다이브 내용 기반. 피자 조각 수(12→10)는 비율 설명용 예시이고, 실제 소각 비율은 3.3%야.</div>
+</div>
+</body>
+</html>
