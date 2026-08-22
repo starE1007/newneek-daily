@@ -2,7 +2,7 @@ name: Daily NewNeek Scrape
 
 on:
   schedule:
-    - cron: '30 20 * * 0-4' # 05:30 KST, Mon-Fri
+    - cron: '30 20 * * *' # 05:30 KST, 매일
   workflow_dispatch:
 
 permissions:
