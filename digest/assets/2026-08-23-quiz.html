@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.08.23</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.23 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'crevasse', variants:[
+    { q:"'소득 크레바스'가 생기는 이유로 가장 알맞은 것은?",
+      opts:['회사의 정년퇴직 나이가 매년 자동으로 늦춰지기 때문에',
+            '법정 정년(60세)과 국민연금을 실제로 받기 시작하는 나이 사이에 시차가 있기 때문에',
+            '국민연금 보험료율이 매년 인상되면서 실수령액이 줄어들기 때문에',
+            '정년퇴직자 대부분이 재취업에 실패해 소득이 영구히 사라지기 때문에'], answer:1,
+      explain:'정년은 <b>60세</b>로 고정돼 있는데 국민연금 수급 개시 연령만 계속 늦춰지고 있어(현재 63세, 2033년 65세) — 그 사이 시차가 소득 공백을 만드는 거야. 재취업 실패는 개인차가 있는 별개 문제고.' },
+    { q:'2026년 현재 소득 크레바스 기간과, 2033년엔 몇 년까지 벌어지는지를 가장 정확히 짝지은 것은?',
+      opts:['지금 3년 → 2033년 5년',
+            '지금 5년 → 2033년 3년',
+            '지금 1년 → 2033년 10년',
+            '지금부터 2033년까지 계속 공백 없음'], answer:0,
+      explain:'국민연금 수급 개시가 지금 <b>63세</b>(정년 60세와 3년 차)에서 2033년 <b>65세</b>(5년 차)까지 계속 늦춰지는 구조라, 공백이 갈수록 벌어져.' },
+  ]},
+  { id:'retire_align', variants:[
+    { q:'현대차 노조가 "정년을 국민연금 수급 시기와 연동해 최장 65세로 늦추자"고 요구한 배경으로 가장 알맞은 것은?',
+      opts:['정부가 이미 정년을 65세로 법제화했는데 회사가 이를 어기고 있어서',
+            '정년-연금 공백을 메울 법 개정이 아직 안 끝나서, 회사 단체협상으로 먼저 반영하려는 것',
+            '정년이 연장되면 상여금도 자동으로 같이 오르도록 법에 정해져 있어서',
+            '국민연금 수급 개시 연령을 낮추기 위한 압박 수단으로'], answer:1,
+      explain:'정부는 2027년부터 정년을 단계적으로 늦추는 방안을 <b>검토 중</b>일 뿐 아직 법으로 확정하지 않았어. 노조는 이 공백을 기다리지 않고 회사 단협으로 선반영하려는 거야.' },
+    { q:'회사 측이 노조의 정년연장·해고자 복직 요구에 "임금교섭 범위 밖"이라며 즉답을 피한 이유로 가장 알맞은 것은?',
+      opts:['두 요구 모두 법적·제도적 검토가 더 필요한 사안이라고 보기 때문',
+            '회사가 이미 두 요구를 전부 받아들이기로 확정했기 때문',
+            '노조의 요구가 임금교섭 안건으로 상정된 적이 없기 때문',
+            '정년·해고 문제는 정부 승인 없이는 언급 자체가 금지돼 있기 때문'], answer:0,
+      explain:'정년 연장이나 해고자 복직은 통상적인 상여금·기본급 협상 범위를 넘어서는, 제도 전반을 건드리는 사안이라 회사가 신중한 태도를 보이는 거야.' },
+  ]},
+  { id:'strike_scale', variants:[
+    { q:'이번 현대차 전면파업이 "10년 만"이라는 게 갖는 의미로 가장 알맞은 것은?',
+      opts:['지난 10년간 있었던 모든 부분파업이 이번에 처음으로 합법 인정됐다는 것',
+            '2016년 이후 부분파업 수준에서 타협해오다, 이번에 전면파업까지 갈 만큼 갈등이 커졌다는 것',
+            '10년마다 정기적으로 열리는 예정된 파업 행사라는 것',
+            '지난 10년간 현대차에 노사 갈등이 전혀 없었다는 것'], answer:1,
+      explain:"그동안은 부분파업 등으로 타협점을 찾아왔는데, 이번엔 상여금·정년·해고자 복직이 겹치며 8시간 전면파업까지 간 거라 '10년 만'이라는 수식어가 갈등의 크기를 보여줘." },
+    { q:'현대차 파업이 포스코 등 다른 대기업 임금교섭에도 영향을 줄 수 있다고 보는 이유로 가장 알맞은 것은?',
+      opts:['현대차와 포스코가 같은 노동조합 상급단체에 속해 있어 파업이 법적으로 연동되기 때문',
+            '정년연장·해고자 복직 같은 제도적 쟁점이 특정 회사만의 문제가 아니라 여러 대기업이 함께 마주한 공통 쟁점이기 때문',
+            '두 회사가 부품을 서로 공급하는 관계라 한쪽이 멈추면 다른 쪽도 자동으로 멈추기 때문',
+            '정부가 한 회사의 파업 결과를 다른 회사에도 강제로 적용하도록 규정했기 때문'], answer:1,
+      explain:'정년-연금 공백이나 해고자 복직 같은 쟁점은 특정 회사만의 문제가 아니라 <b>제도 차원의 이슈</b>라, 한 곳에서 선례가 생기면 다른 대기업 협상에도 참고·압박 요인이 될 수 있어.' },
+  ]},
+  { id:'warsh', variants:[
+    { q:'새 연준 의장 케빈 워시가 파월과 다른 노선을 예고해온 점으로 가장 알맞은 것은?',
+      opts:['물가 상승을 더 오래 방치했다며 파월보다 매파적(금리를 더 올리자는 쪽) 태도를 보여온 것',
+            '연준의 금리 결정권을 의회로 넘기겠다고 밝힌 것',
+            '미국 국채를 더 이상 발행하지 않겠다고 선언한 것',
+            '정례 회의를 연 1회로 줄이겠다고 발표한 것'], answer:0,
+      explain:'워시는 "물가 상승을 방치한 기간이 너무 길었다"며 파월보다 <b>긴축(매파)</b> 쪽에 무게를 둔 발언을 이어왔어. 이번 잭슨홀 데뷔 연설이 그 노선을 확인할 첫 무대야.' },
+    { q:'케빈 워시의 잭슨홀 데뷔 연설(28일)이 시장의 주목을 받는 이유로 가장 알맞은 것은?',
+      opts:['9월 연준 금리 결정을 앞두고 새 의장의 통화정책 방향을 가늠할 마지막 공개 발언이라서',
+            '이 연설에서 올해 미국 대선 결과가 함께 발표되기 때문',
+            '잭슨홀 심포지엄이 올해 처음 열리는 행사라서',
+            '워시가 이 연설을 끝으로 의장직에서 사퇴하겠다고 예고했기 때문'], answer:0,
+      explain:'8월 잭슨홀 연설은 통상 9월 금리 결정 전 연준 수장의 속내를 읽는 자리야. 새 의장의 첫 데뷔 무대라 시장이 더 예민하게 지켜보는 거지.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'정년(60세)과 국민연금 수급 개시 나이 사이에 소득이 끊기는 공백을 부르는 말은? (한 단어)',
+    accept:['소득 크레바스','소득크레바스','크레바스'],
+    explain:"정답은 <b>소득 크레바스</b>야. 정년은 그대로인데 연금 개시 연령만 늦춰지면서 생기는 공백을 빙하의 균열(크레바스)에 빗댄 말이야." },
+  { q:'현대차 노조가 8시간 전면파업에 들어간 건 몇 년 만이었을까? (숫자만)',
+    accept:['10','10년','10년만'],
+    explain:'정답은 <b>10년</b>이야. 2016년 이후 처음으로 전면파업까지 간 거라 갈등의 크기를 보여주는 숫자야.' },
+  { q:'새 미국 연준 의장의 이름은? (성만 답해도 정답)',
+    accept:['워시','케빈 워시','케빈워시','warsh','kevin warsh'],
+    explain:'정답은 <b>케빈 워시</b>야. 파월의 뒤를 이어 지난 5월 취임했고, 28일 잭슨홀에서 첫 공개 연설을 해.' },
+  { q:'국민연금 수급 개시 연령이 2033년에 도달하는 나이는 몇 세일까? (숫자만)',
+    accept:['65','65세'],
+    explain:'정답은 <b>65세</b>야. 지금은 63세인데 단계적으로 늦춰져 2033년엔 65세가 돼 — 정년 60세와의 공백이 5년으로 벌어져.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
