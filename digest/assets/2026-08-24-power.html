@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원전 19기, 대체 얼마나 큰 숫자일까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 3대 메가프로젝트 30초 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .tax-note b{color:var(--text)}
+
+  /* 전력 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 168px;font-size:13.5px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:12px;color:var(--text2)}
+  .bar-track{flex:1;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden;min-width:100px}
+  .bar-fill{height:100%;border-radius:6px}
+  .bar-fill.now{background:var(--red)}
+  .bar-fill.line{background:var(--orange)}
+  .bar-fill.ctx{background:#B9B6B1}
+  .bar-val{flex:0 0 92px;text-align:right;font-size:14px;font-weight:700}
+  .bars-note{margin-top:12px;font-size:12.5px;color:var(--text2)}
+  .bars-note b{color:var(--text)}
+  .bars-divider{margin:16px 0;border-top:1px dashed var(--border)}
+
+  /* 3파전 */
+  .press-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .press{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .press .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.b1{background:var(--blue-soft);color:#1B6BB8}
+  .badge.b2{background:var(--orange-soft);color:#B06426}
+  .badge.b3{background:var(--green-soft);color:#2F7A52}
+  .press h3{font-size:15px;margin-bottom:6px}
+  .press p{font-size:13.5px;color:var(--text2)}
+  .press p b{color:var(--text)}
+
+  /* 나한테 오는 영향 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px 12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .press-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 118px;font-size:12.5px}
+    .bar-val{flex:0 0 76px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.24 데일리 뉴스 · 시각자료</div>
+  <h1>🔌 원전 19기, 대체 얼마나 큰 숫자일까</h1>
+  <div class="sub">3대 메가프로젝트가 4개월 만에 새로 만든 전력 수요가, 한국 원전 26기를 다 합친 것보다 크다는 이야기</div>
+
+  <div class="section-title">3대 메가프로젝트 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>반도체</b><span>충청권 등에 초대형 팹 신·증설</span></div>
+    <div class="tax-op">+</div>
+    <div class="tax-box"><b>AI 데이터센터</b><span>24시간 큰 전기를 먹는 연산 시설</span></div>
+    <div class="tax-op">+</div>
+    <div class="tax-box"><b>피지컬 AI</b><span>로봇 등 현실과 결합하는 AI</span></div>
+    <div class="tax-op">=</div>
+    <div class="tax-box result"><b>700조 원+ 투자</b><span>충청권 392조·영남권 312조 등 지역 배분</span></div>
+  </div>
+  <div class="tax-note">이 셋을 다 돌리려면 <b>안정적이고 큰 전기</b>가 필요해서, 정부의 15년짜리 전력 계획(12차 전기본)까지 다시 손봐야 했어.</div>
+
+  <div class="section-title">숫자로 보면 — 늘어난 몫만 원전 26기 전체와 맞먹어</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">현재 원전 전체 설비<small>국내 26기 총합</small></div>
+      <div class="bar-track"><div class="bar-fill ctx" style="width:97%"></div></div>
+      <div class="bar-val">2,605만kW</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">이번에 새로 늘어난 수요<small>4월 전망 대비 · 원전 19기 분량</small></div>
+      <div class="bar-track"><div class="bar-fill now" style="width:100%"></div></div>
+      <div class="bar-val">2,680만kW</div>
+    </div>
+    <div class="bars-divider"></div>
+    <div class="bar-row">
+      <div class="bar-label">2040년 최대 전력수요<small>전체 전망치 · 참고용</small></div>
+      <div class="bar-track"><div class="bar-fill line" style="width:100%"></div></div>
+      <div class="bar-val">1억6500만kW</div>
+    </div>
+    <div class="bars-note">※ 위 두 막대는 서로 비교, 아래 막대는 <b>전체 규모 참고용</b>이라 스케일이 달라. 핵심은 "4개월 사이 늘어난 몫(2,680만kW)이 지금까지 지은 원전 26기 전체(2,605만kW)보다 많다"는 것.</div>
+  </div>
+
+  <div class="section-title">어떻게 채울지 — 팽팽한 3파전</div>
+  <div class="press-grid">
+    <div class="press">
+      <span class="badge b1">① 원전 확대</span>
+      <h3>수명 연장 + 신규 건설</h3>
+      <p>가장 빠르고 확실하다는 입장. 하지만 <b>수명 끝난 원전 계속 운전</b>과 폐연료 보관시설 부지 선정을 둘러싸고 환경단체가 강하게 반발해.</p>
+    </div>
+    <div class="press">
+      <span class="badge b2">② 재생에너지</span>
+      <h3>태양광·풍력 확충</h3>
+      <p>탄소 배출은 줄이지만, <b>날씨에 따라 발전량이 들쭉날쭉</b>해서 반도체 공장처럼 24시간 안정적 전기가 필요한 곳엔 한계가 있다는 지적.</p>
+    </div>
+    <div class="press">
+      <span class="badge b3">③ 수요 관리</span>
+      <h3>전기 먹는 계획 자체를 손보자</h3>
+      <p>데이터센터를 계속 유치하기보다, <b>전기 수요 증가 속도 자체를 깐깐하게 관리</b>해야 한다는 목소리. 아직은 소수 의견.</p>
+    </div>
+  </div>
+
+  <div class="section-title">나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">3대 메가프로젝트<br>전력수요 폭증</div>
+    <div class="arrow">→</div>
+    <div class="step s2">발전·송전 확충<br>속도 경쟁</div>
+    <div class="arrow">→</div>
+    <div class="step s3">늦어지면<br>산업용 전기요금 압박</div>
+    <div class="arrow">→</div>
+    <div class="step s4">시차 두고<br>가정용 요금·세금 부담</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.24 오늘의 딥다이브 내용 기반 · 수치는 20일 12차 전력수급기본계획 토론회 발표 기준</div>
+</div>
+</body>
+</html>
