@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.08.25</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.25 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'tariff_who_pays', variants:[
+    { q:'미국이 캐나다산 제품에 50% 관세를 매기면, 그 관세를 실제로 미국 정부에 내는 쪽은 누구일까?',
+      opts:['캐나다 정부', '그 제품을 사 오는 미국 수입업체', '캐나다 수출업체', '미국 소비자가 직접 세관에 납부'], answer:1,
+      explain:'관세는 <b>물건을 사 오는 나라 안의 수입업체</b>가 자국 정부에 내는 세금이야. 캐나다 정부나 수출업체가 미국에 세금을 내는 게 아니야. 다만 그 비용은 결국 물건값에 얹혀 소비자한테 넘어가.' },
+    { q:'미국·캐나다 관세 전쟁에서 "청구서가 자국 소비자한테 먼저 간다"는 말이 뜻하는 바로 가장 알맞은 것은?',
+      opts:['상대국 정부가 관세만큼 배상금을 물어준다는 뜻',
+            '관세를 매긴 나라의 수입업체가 오른 원가를 소비자 가격에 얹기 쉽다는 뜻',
+            '관세를 매기면 그 나라 수출이 자동으로 늘어난다는 뜻',
+            '관세는 전액 상대국 정부 예산에서 대신 내준다는 뜻'], answer:1,
+      explain:'관세를 매기는 나라의 수입업체가 관세를 내고, 그 오른 원가를 물건값에 반영하면서 <b>정작 그 나라 소비자가 부담을 지게 되는 구조</b>야. 그래서 "상대를 조준했는데 청구서는 자국에 간다"는 역설이 나와.' },
+  ]},
+  { id:'tariff_escalation', variants:[
+    { q:'미국의 대(對)캐나다 관세 발효 이후, 캐나다의 대응으로 가장 알맞은 것은?',
+      opts:['같은 규모의 보복 관세를 예고하며 9월 8일부터 발효하기로 함',
+            '아무 대응 없이 관세를 그대로 수용하기로 함',
+            'WTO에 제소하는 대신 관세를 즉시 절반으로 낮춰 화해함',
+            '캐나다가 먼저 미국에 무역협상 재개를 제안하며 갈등을 끝냄'], answer:0,
+      explain:'캐나다는 미국산 철강·유제품·가전 등에 <b>같은 규모의 보복 관세를 9월 8일부터</b> 물리기로 했고, 마크 카니 총리는 "우리는 공격받았다, 전쟁 상태"라고 말할 만큼 강경하게 맞섰어.' },
+    { q:'관세 전쟁이 양쪽 모두에게 물가 상승으로 이어지기 쉬운 이유로 가장 알맞은 것은?',
+      opts:['관세를 매긴 나라와 보복 관세를 매긴 나라, 양쪽 다 각자 자국 수입업체·소비자가 오른 원가를 떠안기 때문에',
+            '두 나라 모두 관세 수입을 전부 상대국에 송금해야 하기 때문에',
+            '관세가 오르면 환율이 자동으로 두 배가 되기 때문에',
+            '두 나라 중앙은행이 동시에 금리를 인상하기로 협정을 맺었기 때문에'], answer:0,
+      explain:'관세를 매기는 나라도, 보복 관세로 맞서는 나라도 <b>각자 자국 수입업체·소비자가 오른 원가를 떠안는 구조</b>라서, 관세 전쟁이 커질수록 양쪽 다 물가만 밀려 올라가는 악순환이 생겨.' },
+  ]},
+  { id:'samsung_gap', variants:[
+    { q:'삼성전자가 110조 원 규모의 사상 최대 주주환원을 발표했는데도 24일 주가가 급락한 이유로 가장 알맞은 것은?',
+      opts:['시장이 기대했던 최대 150조 원 수준에 못 미친 데다, 자사주 매입·소각 규모가 아직 정해지지 않아서',
+            '삼성전자가 주주환원 계획 자체를 전면 철회했기 때문에',
+            '경쟁사가 그날 더 큰 규모의 주주환원을 발표했기 때문에',
+            '110조 원 전액을 해외 투자자에게만 지급하기로 했기 때문에'], answer:0,
+      explain:'기존 원칙(3개년 잉여현금흐름의 50%)대로면 시장은 <b>최대 150조 원</b>까지 기대했는데 110조 원에 그쳤고, 주가에 직접 영향을 주는 <b>자사주 매입·소각 규모가 미정</b>이라는 점이 실망감을 키웠어.' },
+    { q:'삼성전자 사례가 보여주는 주가 반응의 특징으로 가장 알맞은 것은?',
+      opts:['발표 자체의 절대적 규모보다 시장이 미리 가졌던 기대치와의 격차가 주가를 움직였다',
+            '주주환원 규모와 무관하게 발표 다음 거래일 주가는 관행적으로 오른다',
+            '시장은 발표 규모보다 자사주 매입 시점만을 유일한 판단 기준으로 삼는다',
+            '역대 최대 규모라는 타이틀 자체가 주가 상승을 보장한다'], answer:0,
+      explain:'110조 원은 역대 최대 규모였지만, 시장의 <b>기대치(최대 150~200조 원)에는 못 미쳤던 격차</b>가 오히려 주가를 끌어내렸어. "규모"보다 "기대와의 차이"가 핵심이라는 걸 보여주는 사례야.' },
+  ]},
+  { id:'tax_revision', variants:[
+    { q:"정부가 2026년 세제개편안 중 비거주 1주택자 종부세 부분을 20여 일 만에 재검토하는 이유로 가장 알맞은 것은?",
+      opts:['모든 1주택자 세금을 올리는 데 대한 비판과 전월세 매물 감소·집값 상승 우려가 커졌기 때문에',
+            '비거주 1주택자에 대한 세금 자체가 이번에 처음 신설됐기 때문에',
+            '종합부동산세 제도를 전면 폐지하기로 했기 때문에',
+            '재검토 대상이 다주택자 양도세로 완전히 바뀌었기 때문에'], answer:0,
+      explain:'"모든 1주택자 세금을 다 올리는 건 문제"라는 비판과, 세 부담이 전월세 매물을 줄여 <b>집값·전월세 부담을 오히려 키운다</b>는 우려가 커지면서 재검토에 들어갔어.' },
+    { q:'재검토되는 비거주 1주택자 종부세 기본공제 방향으로 가장 알맞은 것은?',
+      opts:['12억 원에서 9억 원으로 낮추려던 방안을 철회하고 현행 12억 원을 유지하는 쪽',
+            '기본공제를 아예 없애고 전액 과세하는 쪽',
+            '기본공제를 20억 원까지 대폭 상향하는 쪽',
+            '비거주자에게만 별도 감면을 신설하는 쪽'], answer:0,
+      explain:'애초 <b>12억 원→9억 원으로 낮추려던 안을 철회</b>하고 현행 12억 원대로 되돌리는 쪽으로 가닥이 잡혔어. 정부는 "거주 중심 1주택자 보호"라는 큰 원칙은 유지한다는 입장이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'미국이 22일 발효한, 캐나다산 제품에 매긴 관세율은 몇 %일까? (숫자만)',
+    accept:['50','50%'],
+    explain:'정답은 <b>50%</b>야. 와인·유제품·하키용품·시멘트 등 약 200억 달러 규모 제품에 적용됐어.' },
+  { q:'캐나다가 미국산 제품에 보복 관세를 발효하기로 한 날짜는? (월/일 숫자만, 예: 9/8)',
+    accept:['9/8','9월8일','98'],
+    explain:'정답은 <b>9월 8일</b>이야. 미국산 철강·유제품·가전 등에 미국과 같은 규모로 부과할 예정이야.' },
+  { q:'110조 원 주주환원을 발표한 후에도 24일 주가가 급락한 회사는? (기업명)',
+    accept:['삼성전자'],
+    explain:'정답은 <b>삼성전자</b>야. 시장 기대치(최대 150조 원)에 못 미치고 자사주 매입·소각 규모가 미정이라 주가는 오히려 8.88% 빠졌어.' },
+  { q:'재검토 중인 비거주 1주택자 종부세 기본공제, 철회 전 정부안은 12억 원에서 몇 억 원으로 낮추는 것이었을까? (숫자만)',
+    accept:['9','9억','9억원'],
+    explain:'정답은 <b>9억 원</b>이야. 이 축소안을 철회하고 현행 12억 원대로 되돌리는 쪽으로 가닥이 잡혔어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
