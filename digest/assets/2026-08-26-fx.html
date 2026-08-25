@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>환율, 두 달 만에 170원 급락 — 무슨 일이 있었나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 30초 정리 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .tax-note b{color:var(--text)}
+
+  /* 추이 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 132px;font-size:13.5px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:12px;color:var(--text2)}
+  .bar-track{flex:1;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden;min-width:120px}
+  .bar-fill{height:100%;border-radius:6px}
+  .bar-fill.past{background:#B9B6B1}
+  .bar-fill.mid{background:var(--orange)}
+  .bar-fill.now{background:var(--blue)}
+  .bar-val{flex:0 0 74px;text-align:right;font-size:14px;font-weight:700}
+  .bars-note{margin-top:12px;font-size:12.5px;color:var(--text2)}
+
+  /* 이유 4장 */
+  .press-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .press{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .press .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px;background:var(--blue-soft);color:#1B6BB8}
+  .press h3{font-size:15px;margin-bottom:6px}
+  .press p{font-size:13.5px;color:var(--text2)}
+  .press p b{color:var(--text)}
+
+  /* 장단점 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.good{background:var(--green-soft);color:#2F7A52}
+  .badge.bad{background:var(--red-soft);color:#C6493E}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:6px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .press-grid,.vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 100px;font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.26 데일리 뉴스 · 시각자료</div>
+  <h1>💵 환율, 두 달 만에 170원 급락</h1>
+  <div class="sub">1560원대에서 1380원대까지 — 뭐가 환율을 이렇게 빨리 끌어내렸는지 한 장으로 보기</div>
+
+  <div class="section-title">환율 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>원·달러 환율 하락</b><span>1달러 사는 데 필요한 원화가 줄어듦</span></div>
+    <div class="tax-op">=</div>
+    <div class="tax-box result"><b>원화 가치 상승(강세)</b><span>같은 원화로 달러를 더 많이 살 수 있음</span></div>
+  </div>
+  <div class="tax-note">그래서 <b>"환율이 떨어졌다"</b>는 건 원화가 세졌다는 뜻이야. 수입물가·해외여행엔 유리하지만, 아래처럼 마냥 좋기만 한 건 아니야.</div>
+
+  <div class="section-title">두 달 새 이렇게 빠졌어</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">6월 초<small>올해 연고점</small></div>
+      <div class="bar-track"><div class="bar-fill past" style="width:100%"></div></div>
+      <div class="bar-val">1560원대</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">8/19<small>1400원선 붕괴</small></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:70%"></div></div>
+      <div class="bar-val">1397.7원</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">8/21<small>11개월 만에 최저</small></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:65%"></div></div>
+      <div class="bar-val">1386.5원</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">8/25<small>오늘 기준</small></div>
+      <div class="bar-track"><div class="bar-fill now" style="width:63%"></div></div>
+      <div class="bar-val">1380원대</div>
+    </div>
+    <div class="bars-note">※ 7월 한 달 동안에만 원화 가치가 <b>8.81%</b> 절상 — 2009년 3월(금융위기 직후) 이후 최대 폭이야.</div>
+  </div>
+
+  <div class="section-title">왜 이렇게 빨리 떨어져 — 네 가지가 한꺼번에</div>
+  <div class="press-grid">
+    <div class="press">
+      <span class="badge">① 연준</span>
+      <h3>美 9월 금리 동결 전망↑</h3>
+      <p>고용·소매판매·물가 지표가 줄줄이 부진 → <b>달러를 살 이유가 줄어듦</b></p>
+    </div>
+    <div class="press">
+      <span class="badge">② 기업</span>
+      <h3>반도체 기업 달러 매도 러시</h3>
+      <p>SK하이닉스 ADR 환전(<b>265억 달러</b>) + 법인세 중간예납용 달러 매도</p>
+    </div>
+    <div class="press">
+      <span class="badge">③ 외국인</span>
+      <h3>주식 순유출 크게 진정</h3>
+      <p>6월 <b>57.5조 원</b> 순유출 → 7월 <b>8.8조 원</b>으로 급감, 환율 밀어올리던 힘이 약해짐</p>
+    </div>
+    <div class="press">
+      <span class="badge">④ 공조</span>
+      <h3>한·미·일 엔화 방어 개입</h3>
+      <p>40년 만에 최저인 엔화를 지키려 개입 → <b>원화도 동반 강세</b></p>
+    </div>
+  </div>
+
+  <div class="section-title">좋기만 할까? — 반은 맞고 반은 틀려</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge good">유리해지는 쪽</span>
+      <h3>수입물가 · 해외여행</h3>
+      <p>원유·원자재 <b>수입 가격 부담이 줄고</b>, 해외여행·직구 비용도 상대적으로 싸져.</p>
+    </div>
+    <div class="vs">
+      <span class="badge bad">불리해지는 쪽</span>
+      <h3>수출기업 · 외국인 인바운드</h3>
+      <p>수출기업은 <b>달러로 벌어도 원화로 바꾸면 덜 받고</b>, 외국인 입장에선 원화 표시 가격이 상대적으로 <b>비싸지는</b> 효과가 생겨.</p>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.26 오늘의 딥다이브 내용 기반 · 환율은 25일 오후 기준</div>
+</div>
+</body>
+</html>
