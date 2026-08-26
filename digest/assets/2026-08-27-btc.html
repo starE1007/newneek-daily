@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>국채 바이백이 왜 비트코인을 띄웠을까</title>
+<title>비트코인을 밀어 올린 건 코인이 아니라 미 국채였다</title>
 <style>
   :root{
     --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
@@ -19,83 +19,166 @@
   .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
   .section-title:first-of-type{margin-top:0}
 
-  /* price bars */
-  .price-row{display:flex;align-items:flex-end;gap:24px;padding:20px 18px 10px;border:1px solid var(--border);border-radius:12px;background:var(--soft)}
-  .pbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
-  .pbar-track{width:100%;max-width:120px;height:160px;display:flex;align-items:flex-end;background:var(--surface2);border-radius:8px 8px 4px 4px;overflow:hidden}
-  .pbar{width:100%;border-radius:8px 8px 0 0}
-  .pbar.b1{background:var(--orange);height:60%}
-  .pbar.b2{background:var(--red);height:100%}
-  .pbar-label{font-size:13px;color:var(--text2);text-align:center}
-  .pbar-value{font-size:16px;font-weight:700}
-  .price-note{text-align:center;font-size:12.5px;color:var(--text2);padding:10px 0 4px}
-  .price-note b{color:#B23F34}
+  /* 바이백 30초 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-box span b{display:inline;font-size:13px;color:var(--text)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .tax-note b{color:var(--text)}
 
-  /* mechanism */
+  /* 추이 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 176px;font-size:13.5px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:12px;color:var(--text2)}
+  .bar-track{flex:1;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden;min-width:100px}
+  .bar-fill{height:100%;border-radius:6px}
+  .bar-fill.low{background:#B9C7D4}
+  .bar-fill.mid{background:var(--orange)}
+  .bar-fill.high{background:var(--green)}
+  .bar-val{flex:0 0 104px;text-align:right;font-size:14px;font-weight:700}
+  .bars-note{margin-top:12px;font-size:12.5px;color:var(--text2)}
+  .bars-note b{color:var(--text)}
+
+  /* 메커니즘 단계 */
   .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
   .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
   .mstep:last-of-type{padding-bottom:0}
   .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
   .mstep:last-of-type::before{display:none}
   .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
-  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mstep.hot .mnum{background:var(--green-soft);color:#2F7A52}
   .mtxt{padding-top:4px;font-size:14.5px}
   .mtxt b{font-size:15px}
   .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .mtxt .mdesc b{font-size:13.5px;color:var(--text)}
   .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
   .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 두 겹 카드 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.now{background:var(--blue-soft);color:#1B6BB8}
+  .badge.later{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:8px}
+
+  /* 순환 흐름도 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px 12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--green-soft);color:#2F7A52}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
 
   .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
   @media (max-width:640px){
     .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
     h1{font-size:21px}
-    .price-row{gap:12px}
+    .bar-label{flex:0 0 122px;font-size:12.5px}
+    .bar-val{flex:0 0 86px;font-size:13px}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">2026.08.27 데일리 뉴스 · 시각자료</div>
-  <h1>🪙 국채 바이백이 왜 비트코인을 띄웠을까</h1>
-  <div class="sub">3개월 만에 8만 달러 — 일주일 새 23% 급등한 이유를 가격 흐름과 메커니즘으로 보기</div>
+  <h1>🪙 비트코인을 밀어 올린 건, 코인이 아니라 미 국채였다</h1>
+  <div class="sub">일주일 만에 23% 오른 진짜 방아쇠 — '국채 바이백'이 뭐고, 왜 그게 코인값을 움직이는지 한 장으로 보기</div>
 
-  <div class="section-title">가격, 일주일 새 얼마나 뛰었나</div>
-  <div class="price-row">
-    <div class="pbar-col">
-      <div class="pbar-track"><div class="pbar b1"></div></div>
-      <div class="pbar-value">6만 달러대</div>
-      <div class="pbar-label">8월 중순</div>
-    </div>
-    <div class="pbar-col">
-      <div class="pbar-track"><div class="pbar b2"></div></div>
-      <div class="pbar-value">8만 달러 돌파</div>
-      <div class="pbar-label">8월 25일</div>
-    </div>
+  <div class="section-title">국채 바이백 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>바이백(Buyback)</b><span>정부가 예전에 팔아둔 <b>자기 국채</b>를 만기 전에 도로 사들이는 것</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box"><b>사주는 사람이 늘면</b><span>국채값이 오르고, 값이 오르면 <b>금리는 내려감</b>(시소)</span></div>
+    <div class="tax-op">+</div>
+    <div class="tax-box result"><b>되사준 대금은 현금</b><span>채권을 판 쪽 손에 <b>쓸 수 있는 돈</b>이 쥐어짐 = 유동성 공급</span></div>
   </div>
-  <div class="price-note">일주일 새 <b>+23%</b> · 19~21일 사흘 동안에만 <b>+20%</b> 넘게 급등 — 미국 재무부 발표 시점과 정확히 겹쳐</div>
+  <div class="tax-note">8월 19일 미 재무부는 10~30년 장기국채 바이백 한도를 <b>회당 20억 → 최소 40억 달러</b>로 두 배 늘린다고 발표했어(9/9~11/4 적용). 그 몇 시간 뒤 비트코인이 <b>8% 넘게</b> 튀었어.</div>
 
-  <div class="section-title">국채 바이백 → 비트코인 랠리, 이어지는 경로</div>
+  <div class="section-title">일주일 사이 무슨 일이 있었나</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">8월 중순<small>발표 전</small></div>
+      <div class="bar-track"><div class="bar-fill low" style="width:80%"></div></div>
+      <div class="bar-val">약 6.4만 달러</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">8월 19일<small>바이백 2배 확대 발표 당일</small></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:87.5%"></div></div>
+      <div class="bar-val">약 7.0만 달러</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">8월 25일<small>약 3개월 만에 8만 달러 회복</small></div>
+      <div class="bar-track"><div class="bar-fill high" style="width:100%"></div></div>
+      <div class="bar-val">8만 달러 돌파</div>
+    </div>
+    <div class="bars-note">같은 기간 미 30년물 국채금리는 <b>5.337%</b>(19년 만의 최고)에서 바이백 발표 뒤 <b>5.187%</b>까지 내려왔어 — 코인이 오른 것과 금리가 내린 것은 <b>같은 사건의 앞뒷면</b>이야.</div>
+  </div>
+
+  <div class="section-title">왜 국채를 사줬는데 코인이 오를까</div>
   <div class="mech">
     <div class="mstep">
       <div class="mnum">1</div>
-      <div class="mtxt"><b>미국 재무부, 장기국채 바이백 20억→40억 달러로 확대</b><span class="mdesc">이미 시중에 풀린 국채를 정부가 다시 사들이는 조치 — 그만큼 달러를 시중에 돌려주는 효과</span></div>
+      <div class="mtxt"><b>재무부가 장기국채를 두 배로 되사준다</b><span class="mdesc">시장에 확실한 매수자가 한 명 더 생긴 셈</span></div>
     </div>
     <div class="mstep">
       <div class="mnum">2</div>
-      <div class="mtxt"><b>시중 유동성(도는 돈) 증가</b><span class="mdesc">갈 곳 찾는 달러가 늘어남</span></div>
+      <div class="mtxt"><b>국채값 ↑ · 장기금리 ↓</b><span class="mdesc">채권값과 금리는 시소 — 값이 오르면 이자율은 내려가</span></div>
     </div>
     <div class="mstep">
       <div class="mnum">3</div>
-      <div class="mtxt"><b>가상자산 규제완화 기대 + 재정적자·물가 우려 겹침</b><span class="mdesc">클래리티법 통과 기대감, 달러 대안으로 금·코인 선호 심리 확산</span></div>
+      <div class="mtxt"><b>안전자산 이자 매력이 줄고, 손엔 현금이 남는다</b><span class="mdesc">5% 넘게 주던 국채가 덜 매력적이 되면 그 돈은 갈 곳을 찾아</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>돈이 위험자산으로 이동</b><span class="mdesc">비트코인·주식처럼 이자는 안 주지만 값이 오를 수 있는 쪽으로</span></div>
     </div>
     <div class="mstep hot">
-      <div class="mnum">4</div>
-      <div class="mtxt"><b>현물 ETF로 기관 자금까지 유입 — 비트코인 8만 달러 돌파</b><span class="mdesc">일주일 새 23% 급등</span></div>
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>숏 청산이 불에 기름을 붓는다</b><span class="mdesc">"떨어진다"에 걸어둔 <b>10억 달러 이상</b>의 베팅이 강제 정리되며 <b>어쩔 수 없이 사는 주문</b>으로 바뀌어 상승폭을 키웠어</span></div>
     </div>
-    <div class="paradox"><b>⚠️ 역설</b>국채(안전자산)를 사들이려 푼 돈이, 정작 코인(위험자산) 랠리로 먼저 흘러갔어.</div>
+    <div class="paradox"><b>⚠️ 그래서 되돌림도 빠르다</b>실적이 좋아져서 오른 게 아니라 <b>정책 한 방</b>에 올라탄 상승이야. 확대 적용은 11월 4일까지고, 강제 매수로 부풀려진 만큼 방향이 바뀌면 같은 힘으로 되감길 수 있어.</div>
   </div>
 
-  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.27 오늘의 딥다이브 내용 기반</div>
+  <div class="section-title">한 겹 더 — 왜 미국은 코인을 키우려 할까</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge now">지금의 고민</span>
+      <h3>국채를 사줄 사람이 부족하다</h3>
+      <p>빚은 계속 늘어나는데 30년물 금리가 <b>19년 만의 최고</b>까지 치솟았어. 금리가 높다는 건 <b>그만큼 이자를 더 얹어야 겨우 팔린다</b>는 뜻이야.</p>
+      <p>바이백은 그 급한 불을 끄는 응급처치지, 살 사람을 새로 만들어내진 못해.</p>
+    </div>
+    <div class="vs">
+      <span class="badge later">노리는 그림</span>
+      <h3>스테이블코인을 '국채 큰손'으로</h3>
+      <p>내년 1월 시행되는 <b>지니어스법</b>은 스테이블코인(달러에 값을 고정한 코인)을 발행한 만큼 안전자산을 쌓아두게 하는데, 그 목록에 <b>만기 93일 이내 미 국채</b>가 들어가 있어.</p>
+      <p>즉 <b>코인 시장이 커질수록 미 국채를 자동으로 사줄 수요가 늘어나는</b> 구조 — 규제 완화가 단순한 친코인 정책만은 아니라는 해석이 나오는 이유야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">나한테 오는 경로</div>
+  <div class="flow">
+    <div class="step s1">미 재무부<br>바이백 확대</div>
+    <div class="arrow">→</div>
+    <div class="step s2">미 장기금리 하락<small>달러 매력 ↓</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">달러 약세<small>원화 강세 압력</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">코스피·코인 등<br>위험자산 강세<small>내 연금·적립식 계좌에도 반영</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.27 오늘의 딥다이브 내용 기반 · 가격은 근사치</div>
 </div>
 </body>
 </html>
