@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국채 바이백이 왜 비트코인을 띄웠을까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* price bars */
+  .price-row{display:flex;align-items:flex-end;gap:24px;padding:20px 18px 10px;border:1px solid var(--border);border-radius:12px;background:var(--soft)}
+  .pbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .pbar-track{width:100%;max-width:120px;height:160px;display:flex;align-items:flex-end;background:var(--surface2);border-radius:8px 8px 4px 4px;overflow:hidden}
+  .pbar{width:100%;border-radius:8px 8px 0 0}
+  .pbar.b1{background:var(--orange);height:60%}
+  .pbar.b2{background:var(--red);height:100%}
+  .pbar-label{font-size:13px;color:var(--text2);text-align:center}
+  .pbar-value{font-size:16px;font-weight:700}
+  .price-note{text-align:center;font-size:12.5px;color:var(--text2);padding:10px 0 4px}
+  .price-note b{color:#B23F34}
+
+  /* mechanism */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .price-row{gap:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.27 데일리 뉴스 · 시각자료</div>
+  <h1>🪙 국채 바이백이 왜 비트코인을 띄웠을까</h1>
+  <div class="sub">3개월 만에 8만 달러 — 일주일 새 23% 급등한 이유를 가격 흐름과 메커니즘으로 보기</div>
+
+  <div class="section-title">가격, 일주일 새 얼마나 뛰었나</div>
+  <div class="price-row">
+    <div class="pbar-col">
+      <div class="pbar-track"><div class="pbar b1"></div></div>
+      <div class="pbar-value">6만 달러대</div>
+      <div class="pbar-label">8월 중순</div>
+    </div>
+    <div class="pbar-col">
+      <div class="pbar-track"><div class="pbar b2"></div></div>
+      <div class="pbar-value">8만 달러 돌파</div>
+      <div class="pbar-label">8월 25일</div>
+    </div>
+  </div>
+  <div class="price-note">일주일 새 <b>+23%</b> · 19~21일 사흘 동안에만 <b>+20%</b> 넘게 급등 — 미국 재무부 발표 시점과 정확히 겹쳐</div>
+
+  <div class="section-title">국채 바이백 → 비트코인 랠리, 이어지는 경로</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>미국 재무부, 장기국채 바이백 20억→40억 달러로 확대</b><span class="mdesc">이미 시중에 풀린 국채를 정부가 다시 사들이는 조치 — 그만큼 달러를 시중에 돌려주는 효과</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>시중 유동성(도는 돈) 증가</b><span class="mdesc">갈 곳 찾는 달러가 늘어남</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>가상자산 규제완화 기대 + 재정적자·물가 우려 겹침</b><span class="mdesc">클래리티법 통과 기대감, 달러 대안으로 금·코인 선호 심리 확산</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>현물 ETF로 기관 자금까지 유입 — 비트코인 8만 달러 돌파</b><span class="mdesc">일주일 새 23% 급등</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 역설</b>국채(안전자산)를 사들이려 푼 돈이, 정작 코인(위험자산) 랠리로 먼저 흘러갔어.</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.27 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
