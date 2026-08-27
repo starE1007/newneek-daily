@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기준금리 3% — 두 달 연속 인상, 왜 그리고 나한테 뭐가 오나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 30초 정리 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 추이 막대 */
+  .chart{border:1px solid var(--border);border-radius:12px;padding:18px 20px 14px;background:var(--canvas)}
+  .bars{display:flex;align-items:flex-end;gap:14px;height:190px;padding-bottom:4px}
+  .bar-col{flex:1 1 0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+  .bar-val{font-size:14px;font-weight:700;margin-bottom:6px}
+  .bar{width:100%;max-width:96px;border-radius:8px 8px 0 0;background:var(--surface2)}
+  .bar.hold{background:#D9D7D3}
+  .bar.up1{background:var(--orange-soft);border:1px solid #EBCDAE;border-bottom:none}
+  .bar.up2{background:var(--red-soft);border:1px solid #F3C7C1;border-bottom:none}
+  .bar-labels{display:flex;gap:14px;border-top:1px solid var(--border);padding-top:8px}
+  .bar-lab{flex:1 1 0;text-align:center;font-size:12.5px;color:var(--text2);line-height:1.35}
+  .bar-lab b{display:block;color:var(--text);font-size:13px}
+  .chart-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .chart-note b{color:var(--text)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 갈래 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.tight{background:var(--red-soft);color:#C6493E}
+  .badge.loose{background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:8px}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 220px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bars{height:160px;gap:8px}
+    .bar-labels{gap:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.28 데일리 뉴스 · 시각자료</div>
+  <h1>📈 기준금리 3% — 두 달 연속 올린 이유</h1>
+  <div class="sub">기준금리가 뭐고, 왜 지금 올렸고, 그게 내 대출·월급·환율까지 어떻게 내려오는지 한 장으로 보기</div>
+
+  <div class="section-title">기준금리 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>기준금리</b><span>한국은행이 은행에 돈을 빌려줄 때 매기는 <b>기준값</b></span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box"><b>은행 조달비용</b><span>은행이 돈을 구해오는 값이 같이 오르내림</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box result"><b>내 대출·예금 금리</b><span>주담대·신용대출 이자와 예금 이자가 뒤따라 움직임</span></div>
+  </div>
+  <div class="tax-note">한은은 내 대출금리를 직접 정하지 않아. <b>은행이 돈을 구해오는 원가</b>를 건드리면, 그게 시차를 두고 내 통장까지 내려오는 구조야.</div>
+
+  <div class="section-title">1년 2개월 멈춰 있다가, 두 달 연속</div>
+  <div class="chart">
+    <div class="bars">
+      <div class="bar-col"><div class="bar-val">2.50%</div><div class="bar hold" style="height:62%"></div></div>
+      <div class="bar-col"><div class="bar-val">2.75%</div><div class="bar up1" style="height:74%"></div></div>
+      <div class="bar-col"><div class="bar-val">3.00%</div><div class="bar up2" style="height:86%"></div></div>
+    </div>
+    <div class="bar-labels">
+      <div class="bar-lab"><b>2025.05 ~ 2026.06</b>1년 2개월 동결</div>
+      <div class="bar-lab"><b>2026.07.16</b>+0.25%p · 3년 6개월 만의 인상</div>
+      <div class="bar-lab"><b>2026.08.27</b>+0.25%p · 두 달 연속</div>
+    </div>
+    <div class="chart-note">인상 사이클을 시작하자마자 <b>연달아 올린 건 역대 처음</b>이야. 보통 한 번 올리고 효과를 보며 쉬어 가는데, 이번엔 쉬지 않았어 — 그만큼 급하다는 신호를 시장에 던진 거야.</div>
+  </div>
+
+  <div class="section-title">왜 올렸어? — 불황이 아니라 '과열'이 이유</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>성장이 예상보다 세다</b><span class="mdesc">올해 성장률 전망을 3.3%로 올려 잡음 — 2021년(4.7%) 이후 5년 만의 최고치</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>경제가 잘 돌면 물가도 같이 밀려 올라간다</b><span class="mdesc">사람들이 쓸 돈이 늘면 가격을 올려도 팔려서, 물가 상승 압력이 쌓임</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>빚과 집값도 같은 방향으로 부풀고 있다</b><span class="mdesc">가계부채 2,000조 원 돌파 · 수도권 집값 상승 — 낮은 금리가 계속 연료가 됨</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>번지기 전에 미리 눌러둔다</b><span class="mdesc">"가래 쓰기 전에 호미로" — 물가가 퍼지고 나서 잡으면 훨씬 세게 조여야 하고, 그때 경기가 받는 타격이 더 큼</span></div>
+    </div>
+    <div class="paradox"><b>💡 핵심</b>이번 인상은 경기가 나빠서가 아니라 <b>너무 잘 돌아서</b> 나온 브레이크야. 그래서 "금리 인상 = 나쁜 소식"으로만 읽으면 절반만 본 거야.</div>
+  </div>
+
+  <div class="section-title">그런데 정부는 반대로 밟고 있어</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge tight">한국은행 — 조인다</span>
+      <h3>금리 3.00%로 인상</h3>
+      <p>돈 빌리는 값을 올려 <b>소비·대출·집값 쪽 열기를 식히는</b> 방향. 시장은 종착지를 <b>3.25% 이상</b>으로 보고 있어.</p>
+    </div>
+    <div class="vs">
+      <span class="badge loose">정부 — 푼다</span>
+      <h3>800조 예산 + 추가 재정 투입</h3>
+      <p>돈을 더 풀어 <b>경기와 소비를 밀어 올리는</b> 방향. 같은 경제에 브레이크와 액셀을 동시에 밟는 셈이라 <b>'정책 엇박자'</b> 지적이 나와.</p>
+    </div>
+  </div>
+
+  <div class="section-title">나한테 내려오는 경로</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">①</div>
+      <div class="mtxt"><b>대출 이자 ↑</b><span class="mdesc">변동금리 주담대·신용대출은 몇 달 안에 반영 — 원리금이 실제로 늘어나</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">②</div>
+      <div class="mtxt"><b>예금 이자 ↑</b><span class="mdesc">예·적금 금리는 올라 — 빚이 없다면 이쪽은 유리해지는 국면</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">③</div>
+      <div class="mtxt"><b>원화 강세 ↑ (환율 ↓)</b><span class="mdesc">한국에 돈을 넣으면 이자를 더 주니 달러가 들어와 — 27일 장중 1,377.3원까지 내려가 1,380.9원 마감</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">④</div>
+      <div class="mtxt"><b>수입물가 ↓ · 수출·인바운드에는 역풍</b><span class="mdesc">수입은 싸지지만, 외국인이 느끼는 한국 물가는 비싸짐 — 26일자에서 짚은 원화 강세 흐름이 금리로 한 번 더 굳어진 거야</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">8/27</div><div class="what">기준금리 <b>3.00%</b> · 성장률 전망 3.3%로 상향</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">10월 금통위</div><div class="what"><b>추가 인상 여부</b> — 종착지 3.25%설이 맞는지 확인할 자리</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">이후</div><div class="what">변동금리 대출 재산정 시점 · 예금 금리 갱신 시점 체크</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.28 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
