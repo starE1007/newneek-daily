@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>재무부는 누르고 연준은 당긴다</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 30초 정리 */
+  .row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .box{flex:1 1 220px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .box span{font-size:13px;color:var(--text2)}
+  .op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .box.result{background:var(--red-soft);border-color:#F6D3CE}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 쟁점 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--orange-soft);color:#B06426}
+  .badge.wait{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.29 데일리 뉴스 · 시각자료</div>
+  <h1>🏛️ 재무부는 누르고 연준은 당긴다</h1>
+  <div class="sub">베선트(재무부)와 워시(연준)가 같은 국채금리를 놓고 왜 반대 방향으로 미는지 한 장으로 보기</div>
+
+  <div class="section-title">각자 최근에 한 일</div>
+  <div class="row">
+    <div class="box"><b>재무부 · 베선트</b><span>국채 바이백 두 배 확대(회당 최소 40억 달러) + "금리 150~175bp 낮아야"</span></div>
+    <div class="op">↔</div>
+    <div class="box"><b>연준 · 워시</b><span>잭슨홀서 "인플레 안 잡혔다, 할 일 남았다" 매파 발언</span></div>
+    <div class="op">=</div>
+    <div class="box result"><b>결과</b><span>9월 인상 베팅 30%대 → <b>57%</b>로 급등, 국채금리 요동</span></div>
+  </div>
+
+  <div class="section-title">밀당 메커니즘</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>재무부, 국채 바이백 규모 두 배로 확대</b><span class="mdesc">장기국채를 사들여 값을 올리고, 금리(장기)를 누르려는 시도</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>베선트 장관, 금리 인하 공개 압박</b><span class="mdesc">"모델상 지금보다 150~175bp는 낮아야 한다"</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>연준 워시, 잭슨홀서 매파 발언</b><span class="mdesc">"물가 밑바닥 흐름이 나아졌다는 뜻은 아니다" — 인상 여지 시사</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>시장 신호가 뒤엉킨다</b><span class="mdesc">9월 인상 베팅 57%로 급등, 2년물 금리 4.30%대로 튐</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 같은 국채, 반대 방향</b>재무부는 국채를 사들여 금리를 누르려 하고, 연준은 물가를 잡으려 금리를 올리려 해 — 정부 안에서 두 손이 같은 국채를 반대로 당기는 셈이라 시장이 어느 신호를 따라야 할지 헷갈려.</div>
+  </div>
+
+  <div class="section-title">누가 맞다고 보나</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">누르자</span>
+      <h3>베선트(재무부) — 장기금리는 정책으로도 눌러야</h3>
+      <p>국가부채 40조 달러 시대, 이자 부담이 국방비를 넘어선 상황에서 <b>장기금리를 낮게 묶어야</b> 정부·가계 이자 부담이 줄어든다는 입장.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">물가부터</span>
+      <h3>워시(연준) — 금리는 시장이 찾게 둬야</h3>
+      <p>정부가 인위적으로 장기금리를 누르면 <b>물가 신호가 왜곡</b>돼. 물가 안정이 먼저고, 금리는 시장 스스로 수준을 찾아야 한다는 입장.</p>
+    </div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">8/28</div><div class="what">워시 첫 잭슨홀 연설 — 매파 발언</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/9~11/4</div><div class="what">재무부 바이백 확대 시행 구간</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">9월 중</div><div class="what"><b>다음 FOMC</b> — 인상 여부 결정, 환율·코스피 영향 체크</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.29 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
