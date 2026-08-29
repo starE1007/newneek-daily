@@ -1,7 +1,7 @@
-<!-- scraped_at_kst: 2026-08-29 11:52 -->
-<!-- date_kst: 2026-08-29 (Sat) -->
+<!-- scraped_at_kst: 2026-08-30 07:43 -->
+<!-- date_kst: 2026-08-30 (Sun) -->
 
-## 뉴닉 데일리 — 2026-08-29
+## 뉴닉 데일리 — 2026-08-30
 원문: https://stibee.com/api/v1.0/emails/share/O3gYnIzcr9N6ospsOdvOLBEcfPf4OTI
 
 뉴닉 데일리
