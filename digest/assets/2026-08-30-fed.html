@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>연준을 흔들면, 금리는 오히려 오른다</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .box{flex:1 1 220px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .box span{font-size:13px;color:var(--text2)}
+  .op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .box.result{background:var(--red-soft);border-color:#F6D3CE}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--orange-soft);color:#B06426}
+  .badge.wait{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.hot{background:var(--red-soft);border-color:#F6D3CE}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.08.30 데일리 뉴스 · 시각자료</div>
+  <h1>🏛️ 연준을 흔들면, 금리는 오히려 오른다</h1>
+  <div class="sub">대통령이 연준 이사회를 자기 편으로 채우려 한 시도가 왜 대법원까지 갔고, 왜 그 개입이 금리를 더 밀어 올리는지 한 장으로 보기</div>
+
+  <div class="section-title">지금 이사회 구성</div>
+  <div class="row">
+    <div class="box"><b>연준 이사 7석</b><span>이미 트럼프 측근 3석</span></div>
+    <div class="op">+</div>
+    <div class="box"><b>쿡 이사 해임 성공 시</b><span>측근 4석 확보</span></div>
+    <div class="op">=</div>
+    <div class="box result"><b>결과</b><span>이사회 <b>과반</b>을 대통령 편으로</span></div>
+  </div>
+
+  <div class="section-title">흔들기 → 역설 메커니즘</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>트럼프, 리사 쿡 이사 해임 시도 (2025.8)</b><span class="mdesc">모기지(주택담보대출) 사기 혐의를 들어 해임 통보</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>연방대법원, 5대 4로 제동</b><span class="mdesc">"절차적 보호 없이 해임할 수 없다"며 당분간 해임 금지</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>트럼프, 판결 무시하고 해임 재시동 (8/8)</b><span class="mdesc">쿡 이사에게 "사기 소명하라" 재통보</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>워시 의장, 첫 잭슨홀서 매파 발언 (8/28)</b><span class="mdesc">"물가 밑바닥 흐름이 나아졌다는 뜻은 아니다"</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>시장, 오히려 금리를 더 얹는다 (8/29)</b><span class="mdesc">PCE 예상 상회 겹치며 2년물 4.34%로 추가 상승 — 월가는 "합격점"</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 개입할수록 오르는 역설</b>대통령이 이사회를 자기 편으로 채워 금리를 내리려 할수록, 시장은 "이 금리가 물가 판단인지 정치적 선물인지" 의심해 — 그 의심만큼 장기금리에 웃돈을 얹어. 내리려던 개입이 오히려 금리를 밀어 올리는 재료가 되는 거야.</div>
+  </div>
+
+  <div class="section-title">왜 이렇게까지 대법원 판결도 무시하나</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">트럼프 쪽 논리</span>
+      <h3>"금리 인하가 경기·부동산을 살린다"</h3>
+      <p>대통령은 <b>낮은 금리</b>가 성장과 대출 부담 완화로 이어진다고 보고, 이사회 구성부터 바꿔 확실히 내리려는 쪽.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">대법원·연준 쪽 논리</span>
+      <h3>"절차·독립성이 무너지면 신뢰가 무너진다"</h3>
+      <p>정당한 절차 없는 해임은 <b>중앙은행 독립성</b> 자체를 흔들어 — 독립성이 흔들리면 금리 신호를 아무도 못 믿게 돼.</p>
+    </div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">8/8</div><div class="what">쿡 이사 해임 재시동</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot"><div class="when">8/28~29</div><div class="what">잭슨홀 매파 발언 + PCE 상회 → 국채금리 상승</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">9월</div><div class="what"><b>다음 FOMC</b> — 쿡 이사 거취·인상 여부 함께 확인</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.08.30 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
