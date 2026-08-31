@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.01</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.01 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'warsh_hawkish', variants:[
+    { q:'31일 코스피가 개장 직후 3%대 가까이 급락한 가장 직접적인 계기는?',
+      opts:['워시 연준의장의 잭슨홀 매파 발언 이후 9월 금리인상 베팅이 급등하며 미 국채금리가 오른 것',
+            '삼성전자와 SK하이닉스가 동시에 실적 부진을 발표한 것',
+            '한국은행이 새벽에 기준금리를 인상한 것',
+            '원/달러 환율이 1500원을 돌파한 것'], answer:0,
+      explain:'케빈 워시 연준의장이 잭슨홀에서 "물가가 목표치로 충분히 안 내려오면 <b>할 일이 남아있다</b>"고 말하자, 9월 금리인상 베팅이 하루 만에 40%대에서 <b>57.5%</b>로 급등했고 미 국채금리가 더 올랐어. 그 여파가 코스피 개장 폭락으로 이어진 거야.' },
+    { q:'워시 의장의 발언 이후 "9월 금리인상 베팅"이 어떻게 바뀌었는지 가장 정확히 설명한 것은?',
+      opts:['전주 40%대에서 57.5%로 급등했다',
+            '90%에서 10%로 급락했다',
+            '베팅 자체가 아예 사라졌다',
+            '정확히 50%로 변동 없이 유지됐다'], answer:0,
+      explain:'페드워치 기준 9월 금리<b>인상</b> 전망이 전주 40%대에서 <b>57.5%</b>로 급등했어. 시장이 "연준이 정말 더 올릴 수도 있다"고 새로 가격을 매기기 시작했다는 뜻이야.' },
+  ]},
+  { id:'buyback_defense', variants:[
+    { q:'코스피가 개장 폭락에서 마감 무렵 낙폭을 크게 줄이거나 반등할 수 있었던 직접적인 이유로 가장 알맞은 것은?',
+      opts:['삼성전자·SK하이닉스의 대규모 자사주 매입 공시와 밤사이 나온 美 반도체 관련 기업의 깜짝 실적',
+            '정부가 증시 개장을 일시 중단시켰기 때문',
+            '외국인 투자자들이 대규모로 순매수에 나섰기 때문',
+            '코스닥이 상장폐지된 종목들을 정리했기 때문'], answer:0,
+      explain:'삼성전자(<b>200만주</b>)·SK하이닉스(<b>65만주</b>) 자사주 매입 공시가 매도 물량을 흡수했고, 밤사이 미국 AI클라우드·서버 제조업체의 깜짝 실적(20%대 급등)이 반도체 투자심리를 되살렸어. 이 둘이 겹치며 낙폭을 되돌렸어.' },
+    { q:'"자사주 매입"이 이번처럼 지수 방어에 쓰이는 원리를 가장 정확히 설명한 것은?',
+      opts:['회사가 시장에서 직접 자기 주식을 사들이면서 매도 물량 일부를 흡수해 주가 하락 압력을 줄인다',
+            '자사주 매입은 회사의 부채를 늘려 주가를 자동으로 올린다',
+            '자사주 매입은 정부가 세금으로 대신 사주는 제도다',
+            '자사주 매입을 하면 그 회사 주식의 거래가 전면 중단된다'], answer:0,
+      explain:'자사주 매입은 회사가 <b>장내에서 자기 주식을 직접 사들이는 것</b>이야. 팔려는 물량 일부를 회사가 사주는 셈이라 하락 압력이 줄어들어 — 다만 이건 회사 차원의 방어일 뿐, 투자자들의 심리가 바뀐 건 아니야.' },
+  ]},
+  { id:'rebound_reality', variants:[
+    { q:'31일 코스피 반등을 "진짜 투자심리 회복은 아니다"라고 보는 근거로 가장 알맞은 것은?',
+      opts:['외국인·기관·개인 투자자가 이날 모두 순매도했는데도 지수만 올랐기 때문',
+            '거래량이 평소보다 훨씬 줄어들었기 때문',
+            '코스닥은 반등 없이 계속 하락 마감했기 때문',
+            '반등이 정규장이 아니라 시간외거래에서만 있었기 때문'], answer:0,
+      explain:'이날 <b>외국인·기관·개인 세 주체가 모두 순매도</b>했는데도 지수는 올랐어. 즉 "다들 팔았지만 삼성전자·하이닉스의 자사주 매입이 지수를 떠받친" 결과에 가깝다는 뜻이야.' },
+    { q:'이번 코스피 반등의 성격을 가장 정확히 요약한 것은?',
+      opts:['투자자들이 위험자산 선호로 완전히 돌아섰다는 신호',
+            '기업의 자사주 매입발 방어이지, 투자자 전체의 심리 회복이라 보기는 이르다',
+            '연준이 금리인상 계획을 완전히 철회했다는 신호',
+            '한국 기업 실적이 전반적으로 시장 예상을 크게 웃돌았다는 신호'], answer:1,
+      explain:'세 투자주체가 다 팔았다는 사실은 시장이 여전히 리스크를 낮게 보고 있다는 뜻이야. 지수를 지킨 건 자사주 매입이라, <b>9월 미국 고용지표·FOMC</b> 결과에 따라 다시 흔들릴 여지가 남아 있어.' },
+  ]},
+  { id:'nepal_toll', variants:[
+    { q:'31일 기준 네팔·중국(티베트) 합산 사망·실종자 집계가 전날보다 크게 늘어난 이유로 가장 알맞은 것은?',
+      opts:['새로운 산사태가 추가로 발생해 피해가 커졌기 때문',
+            '수색·구조가 진전되면서 추가 사망이 확인되고 실종자 집계가 정리됐기 때문',
+            '집계 기준을 네팔 전체 인구로 바꿨기 때문',
+            '한국인 실종자가 새로 추가됐기 때문'], answer:1,
+      explain:'전날(30일) 사망 750명대·실종 3천명대였던 집계가 31일 사망 <b>919명</b>, 실종 <b>4,793명</b>으로 늘었어. 새 재해가 아니라 <b>수색이 진행되며 확인·정리</b>된 결과로 보는 게 정확해.' },
+    { q:'네팔 UT-1 수력발전소에서 실종된 한국인 근로자 9명의 현재 상황을 가장 정확히 설명한 것은?',
+      opts:['전원 구조돼 귀국 절차를 밟고 있다',
+            '31일 기준으로도 여전히 수색이 계속되고 있다',
+            '수색이 공식 종료되고 실종 처리됐다',
+            '애초에 한국인 실종자는 없었던 것으로 정정됐다'], answer:1,
+      explain:'한국인 9명(두산에너빌리티 6·한국남동발전 3)은 31일 기준으로도 <b>여전히 수색 중</b>이야. 도로가 유실돼 헬기·드론 위주로 수색이 이뤄지고 있어.' },
+  ]},
+  { id:'cabinet_reshuffle', variants:[
+    { q:'30일 발표된 이재명 정부 개각에서 신임 경제부총리 겸 재정경제부 장관으로 지명된 사람은?',
+      opts:['이형일 (전 재정경제부 1차관)',
+            '김승원 (더불어민주당 의원)',
+            '강신철 (전 한미연합사 부사령관)',
+            '홍지선 (국토교통부 2차관)'], answer:0,
+      explain:'경제부총리 겸 재정경제부 장관에는 <b>이형일</b> 현 재정경제부 1차관이 지명됐어. 김승원은 법무부 장관, 강신철은 국방부 장관, 홍지선은 국토교통부 장관 후보자야.' },
+    { q:'이번 6개 부처 개각을 두고 나오는 분석으로 가장 알맞은 것은?',
+      opts:['이재명 대통령의 국정 지지율 하락 속에서 국정 추진력을 다시 끌어올리려는 포석',
+            '헌법상 임기가 끝난 장관들을 자동으로 교체하는 정기 절차',
+            '야당의 요구를 그대로 수용해 이뤄진 개각',
+            '개각 대상 부처가 모두 폐지·통합되면서 생긴 후속 조치'], answer:0,
+      explain:'집권 2년 차에 접어들며 지지율이 계속 떨어지는 상황에서, <b>국정 추진력을 강화</b>하기 위해 6개 부처 장관을 한꺼번에 교체했다는 해석이 나와.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'31일 코스피가 마감한 지수는 몇 포인트였을까? (소수점 포함 숫자)',
+    accept:['6820.02','6820','6,820.02','6,820'],
+    explain:'정답은 <b>6820.02</b>야. 개장 직후 6604선까지 급락했다가 마감엔 전일 대비 0.46% 오른 이 수치로 마쳤어.' },
+  { q:'31일 잭슨홀에서 매파 발언을 내놓은 연준의장의 이름은? (성)',
+    accept:['워시','케빈 워시','Warsh'],
+    explain:'정답은 <b>워시</b>(케빈 워시)야. "물가가 목표치로 안 내려오면 할 일이 남아있다"는 발언으로 9월 금리인상 베팅을 끌어올렸어.' },
+  { q:'코스피 반등을 이끈 두 반도체 대장주 중, 자사주 65만주 매입을 공시한 회사는 어디일까? (회사명)',
+    accept:['SK하이닉스','하이닉스','SK Hynix'],
+    explain:'정답은 <b>SK하이닉스</b>야. 삼성전자는 200만주, SK하이닉스는 65만주를 장내 매수하겠다고 공시했어.' },
+  { q:'31일 기준 네팔·중국 합산 홍수 실종자는 몇 명으로 집계됐을까? (숫자, 명 단위)',
+    accept:['4793','4,793','4793명','4,793명'],
+    explain:'정답은 <b>4,793명</b>이야. 사망자는 919명(네팔 903·티베트 16)으로 집계됐어.' },
+  { q:'30일 개각에서 성평등가족부 장관 후보자로 지명된 기본소득당 의원의 이름은? (인명)',
+    accept:['용혜인'],
+    explain:'정답은 <b>용혜인</b>이야. 지명대로 임명되면 역대 최연소 성평등가족부 장관이 될 수 있다는 얘기가 나와.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
