@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.02</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.02 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'chokepoint_vs_terminal', variants:[
+    { q:'이번 사태에서 "해협 봉쇄 위협"보다 "하르그섬 타격"이 유가에 더 직접적으로 꽂힌 이유로 가장 알맞은 것은?',
+      opts:['항구 타격은 정부 공식 발표를 거쳐야만 유가에 반영되기 때문',
+            '해협은 원유가 지나가는 통행로를 막을 뿐이지만, 항구가 맞으면 원유 생산·수출 자체가 끊기기 때문',
+            '하르그섬이 호르무즈 해협보다 통과하는 물동량이 훨씬 많기 때문',
+            '해협 위협은 이미 관세 협상으로 상쇄돼 시장이 신경 쓰지 않기 때문'], answer:1,
+      explain:'해협은 <b>통행</b>의 문제고, 수출항이 맞으면 <b>생산·수출 자체</b>가 끊겨. 이번엔 위협이 아니라 실제 타격 소식까지 겹치면서 시장이 "이번엔 진짜 공급이 준다"는 쪽에 더 크게 반응한 거야.' },
+    { q:'호르무즈 해협이 세계 원유 시장에서 "병목"으로 불리는 이유를 가장 정확히 설명한 것은?',
+      opts:['페르시아만 산유국들의 원유가 바다로 나가는 사실상 유일한 출구이기 때문',
+            '이 해협을 지나는 배들에만 특별 보험료가 붙기 때문',
+            '이 해협의 수심이 얕아 대형 유조선이 아예 통과할 수 없기 때문',
+            '산유국들이 이 해협을 통해서만 원유 가격을 협상하기 때문'], answer:0,
+      explain:'사우디·UAE 등 걸프 산유국의 원유가 바다로 나가는 <b>사실상 하나뿐인 출구</b>라서, 여기서 나는 사건 하나가 세계 원유 공급 전체를 흔들어.' },
+  ]},
+  { id:'fed_flip', variants:[
+    { q:'이번 사태 전후로 9월 FOMC(연방공개시장위원회) 전망이 어떻게 바뀌었는지 가장 정확히 설명한 것은?',
+      opts:['금리 동결 전망에서 인하 전망으로 바뀌었다',
+            '금리 인하가 유력하던 분위기에서 인상 가능성이 시장 컨센서스로 떠올랐다',
+            '아무 변화 없이 인하 전망이 그대로 유지됐다',
+            '연준이 9월 회의 자체를 취소하기로 했다'], answer:1,
+      explain:'워시 연준의장의 매파 발언에 유가발 물가 압력까지 겹치면서, <b>인하를 기대하던 시장이 인상 가능성(66~68%)</b>을 더 높게 보기 시작했어 — 몇 주 전 컨센서스가 통째로 뒤집힌 거야.' },
+    { q:'매파 발언과 유가 급등이 겹칠 때 중앙은행의 금리 결정 쪽으로 힘이 실리는 경로로 가장 알맞은 것은?',
+      opts:['유가 상승 → 물가 상승 압력 → 금리를 더 올려야 한다는 목소리에 힘 → 매파 발언과 결합해 인상 기대 강화',
+            '유가 상승은 금리 결정과 무관하며 환율에만 영향을 준다',
+            '유가가 오르면 중앙은행은 규정상 자동으로 금리를 동결해야 한다',
+            '매파 발언은 유가와 정반대 방향으로만 작동해 서로 상쇄된다'], answer:0,
+      explain:'유가가 오르면 물가에 <b>직접</b> 압력을 줘. 물가를 잡으려는 매파 발언과 이 압력이 같은 방향으로 겹치니, 인상 쪽 기대가 더 강해진 거야.' },
+  ]},
+  { id:'fx_channel', variants:[
+    { q:'미국 금리인상 가능성이 커지면 원/달러 환율에 영향을 주는 경로로 가장 정확히 설명한 것은?',
+      opts:['미국 금리 상승 기대 → 미 국채금리 상승 → 한미 금리차 확대 → 원화 약세 압력',
+            '미국 금리와 원/달러 환율은 서로 무관하다',
+            '미국 금리가 오르면 자동으로 원화 가치도 같이 오른다',
+            '금리 변화는 환율보다 주가에만 영향을 준다'], answer:0,
+      explain:'한미 <b>금리차</b>가 벌어지면 상대적으로 이자를 더 주는 달러 쪽으로 돈이 쏠리기 쉬워져 — 그래서 원화가 약세 압력을 받는 거야.' },
+    { q:'13개월 만에 최저치까지 내려갔던(원화가 강세였던) 원/달러 환율이 이번 사태로 되돌아갈 위험이 있다고 보는 근거는?',
+      opts:['유가 급등이 반도체 관세 정책을 자동으로 없애기 때문',
+            '미국의 금리인상 가능성이 커지며 한미 금리차가 다시 벌어질 수 있기 때문',
+            '원/달러 환율은 유가와 전혀 관계가 없기 때문',
+            '이란 사태가 한국의 수출 자체를 직접 막기 때문'], answer:1,
+      explain:'원화 강세는 최근 한미 금리차가 좁혀진 영향이 컸어. 그런데 미국이 <b>금리를 다시 올릴 가능성</b>이 커지면 그 격차가 벌어지면서 강세 흐름이 되돌아갈 수 있어.' },
+  ]},
+  { id:'fuel_surcharge', variants:[
+    { q:'9월 국제선 유류할증료가 21단계로, 전월보다 7단계나 뛴 근본 원인으로 가장 알맞은 것은?',
+      opts:['항공사들이 담합해 가격을 올렸기 때문',
+            '산정 기준인 국제 항공유 평균 가격이 한 달 새 크게 뛰었기 때문',
+            '정부가 새로운 세금을 부과했기 때문',
+            '여름 휴가철 수요가 갑자기 몰렸기 때문'], answer:1,
+      explain:'유류할증료는 <b>국제 항공유 평균가 구간</b>에 따라 자동으로 단계가 매겨져. 기준가가 한 달 새 크게 오르면서 단계가 껑충 뛴 거야.' },
+    { q:'유류할증료 제도가 항공권 가격에 반영되는 방식을 가장 정확히 설명한 것은?',
+      opts:['매번 항공사가 임의로 정하는 금액이라 예측이 불가능하다',
+            '국제 항공유 평균 가격 구간에 따라 단계가 정해지고, 그 단계에 맞춰 요금에 자동으로 얹힌다',
+            '유가와 무관하게 계절에 따라서만 바뀐다',
+            '국내선에만 적용되고 국제선에는 적용되지 않는다'], answer:1,
+      explain:'<b>유가 구간별 단계표</b>가 미리 정해져 있고, 그 달 평균 유가가 어느 구간에 들어가는지에 따라 할증료 단계가 자동으로 매겨져 요금에 얹혀.' },
+  ]},
+  { id:'kospi_today', variants:[
+    { q:'1일 코스피가 장중 급락했다가 결국 소폭 상승 마감한 흐름을 가장 정확히 설명한 것은?',
+      opts:['미국-이란 충돌 소식에 놀라 급락했다가, 반도체 대형주가 낙폭을 만회하며 플러스로 마감했다',
+            '오전 내내 상승만 하다 오후 들어 급락 마감했다',
+            '거래가 일시 정지됐다가 재개되며 급등했다',
+            '외국인 매수세만으로 상승 마감했다'], answer:0,
+      explain:'중동發 리스크에 장중 -1.28%까지 밀렸다가, <b>SK하이닉스·삼성전자</b> 같은 반도체 대형주가 낙폭을 되돌리며 결국 소폭 플러스(6,835.80)로 마감했어.' },
+    { q:'이틀 연속(8/31, 9/1) 코스피가 "개장 급락 → 마감 반등" 패턴을 반복한 것에서 알 수 있는 점으로 가장 알맞은 것은?',
+      opts:['대외 리스크에 즉각 반응해 출렁이지만, 반도체 대형주나 자사주 매입 같은 방어 요인이 낙폭을 되돌리고 있다',
+            '한국 증시는 해외 이슈에 전혀 영향받지 않는다',
+            '코스피의 하루 변동성이 이제 완전히 사라졌다',
+            '이 패턴은 매일 정해진 시각에 기계적으로 반복되도록 설계돼 있다'], answer:0,
+      explain:'이틀 다 <b>대외 악재로 급락 → 국내 요인(자사주 매입·반도체 반등)으로 되돌림</b>의 구조가 반복됐어. 시장이 여전히 대외 리스크에 예민하다는 뜻이야.' },
+  ]},
+  { id:'nepal_update', variants:[
+    { q:'1일 기준 네팔 홍수 실종자 집계가 이전(4,793명)보다 줄어든(3,916명) 이유로 가장 알맞은 것은?',
+      opts:['수색이 진전되며 다수의 생사가 확인돼 집계가 정리됐기 때문',
+            '정부가 실종자로 인정하는 기준 자체를 완화했기 때문',
+            '실종자 대부분이 통계에서 임의로 제외됐기 때문',
+            '티베트 쪽 집계를 이번부터 뺐기 때문'], answer:0,
+      explain:'숫자가 줄었다고 피해가 준 게 아니야. <b>수색이 진행되며 생존·사망이 확인</b>되는 만큼 실종자 항목에서 다른 항목으로 옮겨간 결과에 가까워.' },
+    { q:'네팔 홍수 관련, 한국인 근로자 상황을 가장 정확히 설명한 것은?',
+      opts:['연락이 끊긴 두산에너빌리티 직원 6명이 아직 실종 상태로 수색이 계속되고 있다',
+            '실종됐던 한국인 전원의 생존이 확인돼 상황이 종료됐다',
+            '애초에 한국인 근로자 실종 사례는 없었다',
+            '한국인 근로자 수색은 예산 부족으로 중단됐다'], answer:0,
+      explain:'앞서 구조된 9명과 별개로, <b>연락이 끊긴 6명</b>은 여전히 실종 상태라 수색이 계속되고 있어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'미국이 이번에 선제 타격한, 호르무즈 해협 초입에 있는 이란령 섬 이름은? (지명)',
+    accept:['라라크','라라크섬','Larak','Larak Island'],
+    explain:'정답은 <b>라라크섬</b>이야. 미군이 이 섬의 IRGC 로켓 발사대 두 곳을 "해협에 기뢰를 다시 깔려는 정황"을 명분으로 선제 타격했어.' },
+  { q:'이란 원유 수출량의 9할 가까이가 실려 나가는, 이번에 피해 소식이 전해진 수출 터미널이 있는 섬 이름은? (지명)',
+    accept:['하르그','하르그섬','Kharg','Kharg Island'],
+    explain:'정답은 <b>하르그섬</b>이야. 해협 위협과 달리 이 항구가 맞으면 원유 <b>생산·수출 자체</b>가 끊기기 때문에 유가에 더 직접적으로 반영돼.' },
+  { q:'국제 항공유 평균가 구간에 따라 항공권에 자동으로 얹히는, 9월 21단계까지 오른 이 요금을 뭐라고 부를까? (한 단어)',
+    accept:['유류할증료','유류 할증료'],
+    explain:'정답은 <b>유류할증료</b>야. 기준 유가가 오르면 정해진 단계표에 따라 자동으로 올라가는 구조라, 이번 유가 급등이 다음 달 단계에도 반영될 수 있어.' },
+  { q:'중앙은행 총재의 발언이 "물가를 잡기 위해 금리를 더 올려야 한다"는 쪽으로 강경할 때, 이런 태도를 뭐라고 부를까? (한 단어)',
+    accept:['매파','매파적','hawkish'],
+    explain:'정답은 <b>매파</b>(hawkish)야. 반대로 금리를 내리거나 완화적인 쪽은 비둘기파라고 불러.' },
+  { q:'미국 금리와 한국 금리 사이의 차이(금리차)가 벌어지면 원/달러 환율에는 보통 어떤 압력이 생길까? (한 단어: 강세/약세)',
+    accept:['약세','원화 약세','원화약세'],
+    explain:'정답은 <b>약세</b>야. 금리가 높은 쪽(달러)으로 돈이 몰리기 쉬워지면서 원화 가치가 상대적으로 눌리는 압력을 받아.' },
+  { q:'네팔 홍수 이후 지금까지 연락이 끊긴 채 실종 상태인 한국 기업 직원 수는 몇 명일까? (숫자)',
+    accept:['6','6명','여섯','여섯명'],
+    explain:'정답은 <b>6명</b>이야. 앞서 구조돼 귀국한 9명과 별개로, 이 6명은 아직 생사가 확인되지 않아 수색이 이어지고 있어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
