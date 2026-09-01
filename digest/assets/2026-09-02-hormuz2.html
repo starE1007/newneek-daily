@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>호르무즈가 다시 불붙었다 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:640px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  /* 관계도 */
+  .rel{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .rel-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .rel-row:last-child{margin-bottom:0}
+  .chip{border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:700;text-align:center;min-width:120px}
+  .chip.us{background:var(--blue-soft);color:#1B6BB8}
+  .chip.ir{background:var(--red-soft);color:#B23F34}
+  .chip small{display:block;font-weight:500;font-size:11.5px;margin-top:2px;opacity:.85}
+  .rel-arrow{color:#B9B6B1;font-size:15px;font-weight:700}
+  .target{flex:1 1 160px;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;background:var(--soft)}
+  .target b{display:block;font-size:13.5px;color:var(--text)}
+  .target span{color:var(--text2);font-size:12px}
+
+  /* 메커니즘 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px 12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .pins{margin-top:12px;font-size:13px;color:var(--text2)}
+  .pins .pin{margin-bottom:6px}
+  .pins a{color:var(--blue);text-decoration:none;font-weight:600}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .rel-row{flex-direction:column;align-items:stretch}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.02 데일리 뉴스 · 시각자료</div>
+  <h1>⚔️ 호르무즈가 다시 불붙었다</h1>
+  <div class="sub">해협 초입 라라크섬 타격 → 이란 보복 → 원유수출항 하르그섬까지 — 어디서 무슨 일이 났는지 한 장으로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="페르시아만 지도: 라라크섬, 하르그섬, 오만 해역 위치">
+      <defs>
+        <marker id="ah2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="760" height="420" fill="#F0EFED"/>
+
+      <!-- Persian Gulf + Strait of Hormuz + Gulf of Oman -->
+      <path d="M60,70 L520,40 L620,90 L680,150 L700,230 L660,300 L560,330 L400,300 L260,260 L140,190 L80,130 Z"
+            fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- Iran (north) -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="330" y="34" font-size="16">이  란</text>
+        <text x="120" y="106" font-size="13">사우디아라비아</text>
+        <text x="600" y="330" font-size="13">오만</text>
+        <text x="450" y="220" font-size="12">UAE</text>
+      </g>
+      <g font-style="italic" fill="#5B87B5" font-size="12" text-anchor="middle" font-family="inherit">
+        <text x="260" y="130">페르시아만</text>
+        <text x="600" y="220" transform="rotate(35 600 220)">오만만</text>
+      </g>
+
+      <!-- Strait of Hormuz label -->
+      <text x="520" y="150" font-size="11" font-weight="700" fill="#2C2C2B" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">호르무즈 해협</text>
+
+      <!-- tanker route arrow through strait -->
+      <path d="M120,150 C260,190 400,190 500,165 C580,150 640,180 670,240" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9" marker-end="url(#ah2)"/>
+
+      <!-- ① Kharg Island marker (NW Persian Gulf, near Iran coast) -->
+      <g>
+        <circle cx="160" cy="110" r="20" fill="#E56458" opacity="0.15"/>
+        <circle cx="160" cy="110" r="11" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <text x="160" y="114" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="inherit">①</text>
+      </g>
+      <g font-family="inherit">
+        <rect x="60" y="140" width="176" height="40" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="148" y="157" font-size="12.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 하르그섬</text>
+        <text x="148" y="172" font-size="11" font-weight="700" fill="#C6493E" text-anchor="middle">이란 원유수출 터미널 피해</text>
+      </g>
+
+      <!-- ② Larak Island marker (near Hormuz strait, south Iran coast) -->
+      <g>
+        <circle cx="470" cy="180" r="20" fill="#E56458" opacity="0.15"/>
+        <circle cx="470" cy="180" r="11" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <text x="470" y="184" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="inherit">②</text>
+      </g>
+      <g font-family="inherit">
+        <rect x="380" y="60" width="176" height="40" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="468" y="77" font-size="12.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 라라크섬</text>
+        <text x="468" y="92" font-size="11" font-weight="700" fill="#C6493E" text-anchor="middle">美, IRGC 발사대 선제타격</text>
+        <line x1="468" y1="100" x2="470" y2="164" stroke="#9AA5B1" stroke-width="1.5"/>
+      </g>
+
+      <!-- ③ Gulf of Oman tanker marker -->
+      <g>
+        <circle cx="640" cy="260" r="20" fill="#D5803B" opacity="0.18"/>
+        <circle cx="640" cy="260" r="11" fill="#D5803B" stroke="#FFFFFF" stroke-width="3"/>
+        <text x="640" y="264" font-size="10" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="inherit">③</text>
+      </g>
+      <g font-family="inherit">
+        <rect x="540" y="285" width="190" height="40" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="635" y="302" font-size="12.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">③ 오만 해역</text>
+        <text x="635" y="317" font-size="11" font-weight="700" fill="#B06426" text-anchor="middle">정체불명 발사체, 유조선 피격</text>
+        <line x1="635" y1="285" x2="640" y2="271" stroke="#9AA5B1" stroke-width="1.5"/>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/></svg> 타격·피해 지점</span>
+      <span class="item"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#D5803B"/></svg> 공격 발생 지점</span>
+      <span class="item"><span style="display:inline-block;width:34px;height:0;border-top:3px dashed #D5803B"></span> 주요 원유 항로</span>
+    </div>
+  </div>
+
+  <div class="pins">
+    <div class="pin">📍 <a href="https://www.google.com/maps/search/?api=1&query=Kharg+Island+Iran" target="_blank" rel="noopener">하르그섬</a> — 이란 서부 해안 · 원유 수출량 9할 가까이 실려나가는 항구</div>
+    <div class="pin">📍 <a href="https://www.google.com/maps/search/?api=1&query=Larak+Island+Iran" target="_blank" rel="noopener">라라크섬</a> — 이란 남부 해안 · 호르무즈 해협 초입을 지키는 섬</div>
+    <div class="pin">📍 <a href="https://www.google.com/maps/search/?api=1&query=Gulf+of+Oman" target="_blank" rel="noopener">오만 해역</a> — 오만과 이란 사이 · 호르무즈를 빠져나온 원유선이 지나는 뱃길</div>
+    <div class="pin">📍 <a href="https://www.google.com/maps/search/?api=1&query=Al+Dhafra+Air+Base+UAE" target="_blank" rel="noopener">알 다프라 공군기지</a> — UAE 아부다비 인근 · 미군 최대 해외기지 중 하나</div>
+    <div class="pin">📍 <a href="https://www.google.com/maps/search/?api=1&query=Muwaffaq+Salti+Air+Base+Jordan" target="_blank" rel="noopener">무와파크 살티 공군기지</a> — 요르단 동부 · 미군 주둔 공군기지</div>
+  </div>
+
+  <div class="section-title">누가 누구를 쳤나</div>
+  <div class="rel">
+    <div class="rel-row">
+      <div class="chip us">미국<small>선제타격</small></div>
+      <div class="rel-arrow">→</div>
+      <div class="target"><b>② 라라크섬(이란)</b><span>IRGC 로켓 발사대 2곳 — "기뢰 재투입 정황" 명분</span></div>
+    </div>
+    <div class="rel-row">
+      <div class="chip ir">이란<small>보복 3갈래</small></div>
+      <div class="rel-arrow">→</div>
+      <div class="target"><b>UAE·요르단 미군기지</b><span>미사일·드론 공격</span></div>
+      <div class="target"><b>오만 해역</b><span>유조선 피격(③)</span></div>
+      <div class="target"><b>① 하르그섬(이란 자국 항구)</b><span>수출 터미널까지 피해 — 공급 차질 확정적</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">막히고 맞으면 나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">해협 위협<br>+ 수출항 피해</div>
+    <div class="arrow">→</div>
+    <div class="step s2">원유 공급 차질<br>우려 확산</div>
+    <div class="arrow">→</div>
+    <div class="step s3">국제유가 급등<small>브렌트 90달러 근접</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">물가 압력 ↑<br>9월 금리 '인상' 무게<small>한미 금리차·환율 변수</small></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(정밀 축척 아님) · 2026.09.02 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
