@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기름을 어디서 가져올까 — 중동이 막히자 카리브해로</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-o{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .dash-b{display:inline-block;width:34px;height:0;border-top:3px dashed var(--blue)}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  /* 생산량 비교 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-label{flex:0 0 130px;font-size:13.5px;color:var(--text2)}
+  .bar-label b{display:block;color:var(--text);font-size:14px}
+  .bar-track{flex:1;background:var(--surface2);border-radius:6px;height:26px;position:relative;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:12.5px;font-weight:700;color:#fff}
+  .bar-fill.peak{background:#9AA5B1;width:100%}
+  .bar-fill.now{background:var(--orange);width:32%}
+  .bar-note{font-size:13px;color:var(--text2);margin-top:4px}
+  .bar-note b{color:var(--text)}
+
+  /* 단계 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.broken .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt > b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .mtxt .mdesc b{font-size:inherit;color:var(--text)}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+  .tag.bad{background:var(--red-soft);color:#C6493E}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox > b:first-child{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 딜 구조 */
+  .deal{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center}
+  .deal-box{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .deal-box .who{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px}
+  .deal-box h3{font-size:15px;margin-bottom:4px}
+  .deal-box p{font-size:13.5px;color:var(--text2)}
+  .deal-box p b{color:var(--text)}
+  .deal-arrow{font-size:13px;font-weight:700;color:#B9B6B1;text-align:center;line-height:1.3}
+  .deal-arrow span{display:block;font-size:11.5px;font-weight:600;color:var(--text2)}
+  .split{display:flex;gap:0;margin-top:10px;border-radius:6px;overflow:hidden;height:24px;font-size:11.5px;font-weight:700;color:#fff}
+  .split div{display:flex;align-items:center;justify-content:center}
+  .split .dod{background:#B23F34;width:35%}
+  .split .usa{background:var(--orange);width:20%}
+  .split .nab{background:#9AA5B1;width:45%}
+  .split-note{font-size:12.5px;color:var(--text2);margin-top:6px}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3,.step.s4{background:var(--orange-soft);color:#9A5620}
+  .step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .deal{grid-template-columns:1fr}
+    .deal-arrow{transform:rotate(90deg)}
+    .bar-label{flex:0 0 100px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.02 데일리 뉴스 · 시각자료</div>
+  <h1>🛢️ 기름을 어디서 가져올까 — 중동이 막히자 카리브해로</h1>
+  <div class="sub">미국은 새 기름길을 뚫었고, 한국은 여전히 막힌 쪽에 서 있어 — 지도와 구조로 한 번에 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="세계 개략 지도: 베네수엘라 오리노코 유전과 페르시아만·호르무즈 해협의 위치, 그리고 각각의 원유 항로">
+      <defs>
+        <marker id="ao" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+        <marker id="ab" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#2783DE"/>
+        </marker>
+      </defs>
+
+      <!-- ocean -->
+      <rect x="0" y="0" width="900" height="470" fill="#D8E9F7"/>
+
+      <!-- 북미 -->
+      <path d="M30,50 L215,44 L232,96 L205,132 L178,150 L150,176 L120,186 L96,160 L60,120 L34,84 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 중미 -->
+      <path d="M120,186 L150,176 L176,196 L196,206 L182,222 L150,212 L128,198 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 남미 -->
+      <path d="M182,222 L262,214 L282,258 L266,320 L240,384 L214,430 L196,398 L188,330 L172,276 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 베네수엘라 하이라이트 -->
+      <path d="M196,214 L256,212 L262,240 L232,252 L200,240 Z"
+            fill="#2783DE" fill-opacity="0.16" stroke="#2783DE" stroke-width="1.6" stroke-dasharray="4 3"/>
+
+      <!-- 유럽 -->
+      <path d="M408,42 L520,40 L546,72 L530,110 L482,124 L436,108 L410,74 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 아프리카 -->
+      <path d="M420,132 L544,126 L570,168 L556,232 L520,300 L482,362 L452,336 L432,268 L414,196 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 아라비아반도 -->
+      <path d="M576,140 L648,136 L662,182 L630,224 L594,214 L572,178 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 이란·유라시아 -->
+      <path d="M556,36 L868,40 L880,120 L836,150 L790,140 L742,150 L700,182 L672,166 L648,132 L600,116 L560,86 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 인도 -->
+      <path d="M700,182 L744,176 L742,222 L722,262 L704,224 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+      <!-- 동아시아 반도 -->
+      <path d="M790,140 L836,150 L846,196 L812,206 L788,180 Z"
+            fill="#F0EFED" stroke="#DDDCDA" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 페르시아만 water -->
+      <path d="M596,124 C614,142 636,158 658,172 L648,186 C624,172 602,154 584,134 Z" fill="#BCD9F1"/>
+
+      <!-- 항로 ① 베네수엘라 → 미국 걸프 (파랑, 짧음) -->
+      <path d="M204,222 C176,210 156,196 140,176" fill="none" stroke="#2783DE" stroke-width="3.2" stroke-dasharray="7 6" marker-end="url(#ab)"/>
+      <!-- 항로 ② 페르시아만 → 동아시아 (주황, 길고 우회) -->
+      <path d="M666,192 C700,240 704,296 748,312 C796,326 836,286 812,236 C806,224 798,210 790,200" fill="none" stroke="#D5803B" stroke-width="3.2" stroke-dasharray="7 6" marker-end="url(#ao)"/>
+
+      <!-- 바다 라벨 -->
+      <g font-style="italic" fill="#5B87B5" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="112" y="248">카리브해</text>
+        <text x="352" y="166">대  서  양</text>
+        <text x="618" y="256">아라비아해</text>
+        <text x="782" y="382">인  도  양</text>
+      </g>
+
+      <!-- 대륙 라벨 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="120" y="100" font-size="15">미  국</text>
+        <text x="238" y="330" font-size="14">남아메리카</text>
+        <text x="480" y="240" font-size="14">아프리카</text>
+        <text x="470" y="80" font-size="13">유럽</text>
+        <text x="722" y="226" font-size="12.5">인도</text>
+      </g>
+
+      <!-- 베네수엘라 라벨 -->
+      <g text-anchor="middle" font-family="inherit">
+        <text x="248" y="272" font-size="13" font-weight="700" fill="#1B6BB8" paint-order="stroke" stroke="#F0EFED" stroke-width="4">베네수엘라</text>
+      </g>
+
+      <!-- 한국 마커 -->
+      <g font-family="inherit">
+        <circle cx="814" cy="176" r="6" fill="#2C2C2B"/>
+        <line x1="814" y1="184" x2="814" y2="214" stroke="#9AA5B1" stroke-width="1.5"/>
+        <text x="814" y="230" font-size="13" font-weight="700" fill="#2C2C2B" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4">한국</text>
+      </g>
+
+      <!-- 마커 ① 오리노코 (새로 열림, 파랑) -->
+      <g>
+        <circle cx="228" cy="228" r="20" fill="#2783DE" opacity="0.15"/>
+        <circle cx="228" cy="228" r="11" fill="#2783DE" stroke="#FFFFFF" stroke-width="3"/>
+        <path d="M222,228 L226.5,232.5 L234,224" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <!-- 마커 ② 호르무즈·카르그 (막힘, 빨강) -->
+      <g>
+        <circle cx="652" cy="178" r="20" fill="#E56458" opacity="0.15"/>
+        <circle cx="652" cy="178" r="11" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="646" y1="184" x2="658" y2="172" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>
+      </g>
+
+      <!-- 칩 ① -->
+      <g font-family="inherit">
+        <line x1="292" y1="292" x2="242" y2="238" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="290" y="280" width="252" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="416" y="299" font-size="13.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 오리노코 유전 (17개)</text>
+        <text x="416" y="317" font-size="12" font-weight="700" fill="#2783DE" text-anchor="middle">새로 열림 · 미국이 100년 개발권</text>
+      </g>
+      <!-- 칩 ② -->
+      <g font-family="inherit">
+        <line x1="700" y1="106" x2="660" y2="164" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="606" y="60" width="266" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="739" y="79" font-size="13.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 호르무즈 해협 · 카르그섬</text>
+        <text x="739" y="97" font-size="12" font-weight="700" fill="#E56458" text-anchor="middle">기뢰·교전으로 위협받는 중</text>
+      </g>
+
+      <!-- 거리 대비 캡션 -->
+      <g font-family="inherit">
+        <rect x="18" y="392" width="330" height="62" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="34" y="412" font-size="12.5" font-weight="700" fill="#1B6BB8">미국 → 카리브해</text>
+        <text x="34" y="429" font-size="12" fill="#7D7A75">배로 며칠. 전쟁 지역을 안 지나감</text>
+        <text x="34" y="446" font-size="12" fill="#7D7A75">이번 계약으로 새로 열린 길</text>
+        <rect x="556" y="392" width="326" height="62" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="572" y="412" font-size="12.5" font-weight="700" fill="#B06426">한국 → 페르시아만</text>
+        <text x="572" y="429" font-size="12" fill="#7D7A75">배로 3주 안팎. 좁은 해협을 반드시 통과</text>
+        <text x="572" y="446" font-size="12" fill="#7D7A75">우리가 쓰는 원유의 약 70%가 이 길로 와</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#2783DE"/><path d="M6,10 L9,13 L14.5,7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 새로 열리는 공급처</span>
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 위협받는 기름길</span>
+      <span class="item"><span class="dash-b"></span> 미국이 새로 쓰려는 항로</span>
+      <span class="item"><span class="dash-o"></span> 한국이 쓰는 항로</span>
+    </div>
+  </div>
+
+  <div class="section-title">매장량 1위인데, 왜 생산은 3분의 1일까</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label"><b>1990년대 최대</b>베네수엘라 산유량</div>
+      <div class="bar-track"><div class="bar-fill peak">약 350만 배럴/일</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><b>2026년 7월</b>지금</div>
+      <div class="bar-track"><div class="bar-fill now">111.7만</div></div>
+    </div>
+    <div class="bar-note">확인 매장량은 세계 1위인데 실제로 뽑아내는 양은 전성기의 <b>3분의 1</b>. 땅속에 있다는 것과 내일 쓸 수 있다는 건 전혀 다른 얘기야.</div>
+  </div>
+
+  <div class="section-title">이유 — 베네수엘라 기름은 '흐르지 않는 기름'이다</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>땅속에 있는 건 초중질유</b><span class="mdesc">API 8~10도. 상온에서 아스팔트에 가까운 끈적한 덩어리라, 구멍만 뚫는다고 솟아오르지 않아</span></div>
+    </div>
+    <div class="mstep broken">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>묽게 만들기 — 희석제를 섞는다</b><span class="tag bad">망가진 단계</span><span class="mdesc">송유관으로 흘려보내려면 나프타·콘덴세이트 같은 희석제를 <b>20~40%</b> 섞어야 해. 그 희석제를 대부분 수입해야 하는데 제재로 끊겼어</span></div>
+    </div>
+    <div class="mstep broken">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>개질하기 — 업그레이더에 넣는다</b><span class="tag bad">망가진 단계</span><span class="mdesc">정유공장이 받아 주는 품질로 바꿔 주는 설비야. 대표 설비 페트로피아는 하루 <b>15.5만 배럴</b>을 처리하다 <b>1.5~3만 배럴</b>까지 떨어졌어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>그제서야 수출용 원유가 된다</b><span class="mdesc">2·3번 설비가 멈추면 1번에 아무리 많이 묻혀 있어도 배에 실을 기름은 안 나와</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 그래서 "내일 기름값이 내려간다"는 아니야</b>연내 시추장비 6기, 내년 12기를 넣기로 했지만 정작 병목은 시추가 아니라 <b>희석제와 개질 설비</b>야. 전문가들은 전성기 수준 회복에 <b>10년 이상, 수천억 달러</b>가 든다고 봐.</div>
+  </div>
+
+  <div class="section-title">계약 구조 — 누가 무엇을 가져가나</div>
+  <div class="deal">
+    <div class="deal-box">
+      <div class="who">주는 쪽</div>
+      <h3>베네수엘라 임시정부</h3>
+      <p>지난 1월 마두로 전 대통령이 미국으로 압송된 뒤 취임한 <b>델시 로드리게스</b> 임시 대통령이 서명. 유전 17곳의 <b>100년 개발권</b>을 넘겼어.</p>
+    </div>
+    <div class="deal-arrow">→<span>100년 개발권</span></div>
+    <div class="deal-box">
+      <div class="who">받는 쪽</div>
+      <h3>미국 + NABEP 합작사</h3>
+      <p>미국 측 지분 <b>55%</b>, 그중 <b>국방부가 35%</b>. 민간 파트너는 베네수엘라 2위 민간 산유사 NABEP(알레한드로 베탕쿠르).</p>
+      <div class="split">
+        <div class="dod">국방부 35%</div>
+        <div class="usa">미국 20%</div>
+        <div class="nab">NABEP 45%</div>
+      </div>
+      <div class="split-note">여기에 미국은 원유를 <b>원가에 우선 살 권리</b>까지 받았어. NABEP은 1,000억 달러 투자를 약속.</div>
+    </div>
+  </div>
+
+  <div class="section-title">기름값이 나한테 오는 길</div>
+  <div class="flow">
+    <div class="step s1">중동 교전·기뢰<br>공급 위협</div>
+    <div class="arrow">→</div>
+    <div class="step s2">국제유가 90달러대</div>
+    <div class="arrow">→</div>
+    <div class="step s3">항공유·물류비<small>9월 유류할증료 21단계</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">생활물가 상승</div>
+    <div class="arrow">→</div>
+    <div class="step s5">금리 인하 더 어려워짐<small>물가가 안 잡히니까</small></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(실제 축척·국경과 다름) · 2026.09.02 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>

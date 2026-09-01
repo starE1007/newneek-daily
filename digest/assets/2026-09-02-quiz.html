@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.02</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.02 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'heavy_crude', variants:[
+    { q:'베네수엘라의 확인 매장량은 세계 1위인데 실제 생산량은 전성기의 3분의 1에 머무는 이유를 가장 정확히 설명한 것은?',
+      opts:['유전이 발견된 지 얼마 되지 않아 아직 시추 위치를 정하지 못했기 때문',
+            '초중질유라 묽히고 개질하는 중간 설비를 반드시 거쳐야 하는데, 그 설비가 제재와 투자 부족으로 멈춰 섰기 때문',
+            '유전 대부분이 심해에 있어 현재 기술로는 접근하기 어렵기 때문',
+            '국제 유가가 낮아 뽑을수록 손해라 기업들이 자발적으로 감산해 왔기 때문'], answer:1,
+      explain:'매장량은 <b>"땅속에 있다"</b>는 뜻일 뿐이야. 오리노코 원유는 희석제를 섞고 업그레이더를 거쳐야 수출용 원유가 되는데, 바로 그 중간 설비가 무너져 있어. 대표 설비 페트로피아는 하루 15.5만 배럴 처리에서 1.5~3만 배럴까지 떨어졌어.' },
+    { q:'오리노코 초중질유에 나프타·콘덴세이트 같은 희석제를 20~40%나 섞는 이유로 가장 알맞은 것은?',
+      opts:['원유의 황 함량을 낮춰 환경 규제를 통과시키기 위해',
+            '부피를 늘려 수출 물량을 실제보다 많아 보이게 하기 위해',
+            '상온에서 아스팔트처럼 끈적해, 그대로는 송유관을 따라 흐르지 않기 때문',
+            '수송 도중 원유가 얼어붙는 것을 막기 위해'], answer:2,
+      explain:'API 8~10도의 초중질유는 <b>액체라기보다 반고체에 가까워</b>. 파이프로 흘려보내려면 묽게 만들어야 하는데, 그 희석제를 대부분 수입에 의존하다 제재로 끊긴 게 생산이 주저앉은 핵심 이유 중 하나야.' },
+  ]},
+  { id:'why_now', variants:[
+    { q:'미국이 하필 지금 베네수엘라 유전 확보에 나선 배경으로 가장 알맞은 것은?',
+      opts:['이란과의 교전으로 페르시아만 항로가 위협받자, 전쟁 지역을 거치지 않는 공급처가 필요해졌기 때문',
+            '베네수엘라산 원유가 중동산보다 정제하기 쉬워 미국 정유사들이 선호해 왔기 때문',
+            '베네수엘라가 OPEC을 탈퇴하면서 원유를 시장가보다 싸게 팔 수밖에 없게 됐기 때문',
+            '유럽연합이 미국산 원유 수입을 중단해 남는 물량을 처리할 곳이 필요했기 때문'], answer:0,
+      explain:'8월 30일 미군의 라라크섬 타격 → 이란의 요르단 미군기지 보복 → 호르무즈 기뢰로 이어지면서 브렌트유가 90달러를 넘었어. 핵심은 기름의 품질이 아니라 <b>경로</b>야 — 전쟁 지역을 통과하지 않는 기름이 필요했던 거지.' },
+    { q:'이번 계약을 두고 "거리가 곧 안보"라는 평가가 나오는 이유로 가장 알맞은 것은?',
+      opts:['수송 거리가 짧을수록 원유의 품질 저하가 적기 때문',
+            '카리브해 항로는 배로 며칠이면 닿고 교전 지역이나 좁은 해협을 지나지 않아, 공급이 끊길 수 있는 지점 자체가 적기 때문',
+            '거리가 멀수록 높은 관세율이 붙도록 국제 규정에 정해져 있기 때문',
+            '가까운 나라에서 수입하면 원유 대금을 자국 통화로 결제할 수 있기 때문'], answer:1,
+      explain:'같은 기름이라도 <b>어디를 지나오느냐</b>가 리스크를 결정해. 한국이 쓰는 중동산은 배로 3주 안팎에 좁은 해협을 반드시 통과하지만, 미국이 새로 뚫은 카리브해 항로엔 그런 병목이 없어.' },
+  ]},
+  { id:'deal_structure', variants:[
+    { q:'이번 계약에 법적·정치적 시비가 붙은 지점으로 가장 알맞은 것은?',
+      opts:['계약 금액이 공개되지 않아 국제 회계 기준을 위반했다는 점',
+            '개발권 기간이 25년으로 너무 짧아 투자금 회수가 어렵다는 점',
+            '"석유는 국가 소유이며 매각할 수 없다"는 1999년 헌법과 충돌하는 데다, 서명한 쪽이 선거로 뽑히지 않은 임시 대통령이라는 점',
+            '합작사의 본사가 베네수엘라가 아닌 제3국에 등록됐다는 점'], answer:2,
+      explain:'서명한 델시 로드리게스는 올해 1월 마두로 전 대통령이 미국으로 압송된 뒤 취임한 <b>임시 대통령</b>이야. 헌법 충돌과 정통성 문제가 겹쳐 "계약이 나중에 뒤집힐 수 있다"는 지적이 나오는 거고, 그러면 유가는 다시 튀어.' },
+    { q:'미 국방부가 합작사 지분의 35%를 갖는 구조가 논란이 된 이유로 가장 알맞은 것은?',
+      opts:['군 조직이 해외 자원 사업의 지분을 직접 보유하게 되면서, 군사 행동과 상업적 이익이 뒤섞인다는 지적이 나오기 때문',
+            '국방부 지분은 의회 동의를 받기 전까지 배당을 받을 수 없어 실효성이 없기 때문',
+            '35%는 과반이 아니어서 합작사 경영에 참여할 수 없기 때문',
+            '국방부가 참여하면 해당 유전이 국제법상 군사시설로 분류되기 때문'], answer:0,
+      explain:'미군 작전으로 정권이 바뀐 나라의 유전에서, 그 작전을 수행한 <b>국방부가 지분을 받는</b> 구조야. 미 상원 군사위 간사는 "권한과 세금의 노골적 남용"이라고 했고, 현지에서는 "자산 강탈"이라는 반발이 나왔어.' },
+  ]},
+  { id:'korea_transmission', variants:[
+    { q:'이번 미국-베네수엘라 계약이 "한국에는 직접적인 도움이 되기 어렵다"고 보는 근거로 가장 알맞은 것은?',
+      opts:['베네수엘라산 원유는 아시아까지 오는 수송비가 중동산보다 싸서 오히려 국내 정유사 수익을 떨어뜨리기 때문',
+            '한국은 원유의 약 70%를 여전히 중동에서 들여오고, 그 물량은 위협받는 해협을 그대로 통과해야 하기 때문',
+            '한국 정유사들이 이미 미국산 원유만 사용하기로 계약을 맺어 두었기 때문',
+            '국제유가는 산지별로 따로 정해져, 한 지역의 공급 변화가 다른 지역 가격에는 영향을 주지 않기 때문'], answer:1,
+      explain:'미국은 <b>공급처를 갈아탔지만 한국은 그대로</b>야. 사우디·UAE·이라크·쿠웨이트 등 중동 비중이 약 70%라, 호르무즈 리스크는 고스란히 우리 몫으로 남아. 9월 유류할증료가 21단계로 뛴 게 그 첫 청구서야.' },
+    { q:'유가 상승이 "금리 인하를 더 어렵게 만든다"고 말하는 이유를 가장 잘 설명한 것은?',
+      opts:['유가가 오르면 정유사 실적이 좋아져 주가가 오르고, 주가가 오르면 중앙은행이 금리를 올리기 때문',
+            '유가가 오르면 원유 수입 대금이 늘어 국가 부채가 커지고, 부채가 커지면 금리를 내릴 수 없도록 법에 정해져 있기 때문',
+            '유가는 항공유·물류비를 거쳐 여러 품목 가격으로 퍼지기 때문에 물가가 잘 안 잡히고, 물가를 잡아야 하는 중앙은행은 금리를 내리기 어려워지기 때문',
+            '유가와 기준금리는 같은 지표로 계산되기 때문에 하나가 오르면 다른 하나도 따라 오르기 때문'], answer:2,
+      explain:'유가는 <b>기름값 하나로 끝나지 않아</b>. 항공유·운송비·포장재를 거쳐 거의 모든 품목에 조금씩 얹히거든. 그렇게 번진 물가는 잘 안 내려오고, 물가를 책임지는 중앙은행 입장에선 금리를 내릴 명분이 사라져.' },
+  ]},
+  { id:'stat_reading', variants:[
+    { q:'"제주가 인구 10만 명당 범죄 건수 1위"라는 통계를 읽을 때 함께 따져야 할 점으로 가장 알맞은 것은?',
+      opts:['범죄 건수가 신고 시점이 아니라 판결 시점을 기준으로 집계된다는 점',
+            '분모로 쓰인 인구는 상주인구(약 67만)인데, 실제로 섬에 머무는 사람에는 그 20배에 달하는 관광객이 더해진다는 점',
+            '집계에 미수에 그친 사건이 포함되지 않는다는 점',
+            '제주는 광역시가 아니라 도 단위여서 다른 시도와 직접 비교할 수 없다는 점'], answer:1,
+      explain:'비율 통계는 <b>분모를 의심하는 것</b>이 첫걸음이야. 분자(범죄 건수)에는 관광객이 얽힌 사건이 들어가는데 분모(상주인구)에는 관광객이 안 들어가니, 관광지는 구조적으로 범죄율이 높게 나와.' },
+    { q:'"제주는 실종이 유난히 많다"는 주장을 숫자로 검증한 결과로 가장 알맞은 것은?',
+      opts:['인구 대비 성인 실종 신고 비율은 오히려 서울(0.13%)이 제주(0.05%)의 약 3배였다',
+            '제주의 성인 실종 신고 건수가 전국 17개 시도 가운데 가장 많았다',
+            '제주의 실종 신고는 대부분 외국인 관광객이 낸 것이었다',
+            '제주는 실종 통계를 따로 집계하지 않아 다른 지역과 비교할 수 없었다'], answer:0,
+      explain:'지난해 제주의 성인 실종자는 786명으로 인구 10만 명당 기준 <b>전국 17개 시도 중 7위</b> 수준이야. 올해 인구 대비 신고 비율로 보면 서울이 제주의 약 3배고 — 소문 쪽이 숫자와 어긋나 있었어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'상온에서 아스팔트처럼 끈적해 그대로는 송유관을 흐르지 않는, 오리노코 지대 원유의 종류를 뭐라고 부를까? (한 단어)',
+    accept:['초중질유','초중질원유','극중질유','초중질'],
+    explain:'정답은 <b>초중질유</b>야. API 8~10도로 사실상 반고체라, 뽑는 것보다 묽히고 개질하는 뒷단계가 진짜 병목이야.' },
+  { q:'초중질유를 정유공장이 받아 주는 품질로 바꿔 주는 설비를 뭐라고 부를까? (한 단어)',
+    accept:['업그레이더','upgrader','개질설비','개질 설비','개질기'],
+    explain:'정답은 <b>업그레이더</b>(개질 설비)야. 베네수엘라 대표 설비인 페트로피아는 하루 15.5만 배럴을 처리하다 1.5~3만 배럴까지 떨어졌어.' },
+  { q:'이번 계약에서 미국 측 지분 55% 가운데 미 국방부가 가져가는 비율은 몇 %일까? (숫자)',
+    accept:['35','35%','35퍼센트'],
+    explain:'정답은 <b>35%</b>야. 미군 작전으로 정권이 바뀐 나라의 유전 지분을 국방부가 직접 갖는 구조라, 미 의회에서 권한 남용 논란이 나왔어.' },
+  { q:'한국이 수입하는 원유 가운데 중동산이 차지하는 비중은 대략 몇 %일까? (숫자)',
+    accept:['70','70%','약 70','69','칠십'],
+    explain:'정답은 <b>약 70%</b>야. 미국은 카리브해로 공급처를 갈아탔지만 우리 원유는 여전히 호르무즈 해협을 지나와 — 그래서 같은 뉴스가 우리에겐 다른 뜻이 돼.' },
+  { q:'이란 원유가 배에 실려 나가는 수출 관문이자, 트럼프가 폭발 이미지로 겨냥한 섬의 이름은? (지명)',
+    accept:['카르그섬','카르그','Kharg','카르그 섬','하르그'],
+    explain:'정답은 <b>카르그섬</b>이야. 페르시아만 안쪽에 있는 이란 최대 원유 수출 터미널이라, 여기가 겨냥됐다는 신호만으로 유가가 움직여.' },
+  { q:'범죄율을 계산할 때 분모로 쓰이는, 그 지역에 실제로 등록해 살고 있는 인구를 뭐라고 할까? (한 단어)',
+    accept:['상주인구','상주 인구','등록인구','정주인구'],
+    explain:'정답은 <b>상주인구</b>야. 관광객은 분모에 안 들어가는데 사건에는 얽히니까, 관광지는 범죄율이 구조적으로 높게 잡혀. 비율 통계는 분모부터 확인하는 습관이 중요해.' },
+  { q:'김밥값을 밀어 올린 재료 중, 2분기에 전년 대비 13.2% 올라 상승을 주도한 품목은? (한 단어)',
+    accept:['쌀','쌀값','쌀 가격'],
+    explain:'정답은 <b>쌀</b>이야. 계란(9.0%)·김(2.5%)도 올랐지만 폭이 가장 컸어. 그런데도 분식집은 한 줄에 300~500원밖에 안 남아 31개월째 사업자가 줄고 있어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
