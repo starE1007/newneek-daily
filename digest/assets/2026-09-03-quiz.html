@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.03</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.03 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'cpi_core', variants:[
+    { q:'소비자물가지수(CPI)와 근원물가의 차이를 가장 정확히 설명한 것은?',
+      opts:['근원물가는 서비스 요금만 따로 집계한 지수다',
+            '소비자물가에서 변동성이 큰 식료품·에너지를 뺀 지수로, 추세적인 물가 흐름을 보기 위한 것이다',
+            '근원물가는 정부가 발표하지 않고 민간 연구소만 집계하는 참고 지표다',
+            '소비자물가와 근원물가는 계산 방식이 같아서 두 수치는 항상 동일하게 움직인다'], answer:1,
+      explain:'근원물가는 식료품·에너지처럼 계절·유가에 따라 출렁이는 항목을 뺀 지수야. 그래서 일시적 요인보다 <b>구조적인 물가 압력</b>을 보는 데 쓰여 — 이번에 3.4%로 3년 3개월 최고를 찍은 게 더 무겁게 읽히는 이유야.' },
+    { q:'8월 근원물가가 3년 3개월 만에 최고치(3.4%)를 찍었다는 소식이 소비자물가 3.1%보다 더 무겁게 읽히는 이유로 가장 알맞은 것은?',
+      opts:['근원물가는 정부 재정 적자와 직결되는 지표이기 때문',
+            '근원물가엔 변동성 큰 식료품·에너지가 빠져 있어, 일시적 요인이 아니라 구조적으로 물가가 오르고 있다는 신호이기 때문',
+            '근원물가가 오르면 국제유가가 자동으로 뒤따라 오르기 때문',
+            '근원물가는 수출 기업 실적에만 영향을 주고 가계에는 영향이 없기 때문'], answer:1,
+      explain:'근원물가야말로 <b>식료품·에너지를 빼고도 오르고 있다</b>는 뜻이라, 일시적 충격이 아니라 추세로 굳어지고 있다는 경고로 읽혀.' },
+  ]},
+  { id:'base_effect', variants:[
+    { q:"통신물가가 16.6%(역대 최고) 오른 걸 두고 '실제 통신비가 그만큼 비싸진 건 아니다'라고 말하는 이유로 가장 알맞은 것은?",
+      opts:['통신사들이 실제로 요금을 낮췄다가 이번 달에만 일시적으로 올렸기 때문',
+            '작년 8월 SK텔레콤 유출 보상으로 요금을 반값 깎아준 기저(비교 대상)가 낮았던 탓에, 1년 뒤 그 효과가 사라지며 비교 수치만 크게 튀었기 때문',
+            '통신 요금 통계 집계 방식이 이번 달부터 새로 바뀌었기 때문',
+            '5G에서 6G로 전환되며 요금제 자체가 실제로 두 배 가까이 올랐기 때문'], answer:1,
+      explain:'이런 걸 <b>기저효과</b>라고 해. 작년 비교 대상(기저)이 유난히 낮았다면, 실제 변화가 크지 않아도 전년 대비 상승률은 크게 찍혀.' },
+    { q:"'기저효과'라는 말이 뜻하는 바로 가장 알맞은 것은?",
+      opts:['물가가 오르면 임금도 자동으로 따라 오르는 현상',
+            '비교 기준이 되는 작년 수치가 유난히 낮거나 높았던 탓에, 올해 증감률이 실제 변화보다 과장되거나 축소돼 보이는 현상',
+            '정부가 물가 통계를 발표하기 전에 미리 정해두는 목표치',
+            '환율이 급등하면 수입 물가가 즉시 오르는 현상'], answer:1,
+      explain:'이번 통신물가 16.6% 급등도 실제로 요금이 그만큼 비싸져서가 아니라, 작년 반값 감면이라는 <b>낮은 기저</b>와 비교된 결과야.' },
+  ]},
+  { id:'yield_stock', variants:[
+    { q:'채권금리(국채 수익률)가 오르면 주가가 눌리는 이유로 가장 알맞은 것은?',
+      opts:['채권금리가 오르면 기업들이 채권 발행을 아예 못 하게 법으로 막히기 때문',
+            '안전한 채권 수익률이 높아지면 위험을 감수하고 주식에 투자할 매력이 상대적으로 줄고, 기업의 미래 이익을 현재가치로 환산할 때도 그 값이 더 깎이기 때문',
+            '채권금리와 주가는 같은 지표로 산출돼 하나가 오르면 다른 하나도 반드시 따라 오르기 때문',
+            '채권금리가 오르면 기업의 세금 부담이 늘어나 그만큼 배당을 줄여야 하기 때문'], answer:1,
+      explain:'국채금리는 <b>위험 없는 수익률</b>의 기준이야. 이게 오르면 위험을 감수하고 주식을 살 이유가 줄고, 미래에 벌 돈을 지금 가치로 계산할 때 할인폭도 커져서 주가엔 이중으로 부담이 돼.' },
+    { q:"'9월 금리 인상 기대'가 미국 국채금리를 밀어올렸다는 설명에서, 그 기대가 왜 생겼는지 가장 알맞은 것은?",
+      opts:['국제유가 급등으로 물가 상방 압력이 커지면서, 중앙은행이 물가를 잡으려면 금리를 낮추기보다 올릴 근거가 쌓였기 때문',
+            '미국 정부가 국채를 너무 많이 발행해서 금리를 강제로 올려야 했기 때문',
+            '이란과의 교전으로 미국 국방 예산이 늘면서 국채 신용등급이 떨어졌기 때문',
+            '달러 가치가 떨어지면서 해외 투자자들이 미국 국채를 아예 안 사려 했기 때문'], answer:0,
+      explain:'유가가 오르면 물가가 오르고, 물가를 잡아야 하는 중앙은행은 금리를 내리기보다 <b>올릴 근거</b>를 얻어. 그 기대만으로도 채권금리는 먼저 움직여.' },
+  ]},
+  { id:'same_day_diff_cause', variants:[
+    { q: "'같은 날 물가는 오르고 증시는 빠졌다'는 소식을 읽을 때 가장 주의해야 할 점은?",
+      opts:['두 수치가 발표된 날짜가 같다는 이유만으로 하나가 다른 하나의 직접 원인이라고 단정하면 안 된다',
+            '물가 상승률과 증시 하락률의 크기를 단순 비교해서 어느 쪽 충격이 더 큰지부터 따져야 한다',
+            '정부 발표 순서가 물가 다음에 증시 순이라는 규칙부터 확인해야 한다',
+            '같은 날 나온 지표는 항상 같은 부처에서 함께 계산한 것이라는 점을 알아야 한다'], answer:0,
+      explain:'날짜가 같다고 인과관계가 있는 건 아니야. 이번엔 물가는 통신비 기저효과가, 증시는 중동발 유가·금리 충격이 각각 더 크게 작용했어 — <b>뿌리가 다른 두 소식이 우연히 겹친 것</b>이었어.' },
+    { q: "이번 물가·증시 소식의 '진짜 공통분모'로 가장 알맞은 것은?",
+      opts:['정부의 세금 정책 변경',
+            '중동 확전이 밀어올린 국제유가와, 그로 인한 금리 인상 기대',
+            '국내 기업들의 실적 발표 시즌',
+            '원/달러 환율의 급격한 하락'], answer:1,
+      explain:'물가 쪽은 통신비 기저효과가 더 컸지만, 증시 쪽은 중동 확전 → 유가 급등 → 금리 인상 기대라는 경로가 핵심이었어. 두 소식을 잇는 접점을 굳이 찾자면 이 <b>유가·금리 불안</b>이야.' },
+  ]},
+  { id:'youth_budget', variants:[
+    { q:'내년도 청년예산이 올해보다 53.5% 늘어난 43조 3,000억 원으로 짜인 것과 관련해, 새로 생기는 지원으로 가장 알맞은 것은?',
+      opts:['만 19~34세 청년이면 소득 수준과 관계없이 동일한 금액의 기본소득을 정기 지급한다',
+            '취업 경험이 없는 청년에게 구직촉진수당을, 혼인신고 부부에게는 축하 지원금을 새로 준다',
+            '청년 전용 소득세를 신설해 그 세수로 예산을 마련한다',
+            '청년 예산은 전액 지방자치단체가 자체적으로 집행하도록 이관된다'], answer:1,
+      explain:'취업 경험 없는 청년 16만 명에게 월 65만 원 구직촉진수당을, 혼인신고 부부에겐 100만 원을 새로 지원해. <b>19~34세 생애주기별 지원</b>이 이번 예산의 핵심 프레임이야.' },
+    { q:'2027년도 예산안 전체 규모(820조 9,000억 원)에서 청년 예산이 갖는 의미로 가장 알맞은 것은?',
+      opts:['청년 예산은 국방 예산 다음으로 큰 단일 항목이 됐다',
+            '청년 지원 예산 증가율(53.5%)이 전체 예산 증가율(12.8%)보다 훨씬 커서, 정부가 청년층 지원을 특히 우선순위에 뒀다는 뜻이다',
+            '청년 예산은 전액 부채로 조달돼 국가부채 비율을 크게 높인다',
+            '청년 예산 확대로 다른 모든 분야 예산은 삭감됐다'], answer:1,
+      explain:'전체 예산은 12.8% 늘었는데 청년 예산은 53.5% 늘었어 — <b>증가 속도 자체가 다른 항목보다 훨씬 가파르다</b>는 게 이 예산안에서 청년 예산이 갖는 무게야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'물가에서 변동성이 큰 식료품·에너지를 뺀, 추세를 보기 위한 지수를 뭐라고 부를까? (한 단어)',
+    accept:['근원물가','근원 물가'],
+    explain:'정답은 <b>근원물가</b>야. 8월엔 3.4%로 3년 3개월 만에 최고를 찍었어.' },
+  { q:'작년 8월 개인정보 유출 보상으로 요금을 반값 깎아줘서, 1년 뒤 통신물가를 16.6%(역대 최고)까지 밀어올린 기저효과를 만든 통신사는? (회사명)',
+    accept:['SK텔레콤','sk텔레콤','SKT','skt'],
+    explain:'정답은 <b>SK텔레콤</b>이야. 작년의 낮은 기저와 비교되면서 통신물가 상승률이 역대 최고로 찍혔어.' },
+  { q:'비교 대상이 되는 작년 수치가 유난히 낮거나 높아서, 올해 증감률이 실제보다 과장되거나 축소돼 보이는 현상을 뭐라고 할까? (한 단어)',
+    accept:['기저효과','기저 효과'],
+    explain:'정답은 <b>기저효과</b>야. 통계를 읽을 때 "왜 이렇게 크게 뛰었지?"라는 의문이 들면 먼저 의심해봐야 하는 개념이야.' },
+  { q:'2일 코스피가 급락하며 마감한 지수는 몇이었을까? (숫자, 소수점 반올림)',
+    accept:['6562','6,562','6563','6560'],
+    explain:'정답은 <b>6,562(6,562.72)</b>야. 전날보다 273포인트(3.99%) 빠졌어.' },
+  { q:'내년 취업 경험 없는 청년에게 새로 월 65만 원씩 지급하는 수당의 이름은? (한 단어)',
+    accept:['구직촉진수당','구직 촉진 수당'],
+    explain:'정답은 <b>구직촉진수당</b>이야. 대상자는 16만 명이고, 청년 예산 43.3조 원의 핵심 항목 중 하나야.' },
+  { q:'9월 물가 상방 압력과 함께, 미국 중앙은행이 기준금리를 올릴 수도 있다는 기대를 낳은 회의체 이름은? (영문 약자)',
+    accept:['FOMC','fomc'],
+    explain:'정답은 <b>FOMC</b>(연방공개시장위원회)야. 이 기대가 미국 국채금리를 4.79%까지 밀어올렸어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

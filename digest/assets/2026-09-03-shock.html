@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>물가는 오르고 증시는 무너진 하루</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:23px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .stat{border:1px solid var(--border);border-radius:10px;padding:12px 10px;background:var(--soft);text-align:center}
+  .stat b{display:block;font-size:18px;color:var(--text)}
+  .stat span{font-size:12px;color:var(--text2)}
+  .stat.bad b{color:#C6493E}
+  .stat.warn b{color:#B06426}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+  .badge.price{background:var(--orange-soft);color:#B06426}
+  .badge.stock{background:var(--red-soft);color:#C6493E}
+  .vs h3{font-size:15.5px;margin-bottom:10px}
+  .vstep{font-size:13.5px;color:var(--text2);padding:6px 0;border-top:1px dashed var(--border)}
+  .vstep:first-of-type{border-top:none;padding-top:0}
+  .vstep b{color:var(--text)}
+  .vstep .ar{color:#B9B6B1;margin:0 4px}
+
+  .note{margin-top:14px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:13.5px;color:#1B6BB8}
+  .note b{display:block;margin-bottom:2px;font-size:14px}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:6px}
+  .step{flex:1 1 150px;min-width:130px;border-radius:10px;padding:12px 10px;font-size:13px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:11.5px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .step.s5{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .stat-row{grid-template-columns:repeat(2,1fr)}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.03 데일리 뉴스 · 시각자료</div>
+  <h1>💥 물가는 오르고 증시는 무너진 하루</h1>
+  <div class="sub">2일 하루에 겹친 두 소식 — 원인이 같다고 착각하기 쉬운데, 갈라서 보면 다른 얘기야</div>
+
+  <div class="section-title">오늘의 숫자</div>
+  <div class="stat-row">
+    <div class="stat warn"><b>3.1%</b><span>8월 소비자물가</span></div>
+    <div class="stat warn"><b>3.4%</b><span>근원물가 (3년3개월 최고)</span></div>
+    <div class="stat bad"><b>-3.99%</b><span>코스피 (6,562.72)</span></div>
+    <div class="stat bad"><b>$90.22</b><span>WTI (+5.2%)</span></div>
+    <div class="stat bad"><b>4.79%</b><span>美 10년물 국채금리</span></div>
+  </div>
+
+  <div class="section-title">왜 같은 날 겹쳤어 — 원인은 서로 달라</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge price">📈 물가 3.1%</span>
+      <h3>기저효과 + 에너지·서비스</h3>
+      <div class="vstep">작년 8월, SK텔레콤 유출 보상으로 통신요금 반값 감면</div>
+      <div class="vstep"><span class="ar">→</span> 1년 지나 그 효과가 사라지며 <b>통신물가 +16.6%</b>(역대 최고)</div>
+      <div class="vstep"><span class="ar">→</span> 전기·가스, 서비스 물가까지 겹쳐 <b>근원물가 3.4%</b></div>
+    </div>
+    <div class="vs">
+      <span class="badge stock">📉 코스피 -3.99%</span>
+      <h3>중동 재충돌 + 채권금리</h3>
+      <div class="vstep">미국-이란 교전 재개, 이란 원유 수출 차질 우려</div>
+      <div class="vstep"><span class="ar">→</span> 유가 급등(WTI +5.2%) + 9월 <b>금리 인상</b> 기대 확산</div>
+      <div class="vstep"><span class="ar">→</span> 국채금리 4.79%로 튀며 <b>주식 밸류에이션 압박</b></div>
+    </div>
+  </div>
+  <div class="note"><b>💡 헷갈리지 말 것</b>물가는 <b>통계상 기저효과</b>가 가장 크게 밀어올렸고, 증시는 <b>중동발 유가·금리 충격</b>으로 빠졌어 — 뿌리가 다른 두 소식이 우연히 같은 날 발표됐을 뿐, "물가가 올라서 증시가 빠졌다"는 설명은 정확하지 않아.</div>
+
+  <div class="section-title">그래도 나한테 오는 영향은 같은 방향</div>
+  <div class="flow">
+    <div class="step s1">근원물가<br>3년3개월 최고</div>
+    <div class="arrow">→</div>
+    <div class="step s2">금리 인하<br>명분 약화</div>
+    <div class="arrow">→</div>
+    <div class="step s3">9월 FOMC<br>'인상' 무게</div>
+    <div class="arrow">→</div>
+    <div class="step s4">대출이자·투자<br>부담 확대</div>
+    <div class="arrow">→</div>
+    <div class="step s5">장바구니 물가<br>부담은 그대로<small>원화는 이번엔 버팀(1,368.7원)</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.03 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
