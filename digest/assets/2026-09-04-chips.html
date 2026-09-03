@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D램 3강 체제가 깨진 이유 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 추이 막대 */
+  .card{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .trend{display:flex;align-items:flex-end;gap:14px;height:190px;padding:8px 4px 0}
+  .tcol{flex:1 1 0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+  .tbar{width:100%;max-width:74px;border-radius:8px 8px 0 0;background:var(--blue-soft);position:relative}
+  .tcol.hot .tbar{background:var(--red-soft)}
+  .tval{font-size:14px;font-weight:700;color:#1B6BB8}
+  .tcol.hot .tval{color:#C6493E}
+  .tlabel{font-size:12.5px;color:var(--text2);text-align:center}
+
+  /* 점유율 스택 */
+  .stack-wrap{margin-top:6px}
+  .stack-name{font-size:14px;font-weight:700;margin-bottom:6px}
+  .stack{display:flex;height:38px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+  .seg{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff;min-width:0}
+  .seg.s-sam{background:#2783DE}
+  .seg.s-hyn{background:#6BAEE8}
+  .seg.s-cn{background:#E56458}
+  .seg.s-etc{background:#D8D6D3;color:#5F5C58}
+  .stack-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:8px;font-size:12.5px;color:var(--text2)}
+  .stack-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+  .stack-wrap + .stack-wrap{margin-top:18px}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 두 장 카드 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.now{background:var(--green-soft);color:#2F7A52}
+  .badge.gap{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .trend{height:160px;gap:8px}
+    .seg{font-size:11px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.04 데일리 뉴스 · 시각자료</div>
+  <h1>🇨🇳 D램 3강 체제가 10년 만에 깨졌다</h1>
+  <div class="sub">중국 CXMT가 3년 만에 점유율 10%까지 온 길과, 그 자리가 왜 비어 있었는지 한 장으로 보기</div>
+
+  <div class="section-title">① CXMT의 D램 점유율, 3년 만에 여기까지</div>
+  <div class="card">
+    <div class="trend">
+      <div class="tcol"><div class="tval">1% 미만</div><div class="tbar" style="height:6%"></div><div class="tlabel">2023년</div></div>
+      <div class="tcol"><div class="tval">4%</div><div class="tbar" style="height:32%"></div><div class="tlabel">2025년<br>2분기</div></div>
+      <div class="tcol"><div class="tval">8%</div><div class="tbar" style="height:64%"></div><div class="tlabel">2026년<br>1분기</div></div>
+      <div class="tcol hot"><div class="tval">10%</div><div class="tbar" style="height:80%"></div><div class="tlabel">2026년<br>2분기</div></div>
+    </div>
+    <div class="note">매출 기준 글로벌 D램 점유율 · 카운터포인트리서치 집계</div>
+  </div>
+
+  <div class="section-title">② 그래서 지금 판은 이렇게 생겼어</div>
+  <div class="card">
+    <div class="stack-wrap">
+      <div class="stack-name">D램 (2026년 2분기)</div>
+      <div class="stack">
+        <div class="seg s-sam" style="width:38%">삼성전자 38%</div>
+        <div class="seg s-hyn" style="width:25%">SK하이닉스 25%</div>
+        <div class="seg s-cn" style="width:10%">CXMT 10%</div>
+        <div class="seg s-etc" style="width:27%">마이크론 등 27%</div>
+      </div>
+      <div class="stack-legend">
+        <span>➡️ 삼성·하이닉스·마이크론 3사 합계가 <b>10여 년 만에 90% 아래</b>로 — 업계 예상보다 2년 빨라</span>
+      </div>
+    </div>
+    <div class="stack-wrap">
+      <div class="stack-name">낸드플래시 (2026년 2분기 · 출하량 기준)</div>
+      <div class="stack">
+        <div class="seg s-sam" style="width:25%">삼성전자 25%</div>
+        <div class="seg s-hyn" style="width:22%">SK하이닉스 22%</div>
+        <div class="seg s-cn" style="width:14%">YMTC 14%</div>
+        <div class="seg s-etc" style="width:39%">키옥시아 등 39%</div>
+      </div>
+      <div class="stack-legend">
+        <span>➡️ 중국 YMTC가 일본 <b>키옥시아를 제치고 3위</b>로 올라섬</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">③ 왜 이렇게 빨리 컸을까 — 자리를 비운 건 우리였다</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>AI 슈퍼사이클 → HBM 값이 폭등</b><span class="mdesc">AI 서버에 쓰이는 고부가 메모리(HBM)가 돈이 되기 시작</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>삼성·SK하이닉스가 라인을 HBM으로 몰아줌</b><span class="mdesc">한정된 웨이퍼(반도체 원판)를 비싼 제품 쪽으로 옮기는 건 당연한 선택</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>PC·스마트폰용 '범용 D램' 공급에 구멍</b><span class="mdesc">DDR4·DDR5 — 마진은 낮은데 수요는 그대로 있는 물건이 모자라짐</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>CXMT가 30% 싼 값으로 그 자리를 채움</b><span class="mdesc">중국 스마트폰·PC·서버 업체라는 확실한 내수 고객까지 등에 업고 점유율 10%</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 수출통제의 역설</b>미국이 국가안보를 이유로 첨단 장비·기술 수출을 막자, 중국은 "그럼 우리끼리 다 만들자"며 자립 속도를 오히려 올렸어. 여기에 정부 보조금이 얹히면서 성장이 더 빨라졌다는 분석이 나와.</div>
+  </div>
+
+  <div class="section-title">④ 그런데 두 가지는 꼭 같이 봐야 해</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge now">지금 국면</span>
+      <h3>싸게 팔기 경쟁이 아니라 '멤플레이션'</h3>
+      <p>메모리가 워낙 귀해져서 <b>중국 업체마저 값을 올려 받는</b> 중이야. 그래서 당장은 한국 기업 실적도 좋아 — 점유율은 내줬는데 이익은 늘어나는 구간.</p>
+    </div>
+    <div class="vs">
+      <span class="badge gap">남은 격차</span>
+      <h3>HBM은 아직 2~4년 뒤처져 있어</h3>
+      <p>CXMT는 상장 서류에도 HBM 투자 계획을 구체적으로 못 적었어. 중국의 추격은 <b>범용 제품부터</b>고, 최상단 기술은 아직 한국이 앞서 있다는 뜻.</p>
+    </div>
+  </div>
+
+  <div class="section-title">⑤ 나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">중국이 범용 D램을<br>계속 채움</div>
+    <div class="arrow">→</div>
+    <div class="step s2">한국 기업 이익이<br>HBM 한 다리에 쏠림</div>
+    <div class="arrow">→</div>
+    <div class="step s3">코스피 시총 1·2위가<br>이 두 회사</div>
+    <div class="arrow">→</div>
+    <div class="step s4">내 연금·ETF 수익률에<br>그대로 연결<small>동시에 메모리값 상승 → 노트북·폰 가격도 ↑</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.04 딥다이브 내용 기반 (점유율: 카운터포인트리서치 2026년 2분기)</div>
+</div>
+</body>
+</html>
