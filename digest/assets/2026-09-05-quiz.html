@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.05</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.05 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'origin_rule', variants:[
+    { q:'반도체 관세에서 원산지를 정하는 기준으로 가장 알맞은 것은?',
+      opts:['웨이퍼를 처음 설계한 나라가 원산지가 된다',
+            '마지막으로 실질적인 변형(가공)이 일어난 공정이 있는 나라가 원산지가 된다',
+            '본사가 등록된 나라가 무조건 원산지가 된다',
+            '가장 많은 인력이 투입된 나라가 원산지가 된다'], answer:1,
+      explain:'관세는 <b>"마지막으로 실질적 변형이 일어난 곳"</b>을 원산지로 봐. 그래서 웨이퍼는 다른 나라에서 굽고, 마지막 공정만 미국에서 마쳐도 원산지가 미국으로 바뀔 수 있어.' },
+    { q:"기업들이 관세를 피하려고 '전공정'이 아니라 '후공정(패키징)'만 미국으로 옮기는 이유로 가장 알맞은 것은?",
+      opts:['후공정은 원산지 판정과 아무 관련이 없기 때문',
+            '원산지는 마지막 실질변형 공정 기준이라, 상대적으로 빨리 옮길 수 있는 후공정만 옮겨도 원산지를 바꿀 수 있기 때문',
+            '후공정이 전공정보다 기술적으로 더 어렵기 때문에 우선 옮기기 때문',
+            '미국 정부가 전공정 이전을 법으로 금지하고 있기 때문'], answer:1,
+      explain:'전공정(웨이퍼 제조)은 물·전기·초순수 설비까지 다 갖춰야 해서 <b>수년, 수조 원</b>이 들어. 반면 후공정은 상대적으로 빨리 옮길 수 있고, 원산지 판정은 마지막 공정 기준이라 이것만 옮겨도 관세를 비켜갈 수 있어.' },
+  ]},
+  { id:'targeted_tariff_2', variants:[
+    { q:"삼성전자·SK하이닉스가 이미 미국에 반도체 시설을 두고 있는데도 반도체 표적관세 압박이 커지는 이유로 가장 알맞은 것은?",
+      opts:['두 회사 모두 미국 시설이 파운드리·패키징(후공정)뿐이고, D램을 만드는 전공정 팹은 없기 때문',
+            '두 회사 모두 미국 내 시설을 최근 전부 폐쇄했기 때문',
+            '미국 정부가 두 회사의 미국 시설 존재 자체를 모르고 있기 때문',
+            '표적관세는 시설 유무와 무관하게 모든 기업에 동일하게 적용되기 때문'], answer:0,
+      explain:'삼성전자는 텍사스에 <b>파운드리</b>, SK하이닉스는 인디애나에 <b>패키징(후공정)</b>만 있고, 정작 D램 원판을 굽는 <b>전공정 팹은 둘 다 없어</b> — 미국이 노리는 건 바로 그 빈틈이야.' },
+    { q:'반도체 표적관세가 제약업계 관세 방식과 비슷하다고 알려진 이유로 가장 알맞은 것은?',
+      opts:['반도체와 의약품에 똑같은 세율을 매기는 방식이기 때문',
+            '미국 내 생산량만큼은 무관세로 두고, 그 초과분에만 고율 관세를 매기는 쿼터형 방식이라는 점이 비슷하기 때문',
+            '반도체 기업이 제약회사로 업종을 바꿔야 하기 때문',
+            '제약업계는 관세를 전혀 적용받지 않는 예외 업종이기 때문'], answer:1,
+      explain:'제약업계처럼 <b>미국 내 생산량만큼 무관세, 초과분에 고율 관세</b>를 매기는 쿼터형 방식이 유력하게 거론돼. "미국에서 만들면 면제, 안 만들면 대가"라는 러트닉 장관 발언이 이 구조를 가리켜.' },
+  ]},
+  { id:'kospi_rebound', variants:[
+    { q:'4일 코스피가 1.64% 반등한 배경으로 가장 알맞은 것은?',
+      opts:['미 9월 기준금리 동결 기대가 커지며 전날까지의 국채금리 급등 공포가 진정됐기 때문',
+            '반도체 표적관세가 완전히 철회됐기 때문',
+            '원/달러 환율이 1,500원을 돌파했기 때문',
+            '외국인과 기관이 모두 대규모로 주식을 팔았기 때문'], answer:0,
+      explain:'미 9월 <b>금리 동결</b> 기대가 커지며 전 세계 국채금리 급등 공포가 하루 만에 누그러졌고, 외국인·기관이 동반 매수에 나서며 삼성전자·SK하이닉스 등 반도체주가 반등을 이끌었어.' },
+    { q:'반도체 표적관세 리스크가 여전한데도 4일 삼성전자·SK하이닉스 주가가 오른 이유를 가장 정확히 설명한 것은?',
+      opts:['관세 리스크보다 국채금리 진정이라는 재료가 시장에 더 크게 반영됐기 때문',
+            '두 회사가 미국 사업을 전면 철수하기로 발표했기 때문',
+            '관세 리스크는 주가와 원래 아무 관련이 없기 때문',
+            '이날 두 회사의 실적이 이미 확정 발표됐기 때문'], answer:0,
+      explain:'같은 날 여러 재료가 있을 때 주가는 <b>더 크게 작용한 재료</b> 쪽으로 움직여. 이번엔 표적관세 우려보다 국채금리 진정(9월 금리 동결 기대)이 더 크게 반영됐어.' },
+  ]},
+  { id:'yen_carry_review', variants:[
+    { q:"일본이 '초저금리 시대 종료' 신호를 보내는 게 왜 전 세계 국채금리 상승 배경으로 꼽힐까?",
+      opts:['일본이 국채 발행을 전면 중단하기로 했기 때문',
+            '그동안 싼 엔화를 빌려 해외 국채 등에 투자해온 돈(엔캐리트레이드)이, 일본 금리가 오르면 다시 일본으로 돌아갈 조짐을 보이기 때문',
+            '일본 중앙은행이 미국 국채를 전량 매입하기로 했기 때문',
+            '일본 초저금리 종료는 한국 금리에만 영향을 주고 다른 나라와는 무관하기 때문'], answer:1,
+      explain:'금리가 거의 0에 가까웠던 엔화를 빌려 해외 자산에 투자하는 걸 <b>엔캐리트레이드</b>라고 해. 일본이 금리를 올리기 시작하면 그 돈을 굳이 해외에 둘 이유가 줄어서 자금이 되돌아갈 수 있어.' },
+    { q:"'엔캐리트레이드'가 뜻하는 바로 가장 알맞은 것은?",
+      opts:['일본 정부가 해외 국채만 전문적으로 매입하는 제도',
+            '금리가 낮은 엔화를 빌려서, 금리가 더 높은 해외 자산(국채 등)에 투자하는 거래',
+            '엔화와 원화를 직접 맞바꾸는 환전 서비스',
+            '일본 기업이 한국에 공장을 짓는 투자 방식'], answer:1,
+      explain:'싼 이자로 엔화를 빌려 더 높은 수익을 주는 해외 자산에 투자하는 게 <b>엔캐리트레이드</b>야. 일본이 금리를 올리면 이 자금이 청산되며 국제 자금 흐름에 영향을 줘.' },
+  ]},
+  { id:'won_strength', variants:[
+    { q:'전 세계 국채금리 발작 와중에도 4일 원/달러 환율이 1,350원대까지 더 내려간(원화 강세) 것을 가장 정확히 설명한 것은?',
+      opts:['원화가 유일하게 국채시장의 영향을 받지 않는 통화이기 때문',
+            '위험 신호가 있어도 다른 통화 대비 원화 자체의 강세 흐름이 함께 작용했기 때문',
+            '한국은행이 환율을 법으로 고정했기 때문',
+            '원/달러 환율은 주가와 반대로만 움직이도록 정해져 있기 때문'], answer:1,
+      explain:'국채금리 불안 속에서도 원화는 오히려 <b>강세 흐름</b>을 이어갔어 — 시장 전체가 위험할 때도 개별 통화의 방향은 다른 요인(수급·정책 등)에 따라 다르게 움직일 수 있다는 걸 보여줘.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'러트닉 미 상무장관이 예고한, 미국에서 안 만들면 관세를 물리겠다는 정책의 이름은? (한 단어로)',
+    accept:['표적관세','반도체 표적관세'],
+    explain:'정답은 <b>표적관세</b>야. 미국 내 생산량만큼 무관세, 초과분엔 고율 관세를 매기는 쿼터형 방식으로 알려졌어.' },
+  { q:'삼성전자·SK하이닉스 둘 다 미국에 시설이 있지만 공통으로 없는 것은 무엇일까? (한 단어, ○○정)',
+    accept:['전공정','전 공정'],
+    explain:'정답은 <b>전공정</b>이야. 둘 다 파운드리·패키징(후공정)만 있고 D램 원판을 굽는 전공정 팹은 없어.' },
+  { q:'관세에서 원산지를 정할 때 기준이 되는 것은 "마지막으로 실질적 무엇이 일어난 곳"일까? (한 단어)',
+    accept:['변형','실질적 변형'],
+    explain:'정답은 <b>변형(가공)</b>이야. 마지막으로 실질적 변형이 일어난 나라가 원산지가 돼.' },
+  { q:'4일 코스피 상승을 이끈, 시가총액 상위 두 반도체 기업은 삼성전자와 무엇일까? (기업명)',
+    accept:['SK하이닉스','에스케이하이닉스'],
+    explain:'정답은 <b>SK하이닉스</b>야. 이날 3.20% 오르며 삼성전자(+2.20%)와 함께 반등을 이끌었어.' },
+  { q:'싼 엔화를 빌려 금리가 더 높은 해외 자산에 투자하는 거래를 뭐라고 부를까? (한 단어)',
+    accept:['엔캐리트레이드','엔 캐리 트레이드','캐리트레이드'],
+    explain:'정답은 <b>엔캐리트레이드</b>야. 일본이 초저금리를 끝내면 이 돈이 되돌아갈 수 있어 국채금리 상승 배경 중 하나로 꼽혀.' },
+  { q:'4일 원/달러 환율은 얼마로 마감했을까? (숫자만, 소수점 첫째 자리까지)',
+    accept:['1350.4','1,350.4'],
+    explain:'정답은 <b>1,350.4원</b>이야(-8.9원). 국채금리 불안 속에서도 원화는 강세를 이어갔어.' },
+  { q:'삼성전자가 반도체를 위탁생산하는 미국 내 지역은 어디일까? (주 이름)',
+    accept:['텍사스','텍사스주','테일러'],
+    explain:'정답은 <b>텍사스</b>(테일러)야. 파운드리(위탁생산) 공장이 있고 연말 2공장 착공도 예정돼 있어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

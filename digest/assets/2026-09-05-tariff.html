@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>반도체 관세, 왜 후공정만으론 못 피할까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:23px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:22px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .fab-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .fab{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .fab h3{font-size:15.5px;margin-bottom:10px}
+  .fab-row{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:6px 0;border-top:1px dashed var(--border)}
+  .fab-row:first-of-type{border-top:none}
+  .fab-row .dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+  .dot.have{background:var(--green)}
+  .dot.none{background:var(--red)}
+  .fab-row b{font-weight:700}
+  .fab-note{margin-top:10px;font-size:12.5px;color:var(--text2)}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .fab-grid{grid-template-columns:1fr}
+    h1{font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.05 데일리 뉴스 · 시각자료</div>
+  <h1>🏭 반도체 관세, 왜 후공정만으론 못 피할까</h1>
+  <div class="sub">삼성·SK하이닉스 둘 다 미국에 공장이 있는데도 왜 계속 압박받는지 — 전공정·후공정 빈틈으로 보기</div>
+
+  <div class="section-title">두 회사, 미국엔 뭐가 있고 뭐가 없나</div>
+  <div class="fab-grid">
+    <div class="fab">
+      <h3>삼성전자 (텍사스 테일러)</h3>
+      <div class="fab-row"><span class="dot have"></span>파운드리(위탁생산) <b>있음</b></div>
+      <div class="fab-row"><span class="dot none"></span>D램 전공정(웨이퍼 제조) <b>없음</b></div>
+      <div class="fab-note">연말 2공장 착공 예정이지만 파운드리 라인</div>
+    </div>
+    <div class="fab">
+      <h3>SK하이닉스 (인디애나 웨스트라피엣)</h3>
+      <div class="fab-row"><span class="dot have"></span>HBM 패키징(후공정) <b>있음</b></div>
+      <div class="fab-row"><span class="dot none"></span>D램 전공정(웨이퍼 제조) <b>없음</b></div>
+      <div class="fab-note">40억 달러 투입, 2029년 하반기 양산 목표</div>
+    </div>
+  </div>
+
+  <div class="section-title">관세를 비켜가고 또 조여오는 4단계</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>원산지는 '마지막 실질변형 공정' 기준</b><span class="mdesc">웨이퍼를 어디서 굽든, 마지막으로 크게 손댄 나라가 원산지가 됨</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>기업은 옮기기 쉬운 후공정만 미국行</b><span class="mdesc">전공정(수조 원·수년)보다 패키징·조립이 훨씬 빨리 옮겨짐</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>'Made in USA' 인정 → 관세 비켜감</b><span class="mdesc">패키징만 미국에서 마쳐도 원산지가 미국으로 바뀜</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>미국, 표적관세로 후속타 — "그걸론 부족"</b><span class="mdesc">미국 내 생산량만큼만 무관세(쿼터식), 전공정까지 요구하는 압박으로 확대</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 계속 이어지는 줄다리기</b>기업이 원산지 규정의 빈틈(후공정 이전)을 찾으면, 상대국은 그 빈틈을 메우는 다음 규정(전공정 요구)을 내놓는 식으로 압박 수위가 계속 올라가는 구조야.</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.05 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
