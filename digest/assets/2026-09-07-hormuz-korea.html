@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>호르무즈 파병 — 한국도 이 전쟁의 당사자가 되나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .country-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .country{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .country.hot{background:var(--red-soft);border-color:#F6D3CE}
+  .country .flag{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px}
+  .country.hot .flag{color:#C6493E}
+  .country .val{font-size:20px;font-weight:700}
+  .country .note{font-size:12px;color:var(--text2);margin-top:3px}
+
+  /* 관계도 */
+  .rel{border:1px solid var(--border);border-radius:12px;padding:22px 18px;background:var(--canvas)}
+  .rel-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  .node{border-radius:12px;padding:14px 18px;text-align:center;min-width:110px;font-weight:700;font-size:14.5px}
+  .node.us{background:var(--blue-soft);color:#1B6BB8}
+  .node.kr{background:var(--green-soft);color:#2F7A52}
+  .node.ir{background:var(--red-soft);color:#C6493E}
+  .edge{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;padding:8px 4px;font-size:13px;color:var(--text2)}
+  .edge b{color:var(--text);font-weight:700}
+  .edge .arrow2{color:#B9B6B1;font-size:15px;font-weight:700}
+  .edge.warn{background:var(--red-soft);border-radius:8px;color:#B23F34;padding:8px 12px}
+  .edge.warn b{color:#B23F34}
+  .edge.pressure{background:var(--blue-soft);border-radius:8px;color:#1B6BB8;padding:8px 12px}
+  .edge.pressure b{color:#1B6BB8}
+  .edge.dep{background:var(--orange-soft);border-radius:8px;color:#9A5620;padding:8px 12px}
+  .edge.dep b{color:#9A5620}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 160px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--soft)}
+  .t-item .when{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-item.hot{background:var(--red-soft);border-color:#F6D3CE}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:14px;font-weight:700}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:130px;border-radius:10px;padding:12px 12px;font-size:13px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:11.5px;opacity:.85}
+  .step.s1{background:var(--orange-soft);color:#9A5620}
+  .step.s2,.step.s3{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.07 데일리 뉴스 · 시각자료</div>
+  <h1>🇰🇷 호르무즈 파병 — 한국도 이 전쟁의 당사자가 되나</h1>
+  <div class="sub">미국·이란 확전 속에서 한국이 낀 삼각 관계와, 지난 나흘의 확전 타임라인</div>
+
+  <div class="section-title">숫자로 보는 상황</div>
+  <div class="country-grid">
+    <div class="country hot"><div class="flag">9/5~6 공격</div><div class="val">미 항모·구축함</div><div class="note">이란, 탄도미사일로 타격</div></div>
+    <div class="country"><div class="flag">한국 원유의 호르무즈 의존도</div><div class="val">70%</div><div class="note">이 항로 막히면 국내 기름부터 마름</div></div>
+    <div class="country"><div class="flag">브렌트유</div><div class="val">~$90</div><div class="note">배럴당, 확전 이후 고공행진</div></div>
+    <div class="country hot"><div class="flag">이란의 경고</div><div class="val">"참전 간주"</div><div class="note">한국이 미군 지원 시</div></div>
+  </div>
+
+  <div class="section-title">한국이 낀 삼각 관계</div>
+  <div class="rel">
+    <div class="rel-row">
+      <div class="node us">🇺🇸 미국</div>
+      <div class="node kr">🇰🇷 한국</div>
+      <div class="node ir">🇮🇷 이란</div>
+    </div>
+    <div class="edge pressure"><b>미국 → 한국</b><span class="arrow2">＝</span>"파병(P-8A·군수지원함·EOD)을 기다린다" — 동맹 압박</div>
+    <div class="edge warn"><b>이란 → 한국</b><span class="arrow2">＝</span>"미군 지원하면 그것도 전쟁 참여" — 직접 경고</div>
+    <div class="edge dep"><b>한국 → 호르무즈</b><span class="arrow2">＝</span>원유 수입 70%가 지나는 길목 — 안 지킬 수도 없음</div>
+  </div>
+
+  <div class="section-title">최근 나흘, 확전 타임라인</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">9/4</div><div class="what">청와대, 호르무즈 파병 "종합 검토 중" 공식화</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot"><div class="when">9/5</div><div class="what">美, 이란 유조선 M/T 카일로 타격</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot"><div class="when">9/5~6</div><div class="what">이란, 美 항모·구축함에 탄도미사일 + 유조선 3척·美 관련 선박 3척 타격</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">진행 중</div><div class="what">국회 파병동의안 제출 여부가 다음 분기점</div></div>
+  </div>
+
+  <div class="section-title">나한테 오는 영향 경로</div>
+  <div class="flow">
+    <div class="step s1">호르무즈 확전<br><small>탄도미사일·유조선 타격</small></div>
+    <div class="arrow">→</div>
+    <div class="step s1">유가·유류할증료 상승<br><small>브렌트유 ~$90</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">국내 기름값·물가 부담</div>
+    <div class="arrow">→</div>
+    <div class="step s2">파병 시<br>참전 리스크까지 추가<small>이란의 직접 경고</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.07 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
