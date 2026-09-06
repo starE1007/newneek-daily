@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>25년 만에 다시 하나로 — 공공기관 109개 대수술</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 합치기 / 쪼개기 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+  .badge.merge{background:var(--blue-soft);color:#1B6BB8}
+  .badge.split{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:8px}
+  .mrow{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:7px 0;border-top:1px solid var(--border)}
+  .mrow:first-of-type{border-top:none}
+  .mrow .from{flex:1 1 auto;color:var(--text2)}
+  .mrow .ar{color:#B9B6B1;font-weight:700}
+  .mrow .to{flex:0 0 auto;font-weight:700;color:var(--text)}
+  .vs .note{margin-top:10px;font-size:12.5px;color:var(--text2)}
+
+  /* 단일구매자 도식 */
+  .market{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .sellers{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .seller{flex:1 1 90px;min-width:84px;background:var(--blue-soft);color:#1B6BB8;border-radius:8px;padding:9px 6px;font-size:12.5px;font-weight:700;text-align:center}
+  .vline{text-align:center;color:#B9B6B1;font-size:18px;font-weight:700;margin:6px 0}
+  .buyer{background:var(--red-soft);color:#B23F34;border-radius:10px;padding:12px;text-align:center;font-size:14.5px;font-weight:700}
+  .buyer small{display:block;font-weight:500;font-size:12.5px;margin-top:3px;opacity:.9}
+  .consumer{background:var(--surface2);color:var(--text2);border-radius:10px;padding:11px;text-align:center;font-size:13.5px;font-weight:600}
+  .verdict{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .verdict b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 판단 기준 */
+  .rule{display:flex;gap:12px;flex-wrap:wrap}
+  .rule-box{flex:1 1 260px;border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .rule-box.a{background:var(--blue-soft);border-color:#CBE3F8}
+  .rule-box.b{background:var(--orange-soft);border-color:#F0DAC5}
+  .rule-box b{display:block;font-size:14.5px;margin-bottom:4px}
+  .rule-box span{font-size:13.5px;color:var(--text2)}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2{background:var(--surface2);color:#5F5C58}
+  .step.good{background:var(--green-soft);color:#2F7A52}
+  .step.bad{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .branch-label{font-size:13px;font-weight:700;color:var(--text2);margin:14px 0 6px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.07 데일리 뉴스 · 시각자료</div>
+  <h1>🏛️ 25년 만에 다시 하나로 — 공공기관 109개 대수술</h1>
+  <div class="sub">왜 어떤 곳은 합치고 어떤 곳은 쪼개는지, 2001년에 쪼갰던 발전사를 왜 다시 묶는지 한 장으로 보기</div>
+
+  <div class="section-title">뭐가 합쳐지고, 뭐가 쪼개지나</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge merge">합치는 쪽</span>
+      <h3>흩어져 있으면 덩치가 안 되는 일</h3>
+      <div class="mrow"><span class="from">남동·중부·서부·남부·동서발전</span><span class="ar">→</span><span class="to">한국발전(가칭)</span></div>
+      <div class="mrow"><span class="from">한국석유공사 + 한국가스공사</span><span class="ar">→</span><span class="to">에너지자원공사</span></div>
+      <div class="mrow"><span class="from">지역별 항만공사 4곳</span><span class="ar">→</span><span class="to">한국항만공사</span></div>
+      <div class="mrow"><span class="from">코레일 + SR</span><span class="ar">→</span><span class="to">고속철 운영 일원화</span></div>
+      <div class="note">해상풍력처럼 조 단위·10년짜리 투자는 5곳이 각자 하기엔 덩치가 모자라다는 논리</div>
+    </div>
+    <div class="vs">
+      <span class="badge split">쪼개는 쪽</span>
+      <h3>한 몸에 두면 서로 충돌하는 일</h3>
+      <div class="mrow"><span class="from">LH — 택지개발·주택건설</span><span class="ar">→</span><span class="to">주택도시개발공사</span></div>
+      <div class="mrow"><span class="from">LH — 주거복지·자산비축</span><span class="ar">→</span><span class="to">주택도시자산공사</span></div>
+      <div class="note">집을 지어 파는 일(수익)과 취약계층 주거를 챙기는 일(복지)은 목표가 반대라, 한 기관에 두면 늘 개발 쪽이 이긴다는 게 분리 이유</div>
+    </div>
+  </div>
+
+  <div class="section-title">쪼개고 합치는 기준은 '크기'가 아니야</div>
+  <div class="rule">
+    <div class="rule-box a"><b>규모가 있어야 되는 일 → 합친다</b><span>대규모·장기 투자, 국제 협상력, 중복 조직 제거가 이득인 분야</span></div>
+    <div class="rule-box b"><b>견제가 있어야 되는 일 → 쪼갠다</b><span>목표가 서로 충돌하거나, 한 곳이 다 쥐면 감시가 안 되는 분야</span></div>
+  </div>
+
+  <div class="section-title">2001년엔 왜 쪼갰고, 왜 25년 만에 되돌리나</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">2001년</div><div class="what">한전 발전부문을 <b>5개사로 분할</b> — "경쟁 붙이면 전기요금 내려간다"</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">그 직후</div><div class="what">다음 단계였던 <b>민영화가 무산</b> — 파는 쪽만 다섯으로 나뉜 채 멈춤</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">2026.09.03</div><div class="what"><b>재통합 발표</b> — 경쟁 효과 없이 중복비용만 남았다는 결론</div></div>
+  </div>
+
+  <div class="section-title">왜 경쟁이 생기지 않았을까 — 시장 구조를 보면 보여</div>
+  <div class="market">
+    <div class="sellers">
+      <div class="seller">남동발전</div>
+      <div class="seller">중부발전</div>
+      <div class="seller">서부발전</div>
+      <div class="seller">남부발전</div>
+      <div class="seller">동서발전</div>
+    </div>
+    <div class="vline">↓ &nbsp; ↓ &nbsp; ↓ &nbsp; ↓ &nbsp; ↓</div>
+    <div class="buyer">한국전력 — 전기를 사는 곳은 여기 <b>하나뿐</b><small>단일구매자(single buyer) 구조 · 가격도 시장이 아니라 정부가 정한 정산 규칙으로 매겨짐</small></div>
+    <div class="vline">↓</div>
+    <div class="consumer">소비자 — 전기를 어디서 살지 고를 수 없음</div>
+    <div class="verdict"><b>⚠️ 반쪽짜리 경쟁</b>파는 쪽만 다섯으로 나뉘고 사는 쪽은 하나로 남으면, 발전사끼리 "우리가 더 싸다"고 겨룰 상대가 없어. 손님을 뺏고 뺏기는 일이 없으니 값을 낮출 이유도 안 생기고, 본사·인사·구매만 5중으로 늘어난 거야.</div>
+  </div>
+
+  <div class="section-title">그럼 나한테는 뭐가 오나</div>
+  <div class="branch-label">공통 출발점</div>
+  <div class="flow">
+    <div class="step s1">발전·에너지 공기업<br>통합</div>
+    <div class="arrow">→</div>
+    <div class="step s2">중복 조직·비용<br>정리</div>
+    <div class="arrow">→</div>
+    <div class="step s2">전기·가스 원가 구조<br>변화</div>
+  </div>
+  <div class="branch-label">여기서 갈림길 — 어느 쪽이 될지가 이번 개혁의 진짜 승부처</div>
+  <div class="flow">
+    <div class="step good">✅ 잘 되면<br><small>비용 절감분이 요금에 반영 → 공공요금 인상 압력 완화 → 물가 부담 ↓</small></div>
+    <div class="step bad">⚠️ 안 되면<br><small>경쟁자 없는 거대 공기업의 방만 경영('제2의 LH') → 비효율이 요금으로 전가</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.07 딥다이브 내용 기반 (발전 5사 임직원 합계 1만 4,000명 이상)</div>
+</div>
+</body>
+</html>
