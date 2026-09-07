@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.08</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.08 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'two_forces', variants:[
+    { q:'같은 코스피가 닷새 만에 −4%에서 +4.6%로 뒤집힌 구조를 가장 잘 설명한 것은?',
+      opts:['주가는 기업 이익 기대와 금리라는 두 힘이 줄다리기한 결과라, 어느 쪽 힘이 세지느냐에 따라 방향이 바뀌기 때문',
+            '외국인 투자자는 매달 초에 팔고 중순에 사는 규칙을 따르기 때문',
+            '지수가 특정 수치에 닿으면 반대 방향으로 되돌아가도록 설계돼 있기 때문',
+            '기업들이 그 사이에 실제 벌어들인 이익을 배당으로 나눠줬기 때문'], answer:0,
+      explain:'주가는 "앞으로 벌 돈"을 "지금 돈 가치"로 환산한 값이야. <b>이익 기대</b>가 커지면 오르고 <b>금리(할인율)</b>가 오르면 눌려. 9월 초엔 금리 쪽이 이겨서 떨어졌고, 9/7엔 두 힘이 동시에 주가 편이 돼서 급등한 거야.' },
+    { q:'금리가 오르면 주가가 눌리는 이유로 가장 알맞은 것은?',
+      opts:['금리가 오르면 기업이 그해 벌어들인 이익을 즉시 세금으로 내야 해서',
+            '금리가 오르면 미래에 벌 돈을 현재 가치로 환산할 때 더 많이 깎이기 때문',
+            '금리가 오르면 주식시장 거래 시간이 단축되기 때문',
+            '금리가 오르면 기업이 배당을 늘려 주가가 그만큼 떨어지기 때문'], answer:1,
+      explain:'"3년 뒤 100만원"은 금리가 높을수록 지금 값어치가 작아져 — 이 깎는 비율이 <b>할인율</b>이야. 주가는 미래 이익을 할인율로 나눠 계산하니, 할인율이 오르면 같은 이익이어도 주가는 내려가.' },
+  ]},
+  { id:'ai_to_kospi', variants:[
+    { q:'미국의 AI 관련 뉴스가 코스피 지수 자체를 크게 흔드는 이유로 가장 알맞은 것은?',
+      opts:['한국 증시가 미국 증시와 같은 거래소에서 함께 운영되기 때문',
+            '한국 기업 대부분이 미국에 본사를 두고 있기 때문',
+            '코스피 시가총액 1·2위가 메모리 반도체 회사라, AI 수요 기대가 지수 비중이 큰 종목으로 바로 옮겨붙기 때문',
+            '한국 정부가 미국 증시 흐름에 맞춰 지수 산출 방식을 조정하기 때문'], answer:2,
+      explain:'지수는 <b>시가총액 비중</b>대로 움직여. 삼성전자·SK하이닉스가 코스피에서 차지하는 비중이 워낙 커서, "AI 데이터센터가 메모리를 더 산다"는 기대 하나가 지수 전체를 끌어올릴 수 있어. 9/7에도 삼성전자 +5.68%, SK하이닉스 +8.26%였어.' },
+    { q:'오픈AI의 새 모델 공개가 반도체 주가로 이어지는 경로를 가장 잘 설명한 것은?',
+      opts:['AI 모델이 커질수록 연산·메모리를 더 많이 써서, 데이터센터가 반도체를 더 사갈 거란 기대가 생기기 때문',
+            'AI 회사들이 반도체 회사의 지분을 의무적으로 사도록 규정돼 있기 때문',
+            '새 모델이 나오면 기존 반도체 재고가 폐기돼 가격이 오르기 때문',
+            'AI 모델 공개일에는 반도체 관세가 일시적으로 면제되기 때문'], answer:0,
+      explain:'AI 모델이 더 크고 더 많이 쓰일수록 <b>연산량과 메모리 수요</b>가 늘어. 그 수요가 데이터센터 투자 → HBM·D램 주문으로 이어질 거란 기대가 반도체 주가에 먼저 반영되는 거야. 엔비디아의 허깅페이스 인수(130억 달러)도 "AI 투자 사이클이 안 꺾였다"는 같은 신호로 읽혔어.' },
+  ]},
+  { id:'rate_probability', variants:[
+    { q:'"9월 금리 인상 확률이 55%에서 35%로 낮아졌다"는 말이 주식시장에 좋은 소식인 이유는?',
+      opts:['확률이 낮아지면 그만큼 기업 실적 전망치가 자동으로 올라가기 때문',
+            '금리가 덜 오를 것 같아지면 주가를 눌러 내리던 할인율 부담이 줄기 때문',
+            '확률이 50% 아래로 내려가면 금리 결정이 다음 해로 미뤄지기 때문',
+            '확률이 낮아지면 외국인의 주식 매수가 제도적으로 허용되기 때문'], answer:1,
+      explain:'시장은 <b>확정된 사실</b>이 아니라 <b>바뀐 기대</b>에 먼저 반응해. 인상 가능성이 줄면 미래 할인율이 낮아질 거란 계산이 서고, 그만큼 주가를 누르던 힘이 약해져. 실제 금리가 내린 게 아니라 "덜 오를 것 같다"로 바뀐 것만으로도 주가는 움직여.' },
+    { q:'9/7 코스피 급등에서 "금리 쪽 힘"이 한 역할을 가장 정확히 표현한 것은?',
+      opts:['한국은행이 기준금리를 내리면서 유동성이 직접 늘었다',
+            '미 국채금리가 0% 근처로 떨어지며 채권 투자 매력이 사라졌다',
+            '금리 인상 기대가 한풀 꺾이며 주가를 누르던 힘이 약해졌다',
+            '금리 변수는 이날 주가와 아무 관련이 없었다'], answer:2,
+      explain:'방향이 바뀐 게 아니라 <b>힘이 약해진</b> 거야. 미 10년물은 4.76% 수준으로 여전히 높고, 유가가 다시 튀어 물가를 밀어 올리면 금리 쪽 힘은 언제든 되돌아올 수 있어.' },
+  ]},
+  { id:'foreign_flow', variants:[
+    { q:'9/7 코스피에서 외국인과 기관이 나란히 2조원 넘게 순매수한 것이 의미 있는 이유는?',
+      opts:['두 주체가 같이 사면 그날의 지수 상승폭이 법으로 정해지기 때문',
+            '지수를 실제로 움직이는 큰 자금이 방향을 바꿨다는 신호라, 개인 매수와 달리 흐름의 전환으로 읽히기 때문',
+            '외국인 순매수가 2조원을 넘으면 다음 날 상승이 보장되기 때문',
+            '기관이 매수하면 외국인은 반드시 매도해야 하는 규칙이 있기 때문'], answer:1,
+      explain:'외국인·기관은 <b>덩치가 큰 자금</b>이라 지수 방향을 실제로 만들어. 둘이 나란히 2조원 넘게 산 건 6월 12일 이후 처음이었고, 3거래일 연속 동반 순매수라 "일시적 반등"보다 흐름 전환으로 읽힌 거야. 다만 신호일 뿐 보장은 아니야.' },
+  ]},
+  { id:'oil_inflation_link', variants:[
+    { q:'코스피가 급등했는데도 "금리 부담이 완전히 사라진 건 아니다"라고 보는 근거로 가장 알맞은 것은?',
+      opts:['브렌트유가 96달러대에 머물러 물가 압력이 살아 있고, 물가가 다시 튀면 금리 인상론이 되살아나기 때문',
+            '한국은행이 기준금리를 이미 5% 위로 올려둔 상태이기 때문',
+            '금리는 한 번 방향을 잡으면 1년간 바뀌지 않도록 정해져 있기 때문',
+            '외국인 순매수가 이어지면 금리가 자동으로 오르게 되기 때문'], answer:0,
+      explain:'유가는 <b>거의 모든 물건의 원가</b>에 섞여 들어가서 물가로 번져. 호르무즈 상황으로 브렌트유가 96달러대(주간 +7.8%)에 있는 한 물가 압력은 남아 있고, 물가가 다시 오르면 "금리를 더 올려야 한다"는 힘이 돌아와 주가를 다시 누를 수 있어.' },
+  ]},
+  { id:'hormuz_review', variants:[
+    { q:'어제(9/7) 다룬 내용이야. 호르무즈 파병에서 국회 동의가 필요한지를 가르는 기준으로 가장 알맞은 것은?',
+      opts:['파병 규모가 150명 이하면 동의를 받지 않아도 된다',
+            '이미 나가 있는 청해부대의 작전범위를 넓히는 형식이면 동의 없이 가능하고, 새 부대를 보내면 동의가 필요하다',
+            '전투 임무가 아닌 지원 임무면 동의 절차에서 빠진다',
+            '동맹국의 요청에 따른 파병은 동의 대상에서 제외된다'], answer:1,
+      explain:'이미 국회 동의를 받아 아덴만에 나가 있는 <b>청해부대의 작전범위 확대</b> 형식이면 새 동의 없이 갈 수 있어. 반대로 새 부대·새 자산을 보내면 국회 동의를 받아야 해 — 정부가 파병 쪽으로 가닥을 잡으면서 이 "형식"이 이달의 관전 포인트가 됐어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'금리가 오르면 함께 올라가서 주가를 눌러 내리는, 미래 이익을 현재 가치로 깎는 비율을 뭐라고 할까? (한 단어, ○○율)',
+    accept:['할인율'],
+    explain:'정답은 <b>할인율</b>이야. 주가 = 미래 이익 ÷ 할인율 구조라, 할인율이 오르면 같은 이익이어도 주가는 내려가.' },
+  { q:'9월 7일 코스피 종가는 몇 포인트일까? 7,000선을 4.61포인트 남겨둔 숫자야. (숫자만)',
+    accept:['6995','6995.39','6,995.39','6,995'],
+    explain:'정답은 <b>6,995.39</b>야. 하루에 308.18포인트(+4.61%) 올라 7,000선 바로 아래에서 마감했어.' },
+  { q:'9월 7일 코스피 급등을 이끈, 시가총액 1·2위인 두 반도체 회사 중 8.26% 오른 쪽은 어디일까? (회사 이름)',
+    accept:['SK하이닉스','sk하이닉스','하이닉스'],
+    explain:'정답은 <b>SK하이닉스</b>(178만 3,000원, +8.26%)야. 삼성전자는 27만원으로 +5.68% 올랐어.' },
+  { q:'엔비디아가 약 130억 달러에 인수하며 "AI 투자 사이클이 안 꺾였다"는 신호로 읽힌 오픈소스 AI 플랫폼 이름은? (이름)',
+    accept:['허깅페이스','hugging face','huggingface','허깅 페이스'],
+    explain:'정답은 <b>허깅페이스</b>야. 오픈AI가 AI "사용의 깊이"를 더했다면, 엔비디아는 개발자·고객의 "넓이"를 사들인 셈이라는 해석이 붙었어.' },
+  { q:'시장에서 보는 9월 미국 금리 인상 확률이 일주일 새 55%에서 몇 %로 낮아졌을까? (숫자만)',
+    accept:['35','35%','약 35%'],
+    explain:'정답은 <b>35%</b>야. 물가가 예상보다 눌린 데다 연준 인사의 동결 지지 발언이 겹치며 인상 기대가 한풀 꺾였어.' },
+  { q:'주가를 밀어 올리는 힘이 "이익 기대"라면, 눌러 내리는 힘은 무엇일까? (한 단어)',
+    accept:['금리','금리(할인율)','할인율','이자율'],
+    explain:'정답은 <b>금리</b>(할인율)야. 이 두 힘의 줄다리기로 보면, 어떤 뉴스가 주가에 좋은지 나쁜지를 매번 외우지 않고도 판단할 수 있어.' },
+  { q:'어제 복습이야. 한국이 수입하는 원유 가운데 호르무즈 해협을 지나는 비중은 대략 몇 %일까? (숫자만)',
+    accept:['70','70%','약 70%'],
+    explain:'정답은 <b>약 70%</b>야. 그래서 호르무즈가 흔들리면 유가 → 물가 → 금리로 곧장 번져 와.' },
+  { q:'9월 7일 외국인과 기관이 코스피에서 순매수한 금액은 합쳐서 대략 몇 조원 규모였을까? (숫자만, 조 단위)',
+    accept:['5','5조','약 5조','5.1','5조원'],
+    explain:'정답은 <b>약 5조원</b>(외국인 2조 5,533억 + 기관 2조 6,327억)이야. 둘이 나란히 2조원 넘게 산 건 6월 12일 이후 처음이었어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

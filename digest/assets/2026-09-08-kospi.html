@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일주일 만에 -4% → +4.6%, 코스피는 뭘 보고 움직였나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .lede{font-size:13.5px;color:var(--text2);margin:-6px 0 12px}
+
+  /* 차트 */
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .chart-scroll{overflow-x:auto}
+  .chart-scroll svg{display:block;min-width:600px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding:11px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:12.5px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+  /* 시소(두 힘) */
+  .force-row{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
+  .force{border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+  .force.up{background:var(--green-soft);border-color:#CFE3D7}
+  .force.down{background:var(--red-soft);border-color:#F4D5D1}
+  .force .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .force.up .badge{background:#fff;color:#2F7A52}
+  .force.down .badge{background:#fff;color:#C6493E}
+  .force h3{font-size:15.5px;margin-bottom:6px}
+  .force p{font-size:13.5px;color:var(--text2)}
+  .force p b{color:var(--text)}
+  .force .formula{margin-top:10px;font-size:13px;font-weight:700;background:#fff;border-radius:8px;padding:8px 10px;text-align:center}
+  .seesaw{align-self:center;font-size:22px;font-weight:700;color:#B9B6B1;padding:0 2px}
+
+  /* 전/후 비교 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.lose{background:var(--red-soft);color:#C6493E}
+  .badge.win{background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15.5px;margin-bottom:8px}
+  .vs ul{list-style:none;font-size:13.5px;color:var(--text2)}
+  .vs li{position:relative;padding-left:14px;margin-bottom:5px}
+  .vs li::before{content:"·";position:absolute;left:3px;font-weight:700;color:#B9B6B1}
+  .vs li b{color:var(--text)}
+  .vs .result{margin-top:10px;font-size:14px;font-weight:700;padding:8px 10px;border-radius:8px;text-align:center}
+  .vs .result.minus{background:var(--red-soft);color:#B23F34}
+  .vs .result.plus{background:var(--green-soft);color:#2F7A52}
+
+  /* 단계 흐름도 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--green-soft);color:#2F7A52}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .caution{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .caution b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--green-soft);color:#2F7A52}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    .force-row{grid-template-columns:1fr}
+    .seesaw{justify-self:center}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.08 데일리 뉴스 · 시각자료</div>
+  <h1>📈 일주일 만에 −4% → +4.6%, 코스피는 뭘 보고 움직였나</h1>
+  <div class="sub">같은 시장이 닷새 만에 반대로 튄 이유를 '주가를 밀고 당기는 두 힘'으로 읽어보기</div>
+
+  <div class="section-title">① 지난 한 주, 코스피는 이렇게 움직였어</div>
+  <div class="card">
+    <div class="chart-scroll">
+    <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="9월 2일부터 7일까지 코스피 종가 추이">
+      <rect x="0" y="0" width="900" height="380" fill="#FFFFFF"/>
+
+      <!-- 7000 기준선 -->
+      <line x1="80" y1="70" x2="856" y2="70" stroke="#E56458" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text x="856" y="62" font-size="13" font-weight="700" fill="#C6493E" text-anchor="end" font-family="inherit">7,000 — 아직 못 넘은 선</text>
+
+      <!-- 가로 보조선 -->
+      <g stroke="#F0EFED" stroke-width="1">
+        <line x1="80" y1="148" x2="856" y2="148"/>
+        <line x1="80" y1="227" x2="856" y2="227"/>
+        <line x1="80" y1="300" x2="856" y2="300"/>
+      </g>
+      <g font-size="12" fill="#B9B6B1" text-anchor="end" font-family="inherit">
+        <text x="72" y="152">6,850</text>
+        <text x="72" y="231">6,700</text>
+        <text x="72" y="304">6,560</text>
+      </g>
+
+      <!-- 추이 선 -->
+      <polyline points="170,299 480,234 790,72"
+                fill="none" stroke="#2783DE" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+      <!-- 점 -->
+      <g>
+        <circle cx="170" cy="299" r="7.5" fill="#E56458" stroke="#fff" stroke-width="2.5"/>
+        <circle cx="480" cy="234" r="6" fill="#2783DE" stroke="#fff" stroke-width="2.5"/>
+        <circle cx="790" cy="72" r="9" fill="#46A171" stroke="#fff" stroke-width="3"/>
+      </g>
+
+      <!-- 값 라벨 -->
+      <g font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle" font-family="inherit"
+         paint-order="stroke" stroke="#FFFFFF" stroke-width="4">
+        <text x="170" y="326">6,562.72</text>
+        <text x="480" y="262">6,687.21</text>
+        <text x="790" y="48">6,995.39</text>
+      </g>
+
+      <!-- 날짜 -->
+      <g font-size="13" fill="#7D7A75" text-anchor="middle" font-family="inherit">
+        <text x="170" y="356">9/2 (수) 종가</text>
+        <text x="480" y="356">9/4 (금) 종가</text>
+        <text x="790" y="356">9/7 (월) 종가</text>
+      </g>
+
+      <!-- 저점 칩 -->
+      <g font-family="inherit">
+        <rect x="86" y="188" width="184" height="44" rx="8" fill="#FCE9E7" stroke="#F4D5D1"/>
+        <text x="178" y="206" font-size="13" font-weight="700" fill="#C6493E" text-anchor="middle">이번 조정의 저점</text>
+        <text x="178" y="223" font-size="12" fill="#C6493E" text-anchor="middle">하루 −4% 급락한 날</text>
+        <line x1="178" y1="234" x2="172" y2="289" stroke="#E9A9A2" stroke-width="1.5"/>
+      </g>
+
+      <!-- 반등 라벨 -->
+      <g font-family="inherit">
+        <text x="480" y="290" font-size="12.5" fill="#7D7A75" text-anchor="middle">9/3·9/4 이틀 연속 반등</text>
+      </g>
+
+      <!-- 급등 칩 -->
+      <g font-family="inherit">
+        <rect x="560" y="100" width="206" height="46" rx="8" fill="#E8F1EC" stroke="#CFE3D7"/>
+        <text x="663" y="119" font-size="13.5" font-weight="700" fill="#2F7A52" text-anchor="middle">하루 +308.18p · +4.61%</text>
+        <text x="663" y="136" font-size="12" fill="#2F7A52" text-anchor="middle">7,000까지 딱 4.61포인트</text>
+        <line x1="766" y1="112" x2="782" y2="82" stroke="#A9CFBA" stroke-width="1.5"/>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="dot" style="background:#E56458"></span> 조정 저점(9/2)</span>
+      <span class="item"><span class="dot" style="background:#46A171"></span> 9/7 급등 마감</span>
+      <span class="item">※ 세 점 모두 실제 종가 · 세로축은 6,560~7,000 구간만 확대해서 그림</span>
+    </div>
+  </div>
+
+  <div class="section-title">② 주가를 정하는 건 늘 이 두 힘의 줄다리기야</div>
+  <div class="lede">주식 가격은 "이 회사가 앞으로 벌 돈"을 "지금 돈 가치"로 바꿔 계산한 값이야. 그래서 위쪽(벌 돈)과 아래쪽(금리)이 동시에 주가를 밀고 당겨.</div>
+  <div class="force-row">
+    <div class="force up">
+      <span class="badge">↑ 밀어 올리는 힘</span>
+      <h3>이익 — 앞으로 얼마나 벌까</h3>
+      <p>기업이 벌어들일 돈이 커질 것 같으면 주가는 오르지. AI 데이터센터가 메모리를 더 사갈 거라는 기대가 여기 들어와.</p>
+      <div class="formula">이익 기대 ↑ &nbsp;→&nbsp; 주가 ↑</div>
+    </div>
+    <div class="seesaw">÷</div>
+    <div class="force down">
+      <span class="badge">↓ 눌러 내리는 힘</span>
+      <h3>금리 — 미래 돈을 얼마나 깎을까</h3>
+      <p>금리가 높으면 "3년 뒤 100만원"의 현재 값어치가 더 많이 깎여(할인율↑). 그래서 금리가 오르면 주가는 눌려.</p>
+      <div class="formula">금리(할인율) ↑ &nbsp;→&nbsp; 주가 ↓</div>
+    </div>
+  </div>
+
+  <div class="section-title">③ 그래서 지난주와 이번 주가 갈렸어</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge lose">9월 초 — 금리가 이겼다</span>
+      <h3>이익은 그대로인데 금리만 올랐다</h3>
+      <ul>
+        <li>미국 8월 고용이 예상의 <b>3배</b>로 강하게 나옴</li>
+        <li>"경기가 안 식네" → 연준이 금리 내릴 명분이 사라짐</li>
+        <li>9월 <b>금리 인상</b> 확률이 시장에서 <b>55%</b>까지</li>
+        <li>미 국채금리 급등 → 전 세계 증시가 같이 눌림</li>
+      </ul>
+      <div class="result minus">9/2 코스피 −4% · 6,562.72</div>
+    </div>
+    <div class="vs">
+      <span class="badge win">9/7 — 두 힘이 동시에 편이 됐다</span>
+      <h3>이익 기대는 커지고, 금리 부담은 줄었다</h3>
+      <ul>
+        <li>오픈AI 새 모델 공개 → <b>AI 연산·메모리 수요</b> 기대 급팽창</li>
+        <li>엔비디아, 허깅페이스를 <b>130억 달러</b>에 인수 — AI 투자 사이클이 안 꺾였다는 신호</li>
+        <li>물가가 예상보다 눌리며 9월 인상 확률 <b>55% → 35%</b></li>
+        <li>미 10년물 금리 <b>4.76%</b>로 되밀림</li>
+      </ul>
+      <div class="result plus">9/7 코스피 +4.61% · 6,995.39</div>
+    </div>
+  </div>
+
+  <div class="section-title">④ 9월 7일 하루가 이렇게 굴러갔어</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>미국에서 AI 훈풍이 먼저 불었어</b><span class="mdesc">오픈AI 신모델 + 엔비디아의 허깅페이스 인수 → 필라델피아 반도체지수 +3.37%</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>"AI가 커지면 메모리를 더 산다"로 번졌어</b><span class="mdesc">한국 증시 시가총액 1·2위가 삼성전자·SK하이닉스라, 미국 AI 뉴스가 코스피 지수 자체를 움직여</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>외국인·기관이 같은 날 5조 넘게 사들였어</b><span class="mdesc">외국인 2조 5,533억 + 기관 2조 6,327억 — 둘이 나란히 2조 넘게 산 건 6월 12일 이후 처음이야</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>삼성전자 +5.68%, SK하이닉스 +8.26%</b><span class="mdesc">코스피 6,995.39(+4.61%) · 코스닥 822.19 · 원·달러 1,344.70원(−5.70원)</span></div>
+    </div>
+    <div class="caution"><b>⚠️ 그래도 한쪽 힘은 그대로야</b>이번엔 금리가 '조금' 물러선 거지 방향이 바뀐 건 아니야. 브렌트유가 96달러대에 머무는 한 물가 압력은 살아 있고, 물가가 다시 튀면 금리 쪽 힘이 언제든 되돌아와.</div>
+  </div>
+
+  <div class="section-title">⑤ 나랑 무슨 상관이야</div>
+  <div class="flow">
+    <div class="step s1">AI 투자 사이클 지속<small>메모리 수요 기대</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">반도체 수출 · 실적 개선</div>
+    <div class="arrow">→</div>
+    <div class="step s3">경상수지 흑자 · 달러 유입</div>
+    <div class="arrow">→</div>
+    <div class="step s4">원화 강세<small>수입 물가·해외여행엔 유리<br>수출기업 채산성엔 부담</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.08 오늘의 딥다이브 내용 기반 (지수·금리·환율은 9/7 종가 기준)</div>
+</div>
+</body>
+</html>
