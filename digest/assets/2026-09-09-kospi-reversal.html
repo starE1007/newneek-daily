@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사상 최고 찍고 하루 만에 반납 — 카르그 섬이 뭐길래</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .chart-scroll{overflow-x:auto}
+  .chart-scroll svg{display:block;min-width:600px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding:11px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:12.5px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+  .callout{margin-top:14px;border-radius:10px;padding:12px 16px;font-size:13.5px}
+  .callout.warn{background:var(--orange-soft);color:#9A5620}
+  .callout.warn b{display:block;margin-bottom:2px;font-size:14px}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  .fact{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);display:flex;gap:16px;align-items:center}
+  .fact .num{font-size:30px;font-weight:800;color:#C6493E;flex:0 0 auto}
+  .fact .txt{font-size:13.5px;color:var(--text2)}
+  .fact .txt b{color:var(--text)}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .fact{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.09 데일리 뉴스 · 시각자료</div>
+  <h1>📉 사상 최고 찍고 하루 만에 반납 — 카르그 섬이 뭐길래</h1>
+  <div class="sub">9월 8일 하루 동안 코스피가 그린 궤적과, 그걸 되돌린 유가발 메커니즘</div>
+
+  <div class="section-title">① 9월 8일 하루, 코스피는 이렇게 움직였어</div>
+  <div class="card">
+    <div class="chart-scroll">
+    <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="9월 7일 종가부터 9월 8일 장중 고점, 9월 8일 종가까지의 코스피 추이">
+      <rect x="0" y="0" width="900" height="360" fill="#FFFFFF"/>
+
+      <line x1="80" y1="90" x2="856" y2="90" stroke="#E56458" stroke-dasharray="6 5" stroke-width="1.5"/>
+      <text x="856" y="82" font-size="13" font-weight="700" fill="#C6493E" text-anchor="end" font-family="inherit">7,000 — 이틀 연속 못 넘은 선</text>
+
+      <g stroke="#F0EFED" stroke-width="1">
+        <line x1="80" y1="160" x2="856" y2="160"/>
+        <line x1="80" y1="230" x2="856" y2="230"/>
+        <line x1="80" y1="300" x2="856" y2="300"/>
+      </g>
+      <g font-size="12" fill="#B9B6B1" text-anchor="end" font-family="inherit">
+        <text x="72" y="164">6,900</text>
+        <text x="72" y="234">6,750</text>
+        <text x="72" y="304">6,600</text>
+      </g>
+
+      <polyline points="150,132 480,42 790,150" fill="none" stroke="#2783DE" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="480,42 790,150" fill="none" stroke="#E56458" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="1 0"/>
+
+      <g>
+        <circle cx="150" cy="132" r="7" fill="#2783DE" stroke="#fff" stroke-width="2.5"/>
+        <circle cx="480" cy="42" r="9" fill="#46A171" stroke="#fff" stroke-width="3"/>
+        <circle cx="790" cy="150" r="8" fill="#E56458" stroke="#fff" stroke-width="2.5"/>
+      </g>
+
+      <g font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle" font-family="inherit" paint-order="stroke" stroke="#FFFFFF" stroke-width="4">
+        <text x="150" y="112">6,995.39</text>
+        <text x="480" y="26">7,171.52</text>
+        <text x="790" y="176">6,954.52</text>
+      </g>
+
+      <g font-size="13" fill="#7D7A75" text-anchor="middle" font-family="inherit">
+        <text x="150" y="330">9/7 종가</text>
+        <text x="480" y="330">9/8 장중 최고</text>
+        <text x="790" y="330">9/8 종가</text>
+      </g>
+
+      <g font-family="inherit">
+        <rect x="560" y="180" width="230" height="46" rx="8" fill="#FCE9E7" stroke="#F4D5D1"/>
+        <text x="675" y="199" font-size="13" font-weight="700" fill="#C6493E" text-anchor="middle">−216.99p, 오후에 그대로 반납</text>
+        <text x="675" y="216" font-size="12" fill="#C6493E" text-anchor="middle">전일 대비로는 −40.87p(−0.58%)</text>
+        <line x1="675" y1="180" x2="700" y2="163" stroke="#E9A9A2" stroke-width="1.5"/>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="dot" style="background:#46A171"></span> 9/8 장중 사상 최고</span>
+      <span class="item"><span class="dot" style="background:#E56458"></span> 9/8 종가(반납)</span>
+      <span class="item">※ 세로축은 6,600~7,000 구간만 확대 · 세 점 모두 실제 지수</span>
+    </div>
+    <div class="callout warn"><b>⚠️ 어제 이 자리에서 경고했던 그대로</b>"금리 힘은 잠깐 물러선 거지 사라진 게 아니다 — 유가가 다시 튀면 그대로 되돌아온다"고 했었는데, 정확히 다음 거래일에 그 일이 일어났어.</div>
+  </div>
+
+  <div class="section-title">② 카르그 섬, 왜 여기가 흔들리면 유가 전체가 흔들려?</div>
+  <div class="fact">
+    <div class="num">90%</div>
+    <div class="txt"><b>이란 원유 수출의 약 90%</b>가 페르시아만의 이 작은 섬(카르그 섬) 선적시설을 거쳐 나가. 이란 해안에서 약 25km 떨어진 곳으로, 주요 유전과 파이프라인으로 연결돼 있어 — 사실상 이란 원유가 세계로 나가는 <b>유일한 출구</b>에 가까워.</div>
+  </div>
+
+  <div class="section-title">③ 9월 8일 오후, 이렇게 굴러갔어</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>카르그 섬 인근에서 이란 유조선이 또 타격받았다는 보도</b><span class="mdesc">미군이 이란 유조선을 타격했다는 소식 + 예멘 후티 반군의 사우디 에너지시설 공격이 겹침</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>"이란 원유 공급에 진짜 차질이 생길 수도"라는 우려로 번짐</b><span class="mdesc">브렌트유가 장중 99달러를 뚫고 100달러 코앞까지 — 전날 96.80달러에서 하루 만에 급등</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>"유가가 물가를 다시 밀어 올릴 것"이란 계산이 되살아남</b><span class="mdesc">연준이 금리를 내릴 명분이 다시 줄어들 거란 기대 — 어제 배운 '금리(할인율)' 쪽 힘이 재점화</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>이익 기대는 그대로인데 할인율 부담만 커져 코스피 반납</b><span class="mdesc">같은 날 다우 −1.18%(−628p) 52,786.07 · 코스피 6,954.52(−0.58%) · 원·달러 1,345.6원(+5.1원)</span></div>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.09 오늘의 딥다이브 내용 기반 (지수·유가·환율은 9/8 종가·장중 기준)</div>
+</div>
+</body>
+</html>
