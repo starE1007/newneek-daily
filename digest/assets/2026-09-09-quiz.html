@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.09</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.09 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'ash_glass', variants:[
+    { q:'화산재가 제트엔진에 치명적인 이유로 가장 알맞은 것은?',
+      opts:['화산재의 유리 성분이 1,000℃가 넘는 엔진 안에서 녹은 뒤 뒤쪽에서 다시 굳어 공기 구멍을 막기 때문',
+            '화산재가 연료와 화학반응을 일으켜 연료의 발열량을 크게 떨어뜨리기 때문',
+            '화산재가 기체 표면에 쌓여 무게를 늘려 이륙 중량을 넘기게 만들기 때문',
+            '화산재가 엔진 흡입구의 필터를 막아 공기가 아예 들어가지 못하게 하기 때문'], answer:0,
+      explain:'제트엔진은 앞에서 공기를 대량으로 삼켜 태우는 구조라 가루를 걸러낼 <b>필터가 애초에 없어</b>. 들어간 화산재는 연소실(1,000℃ 이상)에서 녹고, 상대적으로 찬 터빈 뒤쪽에서 다시 굳어 냉각 구멍을 덮어. 냉각이 안 되면 추력이 빠지고 최악엔 엔진이 멈춰.' },
+    { q:'화산재를 \'재\'라고 부르지만 실제 정체와 위험을 가장 잘 설명한 것은?',
+      opts:['타고 남은 탄소 가루여서, 엔진 내부를 그을려 센서를 오작동시킨다',
+            '굳기 전 마그마가 산산이 깨진 유리질 가루여서, 엔진 열에 녹아 부품에 엉겨붙는다',
+            '수증기가 얼어붙은 얼음 알갱이여서, 날개에 착빙을 일으킨다',
+            '대부분 금속 성분이어서, 기체에 정전기를 만들어 통신을 끊는다'], answer:1,
+      explain:'화산재는 <b>불에 타고 남은 재가 아니야</b>. 마그마가 분출 순간 급히 부서진 조각이라 성분이 사실상 유리(규산염)야. 그래서 "재를 좀 마셨다"가 아니라 "유리 가루를 삼켰다"로 이해하는 게 맞아.' },
+  ]},
+  { id:'no_partial', variants:[
+    { q:'안개나 폭우 때는 지연·우회로 버티는데, 화산재는 공항을 아예 닫는 이유로 가장 알맞은 것은?',
+      opts:['화산재 구름은 기상레이더에 잡히지 않아 어디에 얼마나 있는지 알기 어렵고, 적은 양으로도 엔진이 망가질 수 있기 때문',
+            '화산 분화 중에는 관제 통신 주파수를 쓸 수 없도록 국제 규정에 정해져 있기 때문',
+            '활주로에 쌓인 화산재를 치우는 데 며칠이 걸려 물리적으로 이착륙이 불가능하기 때문',
+            '공역을 닫아두는 편이 승객 보상 책임을 줄이는 데 유리하기 때문'], answer:0,
+      explain:'비나 안개는 <b>어디에 얼마나 있는지 보이고</b>, 조금이면 조심해서 날 수 있어. 화산재는 위치 파악이 안 되는데 소량으로도 엔진을 망칠 수 있어서, "덜 위험한 경로"를 고를 수가 없어. 남는 선택이 부분 통제가 아니라 전면 폐쇄인 이유야.' },
+    { q:'화산재 대응에서 \'기상레이더에 잡히지 않는다\'는 점이 특히 위험한 이유는?',
+      opts:['레이더가 없으면 항공기끼리 충돌을 피할 수 없기 때문',
+            '위험 구역의 위치와 농도를 실시간으로 알 수 없어, 피해 갈 경로를 믿을 수 없기 때문',
+            '레이더에 잡히지 않는 물질은 항공보험 약관에서 빠지기 때문',
+            '레이더에 안 잡히는 화산재는 엔진에 들어가도 손상을 주지 않기 때문'], answer:1,
+      explain:'기상레이더는 <b>빗방울·물방울</b>을 읽는 장비라 마른 가루 구름은 그냥 통과시켜. 밤이나 구름 속에서는 조종사 눈에도 안 보여서, "여기만 피하면 된다"는 판단 자체가 성립하지 않아.' },
+  ]},
+  { id:'index_passive', variants:[
+    { q:'나이키가 S&P 100에서 빠지는 것이 단순한 \'상징적 강등\'에 그치지 않는 이유로 가장 알맞은 것은?',
+      opts:['지수를 그대로 복제하는 펀드들은 종목을 고를 재량이 없어, 지수에서 빠지면 재조정일에 기계적으로 팔아야 하기 때문',
+            '지수에서 빠진 기업은 미국 증권거래소에서 거래 단위가 축소되기 때문',
+            '지수에서 빠지면 분기 실적을 공시할 의무가 사라져 투자 정보가 줄어들기 때문',
+            '지수에서 빠진 기업은 자사주를 매입할 수 없게 되기 때문'], answer:0,
+      explain:'지수는 순위표가 아니라 <b>돈이 자동으로 따라가는 통로</b>야. 지수를 복제하는 ETF·인덱스펀드는 "좋아 보여서" 사는 게 아니라 지수에 있어서 사는 거라, 편출되면 실적과 무관하게 팔아야 해. 그게 실제 매도 물량이 되는 거지.' },
+    { q:'\'패시브 자금\'이 지수 구성 변경에 민감하게 반응하는 구조를 가장 잘 설명한 것은?',
+      opts:['저평가된 종목을 골라 담기 때문에 지수 변경 때 저가 매수 기회를 노린다',
+            '지수를 비중대로 그대로 따라 담는 것이 목적이라, 지수가 바뀌면 판단 없이 보유 종목도 바꿔야 한다',
+            '지수 변경이 발표되면 일정 기간 운용을 멈춰야 한다',
+            '지수에 없는 종목만 담아 지수보다 높은 수익을 내려 한다'], answer:1,
+      explain:'패시브(passive)는 말 그대로 <b>수동</b>이야. 목표가 "지수를 이기기"가 아니라 "지수와 똑같아지기"라서, 지수가 바뀌면 그 자체가 매매 지시가 돼. 반대로 새로 편입되는 종목엔 기계적 매수가 붙어.' },
+  ]},
+  { id:'index_composition', variants:[
+    { q:'이번 S&P 100 정기변경에서 나이키·콜게이트팔몰리브 같은 소비 브랜드가 빠지고 그 자리를 IT 기업 4곳이 채운 건 무엇을 보여주는 신호로 읽을 수 있을까?',
+      opts:['미국 증시에서 소비재 주식이 제도적으로 우량주 지위를 잃었다는 뜻',
+            '지수 운영사가 IT 기업에 유리하도록 편입 기준을 새로 만들었다는 뜻',
+            '시가총액으로 미국을 대표하는 대기업의 구성이 소비 브랜드에서 IT·인프라 쪽으로 옮겨가고 있다는 뜻',
+            '소비재 기업들이 지수에서 스스로 나가겠다고 요청했다는 뜻'], answer:2,
+      explain:'S&P 100 같은 지수는 대체로 <b>시가총액 순</b>으로 자리가 정해져. 그래서 구성 변경은 심사 결과라기보다 "지금 미국에서 덩치가 큰 회사가 누구인가"의 기록이야. 이번엔 나가는 4곳이 소비·산업재, 들어오는 4곳이 전부 IT였어.' },
+    { q:'나이키가 S&P 100에서는 빠지지만 S&P 500에는 그대로 남는다는 사실이 알려주는 것은?',
+      opts:['두 지수가 담는 기업의 범위가 달라, 100대 대표기업 자리에서는 밀렸지만 500대 기업 안에는 여전히 든다는 뜻',
+            'S&P 500은 기업이 원하면 계속 남을 수 있도록 선택권을 준다는 뜻',
+            '두 지수의 편입 기준이 서로 반대 방향으로 설계돼 있다는 뜻',
+            'S&P 100에서 빠진 기업은 자동으로 S&P 500 상위권으로 이동한다는 뜻'], answer:0,
+      explain:'S&P 100은 S&P 500 안에서 <b>가장 큰 100곳</b>을 따로 묶은 지수야. 그래서 "100에서 빠졌지만 500엔 남았다"는 건 망한 게 아니라 <b>상위권에서 밀렸다</b>는 뜻이지. 다만 100을 따라가는 자금은 팔아야 하니 수급 영향은 실재해.' },
+  ]},
+  { id:'fleet_domino', variants:[
+    { q:'공항이 다시 열렸는데도 항공 시간표가 곧바로 정상으로 돌아오지 않는 이유로 가장 알맞은 것은?',
+      opts:['운항 재개 첫날에는 국제선을 띄울 수 없도록 정해져 있기 때문',
+            '비행기와 승무원이 원래 있어야 할 공항에 흩어져 있고, 화산재에 노출된 기체는 안전점검을 통과해야 다시 뜰 수 있기 때문',
+            '결항된 항공편은 자동으로 다음 달 일정으로 넘겨 배정되기 때문',
+            '공항이 닫혔던 기간만큼 활주로 보수 공사를 해야 하기 때문'], answer:1,
+      explain:'항공은 <b>기재가 돌아야 다음 편이 뜨는</b> 사업이야. 한 편이 결항되면 그 비행기가 있어야 할 다음 공항의 일정까지 밀려. 이번엔 폐쇄 기간에 갇혀 있던 178대의 안전점검까지 남아서, 문을 연 것과 시간표가 회복된 것은 다른 얘기가 돼.' },
+  ]},
+  { id:'yesterday_review', variants:[
+    { q:'어제(9/8) 다룬 내용이야. 어떤 뉴스가 증시에 호재인지 악재인지 판단할 때 가장 유용한 기준은?',
+      opts:['그 뉴스가 기업의 이익 기대를 키우는지, 아니면 금리(할인율) 부담을 키우는지',
+            '그 뉴스가 국내에서 나온 것인지 해외에서 나온 것인지',
+            '그 뉴스가 장중에 나왔는지 장 마감 후에 나왔는지',
+            '그 뉴스가 대형주와 관련된 것인지 중소형주와 관련된 것인지'], answer:0,
+      explain:'주가는 <b>이익 ÷ 금리</b> 구조야. 그래서 같은 뉴스라도 이익 기대를 키우면 호재, 금리가 더 오를 명분을 주면 악재가 돼 — 미국 고용 서프라이즈가 증시엔 악재였던 게 그 예시야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'화산재가 엔진 안에서 녹은 뒤 터빈 뒤쪽에서 다시 굳으며 공기 구멍을 덮어버리는데, 그 막의 정체는 무엇일까? (한 단어)',
+    accept:['유리','유리막','규산염','유리질'],
+    explain:'정답은 <b>유리</b>(규산염)야. 화산재는 마그마가 급히 부서진 유리질 가루라, 엔진 열에 녹았다가 식으면서 유리막으로 굳어 붙어.' },
+  { q:'아낙 크라카타우 화산이 자리한, 자바섬과 수마트라섬 사이의 해협 이름은? (○○ 해협)',
+    accept:['순다','순다해협','순다 해협','sunda'],
+    explain:'정답은 <b>순다 해협</b>이야. 자바해와 인도양을 잇는 길목이고, 자카르타에서 서쪽으로 약 150km 거리라 화산재가 수도까지 바로 날아왔어.' },
+  { q:'화산재 구름이 위험한 이유 중 하나는 이 장비에 잡히지 않는다는 점이야. 빗방울을 읽어 날씨를 보는 이 장비는? (○○레이더)',
+    accept:['기상','기상레이더','기상 레이더','weather radar'],
+    explain:'정답은 <b>기상레이더</b>야. 물방울을 반사해 읽는 장비라서 마른 가루 구름은 그냥 통과해 — 그래서 "피해서 날기"가 안 돼.' },
+  { q:'나이키는 S&P 100에서 빠지지만, 500대 기업을 담는 이 지수에는 그대로 남아 있어. 이 지수 이름은?',
+    accept:['s&p 500','s&p500','sp500','sp 500','에스앤피 500','에스앤피500'],
+    explain:'정답은 <b>S&P 500</b>이야. S&P 100은 그 500곳 중 가장 큰 100곳을 따로 묶은 지수라, 이번 편출은 "상위권에서 밀렸다"는 의미야.' },
+  { q:'종목을 직접 고르지 않고 지수 구성을 그대로 따라 담는 것을 목적으로 하는 자금을 뭐라고 부를까? (○○○ 자금)',
+    accept:['패시브','패시브 자금','패시브펀드','인덱스','passive'],
+    explain:'정답은 <b>패시브 자금</b>이야. 지수를 이기려는 게 아니라 지수와 똑같아지려는 돈이라, 지수 구성 변경 자체가 매매 지시가 돼.' },
+  { q:'화산 분화처럼 항공사 잘못이 아닌 사유로 결항됐을 때, 항공사가 해주는 건 대체편 제공과 환불이야. 이렇게 배상 책임에서 빠지는 사유를 뭐라고 부를까? (○○○○)',
+    accept:['불가항력','천재지변','기상 등 불가항력','force majeure'],
+    explain:'정답은 <b>불가항력</b>(천재지변)이야. 국내 항공교통이용자 보호기준이나 EU 규정 모두 항공사가 통제할 수 없는 사유는 배상 대상에서 빼 — 그래서 화산·태풍 결항은 "환불·대체편은 되지만 보상금은 안 되는" 자리야.' },
+  { q:'어제 복습이야. 주가를 밀어 올리는 힘이 \'이익 기대\'라면, 눌러 내리는 힘은 무엇일까? (한 단어)',
+    accept:['금리','할인율','금리(할인율)','이자율'],
+    explain:'정답은 <b>금리</b>(할인율)야. 이 두 힘의 줄다리기로 보면 어떤 뉴스가 주가에 좋은지 나쁜지를 매번 외우지 않아도 판단할 수 있어.' },
+  { q:'9월 21일 S&P 100 정기변경에서 나이키가 빠지는 자리에 새로 들어오는 기업 4곳은 모두 어떤 업종일까? (한 단어)',
+    accept:['it','정보기술','기술','테크','아이티'],
+    explain:'정답은 <b>IT</b>(정보기술)야. 델테크놀로지스·팔로알토네트웍스·아리스타네트웍스·샌디스크 네 곳 모두 IT 섹터라, 미국 대표기업의 무게중심이 어디로 옮겨갔는지 보여주는 대목이야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

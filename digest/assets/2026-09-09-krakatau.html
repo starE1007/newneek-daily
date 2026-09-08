@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>화산재 한 줌에 하늘길이 멈춘 이유 — 한눈에 보는 지도</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  /* 메커니즘 단계 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b.t{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.09 데일리 뉴스 · 시각자료</div>
+  <h1>🌋 화산재 한 줌에 하늘길이 멈춘 이유</h1>
+  <div class="sub">아낙 크라카타우가 어디서 터졌고, 왜 자카르타 공항까지 문을 닫아야 했는지 지도로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="인도네시아 순다 해협 지도: 아낙 크라카타우 화산과 자카르타 수카르노하타 공항 위치">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+
+      <!-- 바다(배경) -->
+      <rect x="0" y="0" width="900" height="600" fill="#D8E9F7"/>
+
+      <!-- 수마트라섬 (남동쪽 끝) -->
+      <path d="M-20,20 L160,8 L290,140 L344,286 L316,330 L240,296 L116,180 L-20,118 Z"
+            fill="#EDEBE8" stroke="#C9C6C2" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 자바섬 (서쪽 절반) -->
+      <path d="M452,352 L488,320 L560,300 L640,296 L760,300 L900,306 L900,486 L760,492 L620,486 L520,462 L470,414 L442,382 Z"
+            fill="#EDEBE8" stroke="#C9C6C2" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 반텐주 하이라이트 (화산재 직격 지역) -->
+      <path d="M452,352 L488,320 L556,306 L570,392 L512,452 L470,414 L442,382 Z"
+            fill="#E56458" fill-opacity="0.12" stroke="#E56458" stroke-width="1.4" stroke-dasharray="4 3"/>
+
+      <!-- 화산재 이동 ① 북동진 → 자카르타 -->
+      <path d="M412,320 C470,296 540,282 606,286" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#ah)"/>
+      <!-- 화산재 이동 ② 서·남서진 → 람풍·벵쿨루·인도양 -->
+      <path d="M376,346 C320,382 260,410 190,424" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#ah)"/>
+
+      <!-- 바다 이름 -->
+      <g font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle" font-family="inherit">
+        <text x="560" y="196" font-size="14">자바해</text>
+        <text transform="translate(388,436) rotate(-58)">순다 해협</text>
+        <text x="240" y="540" font-size="14">인도양</text>
+      </g>
+
+      <!-- 육지 이름 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#EDEBE8" stroke-width="4" font-family="inherit">
+        <text x="140" y="96" font-size="16">수마트라섬</text>
+        <text x="272" y="212" font-size="13">람풍주</text>
+        <text x="700" y="400" font-size="16">자바섬</text>
+      </g>
+      <g text-anchor="middle" font-family="inherit">
+        <text x="482" y="376" font-size="12.5" font-weight="700" fill="#C6493E">반텐주</text>
+        <text x="482" y="392" font-size="11.5" fill="#C6493E">화산재 직격</text>
+      </g>
+
+      <!-- 화살표 설명 -->
+      <g font-family="inherit" fill="#B06426" font-weight="600">
+        <text x="512" y="266" font-size="12.5" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4">화산재 북동진 · 약 150km</text>
+        <text x="258" y="374" font-size="12.5" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4">2차 분출분 5만ft · 서쪽으로</text>
+      </g>
+
+      <!-- ⊘ 화산 지점 -->
+      <g>
+        <circle cx="390" cy="334" r="24" fill="#E56458" opacity="0.15"/>
+        <circle cx="390" cy="334" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="383" y1="341" x2="397" y2="327" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <!-- ✈ 공항 지점 -->
+      <g>
+        <circle cx="628" cy="300" r="20" fill="#2783DE" opacity="0.15"/>
+        <circle cx="628" cy="300" r="11" fill="#2783DE" stroke="#FFFFFF" stroke-width="3"/>
+      </g>
+
+      <!-- 칩 ① 화산 -->
+      <g font-family="inherit">
+        <line x1="300" y1="470" x2="378" y2="348" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="150" y="446" width="252" height="64" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="276" y="468" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">⊘ 아낙 크라카타우</text>
+        <text x="276" y="486" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">4일 밤 분화 · 25시간 연속 분출</text>
+        <text x="276" y="502" font-size="12" fill="#7D7A75" text-anchor="middle">화산재 최대 15km(5만ft) 상공까지</text>
+      </g>
+      <!-- 칩 ② 공항 -->
+      <g font-family="inherit">
+        <line x1="700" y1="214" x2="636" y2="286" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="584" y="150" width="290" height="64" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="729" y="172" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">✈ 자카르타 · 수카르노하타 공항</text>
+        <text x="729" y="190" font-size="12.5" font-weight="700" fill="#2783DE" text-anchor="middle">동남아 2위 허브 · 5~7일 전면 폐쇄</text>
+        <text x="729" y="206" font-size="12" fill="#7D7A75" text-anchor="middle">인천발 직항 4개 항공사 전편 결항</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 분화 지점</span>
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#2783DE"/></svg> 폐쇄된 관문 공항</span>
+      <span class="item"><span class="dash-sample"></span> 화산재가 퍼진 방향</span>
+    </div>
+  </div>
+
+  <div class="section-title">화산재는 왜 비행기를 세워? — 엔진 안에서 벌어지는 일</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>화산재는 '재'가 아니라 잘게 부서진 유리·암석 가루야</b><span class="mdesc">타고 남은 가루가 아니라, 굳기 전 마그마가 산산이 깨진 조각 — 성분이 사실상 유리(규산염)</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>엔진이 그 가루를 공기와 함께 빨아들여</b><span class="mdesc">제트엔진은 앞에서 공기를 대량으로 삼켜 태우는 구조라, 공기 속 가루를 걸러낼 방법이 없어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>연소실 안은 1,000℃가 넘어 — 가루가 녹아버려</b><span class="mdesc">유리 성분이 무르는 온도가 엔진 내부 온도보다 낮아서, 들어간 순간 녹은 상태가 돼</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>터빈 날개·냉각 구멍에 유리막으로 굳어 붙어</b><span class="mdesc">뒤쪽 찬 부분에서 다시 굳으면서 공기 구멍을 막아 → 냉각이 안 되고 추력이 빠져 최악엔 엔진 정지</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>게다가 기상레이더에 안 잡혀</b><span class="mdesc">레이더는 빗방울·물방울을 읽는 장비라 마른 가루 구름은 그냥 통과 — 조종사 눈에도 밤엔 안 보여</span></div>
+    </div>
+    <div class="paradox"><b class="t">⚠️ 그래서 '조심해서 우회'가 안 된다</b>양이 적으면 천천히 가면 되는 안개나 비와 달리, 화산재는 <b>피할 위치를 알 수 없고 적은 양으로도 엔진을 망친다</b>. 결국 남은 선택은 부분 통제가 아니라 공항 전면 폐쇄뿐이야.</div>
+  </div>
+
+  <div class="section-title">지금 어디까지 왔어?</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">9/4 밤(현지)</div><div class="what">분화 시작 — 약 <b>25시간</b> 연속 분출</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/5~7</div><div class="what">공항 <b>8곳</b> 폐쇄 · <b>2,961편</b> 차질 · <b>34만 1,000명</b> 발 묶임</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/8</div><div class="what">바람 방향이 바뀌어 자카르타 등 <b>5곳 재개</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">지금 확인 포인트</div><div class="what">8일 오전에도 <b>3차례 재분화</b> · 갇혀 있던 <b>178대</b> 안전점검 대기 — 시간표 정상화는 아직</div></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(거리·모양은 실제와 다름) · 2026.09.09 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
