@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.10</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.10 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'why_together', variants:[
+    { q:'한국·유럽·미국·일본 중앙은행이 비슷한 시기에 나란히 금리 인상 쪽으로 움직이는 이유로 가장 알맞은 것은?',
+      opts:['중동發 기름값 급등이라는 공통 요인이 각국 물가를 같은 방향으로 밀어 올렸기 때문',
+            '주요국이 금리 결정을 함께 하기로 국제 협약을 맺어두었기 때문',
+            '각국 경기가 동시에 과열돼 소비가 폭발적으로 늘었기 때문',
+            '기축통화국의 금리를 다른 나라가 그대로 따라 쓰도록 정해져 있기 때문'], answer:0,
+      explain:'중앙은행은 각자 자기 나라 물가를 보고 결정해. 그런데 이번엔 <b>기름값</b>이라는 원인이 공통이야 — 브렌트유가 100달러를 다시 찍자 유로존 8월 에너지 물가가 +14.3%로 튀는 식으로, 여러 나라 물가가 같은 방향으로 동시에 밀린 거지.' },
+    { q:'"각국이 약속한 것도 아닌데 왜 동시에 올리지?"라는 질문에 가장 정확한 답은?',
+      opts:['국제결제은행이 매년 금리 인상 일정을 배정하기 때문',
+            '물가를 밀어 올린 원인(에너지 가격)이 국경과 상관없이 공통이라, 각자 판단해도 결론이 비슷해지기 때문',
+            '한 나라가 올리면 나머지 나라는 자동으로 같은 폭을 올리게 돼 있기 때문',
+            '금리 인상은 원래 홀수 달에 몰아서 하도록 관행이 굳어졌기 때문'], answer:1,
+      explain:'조율이 아니라 <b>같은 충격에 대한 같은 반응</b>이야. 에너지는 어느 나라든 수입해 쓰는 원가라, 국제 유가가 오르면 각국 물가지표가 나란히 흔들리고 대응도 닮아져.' },
+  ]},
+  { id:'expected_inflation', variants:[
+    { q:'기름값 때문에 오른 물가는 기름값이 내리면 저절로 내려갈 텐데, 중앙은행이 굳이 금리를 올리는 이유로 가장 알맞은 것은?',
+      opts:['"앞으로도 계속 오르겠네"라는 예상이 자리 잡으면 임금·가격표가 미리 올라가버려, 기름값이 내려도 물가가 눌러앉기 때문',
+            '금리를 올리면 국제 유가 자체를 끌어내릴 수 있기 때문',
+            '중앙은행은 물가가 오르면 반드시 금리를 올리도록 법에 정해져 있기 때문',
+            '기름값 상승분은 금리를 올려야만 세금으로 환수할 수 있기 때문'], answer:0,
+      explain:'핵심은 <b>기대인플레이션</b> — 물가가 오를 거라는 예상 그 자체야. 그 예상이 굳으면 사람들은 미리 임금을 올려 받고 가게는 미리 가격표를 고쳐. 한 번 올라간 월급·가격은 잘 안 내려오니까, 원인이 사라져도 물가가 남는 거지. 그래서 예상이 굳기 <b>전에</b> 끊는 거야.' },
+    { q:"중앙은행이 말하는 '선제적 인상'의 목적을 가장 잘 설명한 것은?",
+      opts:['이미 오른 물가를 과거 시점으로 되돌려 놓기 위해',
+            '물가가 계속 오를 거라는 예상이 임금·가격 결정에 반영되기 전에 미리 끊기 위해',
+            '경기가 침체에 빠진 뒤 금리를 내릴 여유를 만들어두기 위해',
+            '수입 물가를 정부 보조금으로 대신 메우기 위해'], answer:1,
+      explain:'물가는 <b>예상이 현실을 만드는</b> 구조라, 늦게 대응하면 훨씬 센 금리로도 잡기 어려워져. 그래서 지표가 완전히 나빠지기 전에 움직이는 걸 선제적(preemptive) 대응이라고 불러.' },
+  ]},
+  { id:'core_vs_headline', variants:[
+    { q:'유로존 8월 물가는 3.3%로 3년 만에 가장 높았는데, 에너지·식품을 뺀 근원물가는 2.5%에서 2.4%로 오히려 내려왔어. 이 조합이 알려주는 것은?',
+      opts:['물가 통계에 오류가 있어 두 수치가 어긋난 것이다',
+            '경기가 과열돼 수요가 폭발한 결과라는 뜻이다',
+            '물가를 밀어 올린 힘이 수요 과열이 아니라 에너지 같은 공급 쪽 요인에 몰려 있다는 뜻이다',
+            '유럽의 물가 상승이 곧 저절로 마이너스로 돌아설 것이라는 뜻이다'], answer:2,
+      explain:'근원물가는 <b>출렁임이 큰 에너지·식품을 뺀</b> 물가야. 전체는 뛰는데 근원은 잠잠하다면, 원인이 경기 과열이 아니라 <b>기름값 같은 공급 충격</b>에 몰려 있다는 신호로 읽어.' },
+    { q:"물가 지표에서 '근원물가'를 따로 보는 이유로 가장 알맞은 것은?",
+      opts:['에너지·식품은 날씨나 국제 정세로 크게 출렁여, 이를 빼면 물가의 바탕 흐름이 더 잘 보이기 때문',
+            '에너지·식품은 소비에서 차지하는 비중이 없다시피 해 통계에서 제외하는 것이 관행이기 때문',
+            '근원물가는 정부가 직접 정하는 가격만 모은 지표이기 때문',
+            '근원물가에는 수입품 가격이 반영되지 않도록 설계돼 있기 때문'], answer:0,
+      explain:'기름값·농산물값은 사건 하나로 확 뛰었다 확 내리는 항목이야. 그래서 정책 판단에는 <b>바탕 흐름</b>을 보여주는 근원물가를 같이 봐 — 다만 장바구니에서 체감하는 건 전체 물가라, 둘을 함께 봐야 해.' },
+  ]},
+  { id:'rate_and_fx', variants:[
+    { q:'다른 나라들이 다 금리를 올리는데 우리만 그대로 두면 생기는 일로 가장 알맞은 것은?',
+      opts:['국내 물가가 자동으로 다른 나라 평균 수준으로 맞춰진다',
+            '이자를 더 주는 통화 쪽으로 돈이 옮겨가 원화 가치가 밀리고, 수입물가가 올라 물가 부담이 되레 커진다',
+            '수입품 가격이 내려가 물가가 안정된다',
+            '환율은 금리와 무관하므로 아무 변화도 생기지 않는다'], answer:1,
+      explain:'돈은 <b>이자를 더 주는 쪽</b>으로 흘러. 남들만 올리면 원화 매력이 떨어져 환율이 오르고(원화 약세), 기름·원자재를 달러로 사 오는 한국은 <b>수입물가</b>가 뛰어. 물가 잡으려다 물가가 더 오르는 셈이라, 금리 결정에는 환율도 같이 얽혀.' },
+    { q:'각국이 함께 금리를 올릴 때 우리 입장에서 생기는 한 가지 이점은?',
+      opts:['한국만 뒤처졌을 때 생기는 원화 약세·수입물가 상승 압력이 줄어든다',
+            '국내 대출금리가 함께 내려간다',
+            '수출 기업의 관세 부담이 사라진다',
+            '국내 물가 통계에서 에너지 항목이 제외된다'], answer:0,
+      explain:'금리 차이가 벌어질 때 환율이 밀리는 거라, <b>다 같이</b> 올리면 격차가 크게 벌어지지 않아. 그래서 동시 인상 국면은 대출 부담이라는 비용과 환율 방어라는 이점을 함께 갖고 와.' },
+  ]},
+  { id:'rate_and_stock', variants:[
+    { q:"주가를 '이익 ÷ 금리'로 볼 때, 주요국 동시 금리 인상이 증시에 부담이 되는 이유는?",
+      opts:['금리 인상이 기업의 매출을 회계상 즉시 깎아내리기 때문',
+            '분모인 금리가 커지면 같은 이익이라도 현재 가치로 환산한 값이 작아지기 때문',
+            '금리가 오르면 주식 거래 자체가 제한되기 때문',
+            '금리 인상 기간에는 기업이 배당을 지급할 수 없기 때문'], answer:1,
+      explain:'주가는 미래에 벌 돈을 현재 가치로 당겨온 값이야. 금리(할인율)가 오르면 <b>같은 이익도 오늘 기준으로는 덜 값어치</b>가 나가 — 그래서 이익 기대가 그대로여도 주가는 눌려.' },
+    { q:'9일 코스피는 1.40% 올라 7,051.64로 마감했는데, 같은 날 밤 뉴욕 3대 지수는 사흘째 하락했어. 뉴욕 쪽 약세의 배경으로 가장 알맞은 것은?',
+      opts:['국제유가가 101달러를 넘고 국채 금리가 급등하며 금리 부담이 커졌기 때문',
+            '미국 기업들이 그날 일제히 실적 발표를 취소했기 때문',
+            '뉴욕 증시의 거래 시간이 단축됐기 때문',
+            '미국 정부가 외국인 투자자의 매수를 제한했기 때문'], answer:0,
+      explain:'유가가 오르면 물가 부담이 커지고, 그 기대가 <b>국채 금리</b>에 먼저 반영돼. 국채 금리는 주식 가치를 계산할 때 쓰는 할인율의 기준이라, 이게 뛰면 주가는 눌려 — 코스피(9일 낮)와 뉴욕(9일 밤)이 갈린 것도 이 시점 차이야.' },
+  ]},
+  { id:'nominal_gdp', variants:[
+    { q:'2분기 명목 GDP가 1년 전보다 26.4% 늘어 47년 만에 최고를 기록했어. 이 숫자를 읽을 때 주의할 점으로 가장 알맞은 것은?',
+      opts:['명목은 가격 변화가 그대로 반영된 값이라, 생산량이 늘어서인지 수출 가격이 올라서인지를 구분해서 봐야 한다',
+            '명목 GDP가 오르면 실질 GDP도 반드시 같은 폭으로 오른다',
+            '명목 GDP는 물가 변동을 제거한 지표라 체감 경기와 정확히 일치한다',
+            '명목 GDP는 수출을 빼고 계산하므로 반도체와는 무관하다'], answer:0,
+      explain:'명목은 <b>가격 그대로</b>, 실질은 <b>물가 변동을 걷어낸</b> 값이야. 이번 급증의 주된 원인은 반도체 수출 가격 급등이라, "물건을 26% 더 만들었다"가 아니라 "같은 걸 훨씬 비싸게 팔았다"에 가까워.' },
+    { q:'반도체 호황에 따른 소득 급증이 금리 논의와 이어지는 이유로 가장 알맞은 것은?',
+      opts:['소득이 늘면 중앙은행이 금리를 내려 소비를 더 밀어주기 때문',
+            '수출 호황으로 돈이 풀리고 소비 여력이 커지면 물가를 자극할 수 있어, 금리를 올릴 명분이 늘기 때문',
+            '수출이 늘면 환율이 물가에 미치는 영향이 사라지기 때문',
+            '국민소득 통계가 기준금리를 자동으로 결정하기 때문'], answer:1,
+      explain:'중앙은행은 물가와 경기를 함께 봐. 경기가 약하면 물가가 올라도 금리 올리기가 부담스러운데, <b>수출로 소득이 늘고 있다면</b> 인상을 견딜 체력이 있다고 읽혀 — 그래서 호황 지표는 인상 쪽에 힘을 실어.' },
+  ]},
+  { id:'afd_state', variants:[
+    { q:'독일 작센안할트 주의회 선거에서 AfD가 43.8%로 1위를 한 것이 특히 주목받는 이유는?',
+      opts:['2차 대전 이후 독일 지방선거에서 극우로 분류되는 정당이 1위를 한 첫 사례이기 때문',
+            '독일에서 주의회 선거가 처음 치러졌기 때문',
+            '득표율 40%를 넘으면 자동으로 연방정부를 구성하게 되기 때문',
+            '해당 정당이 선거 직전에 창당됐기 때문'], answer:0,
+      explain:'전후 독일 정치는 극우 세력을 제도적으로 배제해 온 역사가 길어. 그 선을 지방선거에서 처음 넘었다는 점, 그리고 연립정부 구성에 성공하면 <b>약 80년 만의 강경 우파 주정부</b>가 된다는 점 때문에 유럽 전체가 주시하는 거야.' },
+  ]},
+  { id:'yesterday_review', variants:[
+    { q:'어제(9/9) 다룬 내용이야. 화산재가 뜨면 부분 통제가 아니라 공항 전면 폐쇄로 대응하는 이유로 가장 알맞은 것은?',
+      opts:['화산재는 기상레이더에 잡히지 않아 위치를 알 수 없는데 소량으로도 엔진이 망가져, "덜 위험한 경로"를 고를 수 없기 때문',
+            '화산재가 활주로에 쌓여 제거에 며칠이 걸리기 때문',
+            '분화 중에는 관제 주파수 사용이 국제적으로 금지되기 때문',
+            '화산재가 승객 건강에 미치는 영향이 아직 밝혀지지 않았기 때문'], answer:0,
+      explain:'화산재는 마그마가 부서진 <b>유리질 가루</b>라 엔진 안에서 녹았다 굳어 냉각 구멍을 막아. 게다가 빗방울을 읽는 기상레이더엔 안 잡혀서 어디에 얼마나 있는지도 몰라 — 그래서 "조심 운항"이라는 선택지가 아예 없어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'물가가 앞으로도 오를 거라는 사람들의 예상 자체를 가리키는 말로, 중앙은행이 선제적으로 금리를 올리는 이유이기도 해. 뭐라고 부를까? (○○인플레이션)',
+    accept:['기대','기대인플레','기대인플레이션','기대 인플레이션'],
+    explain:'정답은 <b>기대인플레이션</b>이야. 예상이 굳으면 임금·가격표가 미리 올라가고, 원인(기름값)이 사라져도 물가가 눌러앉아. 그래서 예상이 굳기 전에 끊는 거야.' },
+  { q:'출렁임이 큰 에너지·식품을 뺀 물가로, 물가의 바탕 흐름을 볼 때 쓰는 지표는? (○○물가)',
+    accept:['근원','근원물가','코어','core'],
+    explain:'정답은 <b>근원물가</b>야. 유로존 8월엔 전체 물가가 3.3%로 3년 최고였는데 근원은 2.4%로 되레 내려왔어 — 이번 물가가 공급(에너지)발이라는 근거야.' },
+  { q:'오늘(9/10) 0.25%p 인상이 유력한, 유로존의 금리를 결정하는 중앙은행 이름은? (약자 세 글자)',
+    accept:['ecb','유럽중앙은행'],
+    explain:'정답은 <b>ECB</b>(유럽중앙은행)야. 시장은 이미 인상을 99% 반영해서, 관심은 결정 자체보다 "연내에 한 번 더 올릴 신호를 줄까"에 쏠려 있어.' },
+  { q:'각국 중앙은행이 이번에 동시에 금리를 올리게 만든 공통 원인은 무엇의 급등일까? (한 단어)',
+    accept:['기름값','유가','국제유가','석유','원유','에너지'],
+    explain:'정답은 <b>기름값</b>(국제유가)이야. 브렌트유가 9일 100달러를 다시 찍었고, 기름은 거의 모든 물건의 원가에 섞여 있어 각국 물가를 동시에 밀어 올렸어.' },
+  { q:'9일 브렌트유가 배럴당 몇 달러를 다시 터치했을까? (숫자만)',
+    accept:['100','100달러','약100','약 100','100.02'],
+    explain:'정답은 <b>100달러</b>야(장중 100.02달러). 7월 24일 이후 처음이고, 홍해에서 사우디와 후티 반군의 교전이 격화된 게 계기였어.' },
+  { q:'미국 연준의 9월 금리 결정 회의가 열리는 날짜는 9월 며칠일까? (숫자만)',
+    accept:['16','16일','9/16'],
+    explain:'정답은 <b>16일</b>이야. 시장이 반영한 인상 확률은 66.4% — 오늘 ECB(10일), 다음 주 연준(16일), 일본은행(17~18일) 순서로 3주 안에 줄줄이 결정돼.' },
+  { q:'금리를 올리자는 쪽을 뜻하는 말로, 잭슨홀에서의 워시 연준 의장 발언을 두고 "○○적"이라고 표현했어. 뭘까? (한 단어)',
+    accept:['매파','매','hawkish','호키시'],
+    explain:'정답은 <b>매파</b>야. 물가를 잡기 위해 금리를 올리자는 쪽을 매파, 경기를 위해 내리자는 쪽을 비둘기파라고 불러.' },
+  { q:'한국은행이 8월 27일 기준금리를 2.75%에서 몇 %로 올렸을까? (숫자만)',
+    accept:['3','3%','3.0','3.00','3.0%','3.00%'],
+    explain:'정답은 <b>3%</b>야. 7월에 이어 두 달 연속 인상으로, 2회 연속은 3년 7개월 만이야. 시장은 10월엔 일단 동결하고 이후 추가 인상을 보는 쪽이 우세해.' },
+  { q:'9일 코스피가 33거래일 만에 되찾은 지수대는 몇 선일까? (숫자만)',
+    accept:['7000','7,000','7000선','7천'],
+    explain:'정답은 <b>7,000선</b>이야. 1.40% 오른 7,051.64로 마감하며 7월 23일 이후 33거래일 만에 종가 기준 7,000선을 회복했어.' },
+  { q:'가격 변화가 그대로 반영된 GDP를, 물가 변동을 걷어낸 실질 GDP와 구분해 뭐라고 부를까? (○○ GDP)',
+    accept:['명목','명목gdp','명목 gdp','nominal'],
+    explain:'정답은 <b>명목 GDP</b>야. 2분기 명목 GDP가 26.4% 늘어 47년 만에 최고였는데, 주된 원인이 반도체 수출 <b>가격</b> 급등이라 체감 경기와는 거리가 있을 수 있어.' },
+  { q:'어제 복습이야. 화산재가 엔진 안에서 녹았다가 다시 굳는 이유는, 그 정체가 재가 아니라 무엇이기 때문일까? (한 단어)',
+    accept:['유리','유리질','규산염','유리가루','유리 가루'],
+    explain:'정답은 <b>유리</b>(규산염)야. 마그마가 분출 순간 산산이 부서진 유리질 가루라서, 1,000℃가 넘는 연소실에서 녹았다가 찬 터빈 뒤쪽에서 유리막으로 굳어 붙어.' },
+  { q:'독일 작센안할트 주의회 선거에서 43.8%로 1위를 차지한 강경우파 정당의 약칭은? (알파벳 세 글자)',
+    accept:['afd','독일을 위한 대안','독일을위한대안'],
+    explain:"정답은 <b>AfD</b>('독일을 위한 대안')야. 연립정부 구성에 성공하면 나치 패망 이후 약 80년 만에 강경 우파 주정부가 탄생하게 돼." },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

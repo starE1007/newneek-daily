@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세계가 동시에 금리를 올린다 — 3주 캘린더</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 공통 원인 배너 */
+  .cause{border:1px solid #F2D9CB;background:var(--orange-soft);border-radius:12px;padding:14px 18px;font-size:14.5px;color:#9A5620}
+  .cause b{color:#7E4416}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item .what b{font-size:14.5px}
+  .t-item .note{display:block;font-size:12.5px;color:var(--text2);margin-top:3px}
+  .t-item.done{background:var(--surface2);border-color:#DDDCD9}
+  .t-item.done .when{color:var(--text2)}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 표 */
+  .table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  th{background:var(--soft);font-size:13px;color:var(--text2);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  td b{font-weight:700}
+  .up{color:#C6493E;font-weight:700}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--red-soft);color:#C6493E}
+  .tag.soon{background:var(--orange-soft);color:#B06426}
+  .tag.done{background:var(--green-soft);color:#2F7A52}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.10 데일리 뉴스 · 시각자료</div>
+  <h1>🏦 세계가 동시에 금리를 올린다</h1>
+  <div class="sub">오늘부터 3주 안에 유럽·미국·일본 중앙은행이 차례로 결정한다 — 왜 하필 지금 다 같이인지 한 장으로 보기</div>
+
+  <div class="section-title">먼저, 공통 원인 하나</div>
+  <div class="cause">
+    나라마다 사정은 달라도 이번엔 <b>같은 곳</b>을 보고 있어 — <b>기름값</b>이야. 중동 교전 재개로 브렌트유가 9일 배럴당 <b>100달러</b>를 다시 찍었고(7월 24일 이후 처음), 유로존 8월 물가에서 에너지 항목은 <b>+14.3%</b>로 뛰었어. 기름은 거의 모든 상품의 원가에 섞여 들어가니까, 각국 물가가 동시에 같은 방향으로 밀린 거야.
+  </div>
+
+  <div class="section-title">3주 캘린더 — 오늘부터 줄줄이</div>
+  <div class="timeline">
+    <div class="t-item done">
+      <div class="when">8/27 · 끝남</div>
+      <div class="what"><b>한국은행</b> 2.75% → <b>3.00%</b><span class="note">2회 연속 인상은 3년 7개월 만</span></div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next">
+      <div class="when">9/10 · 오늘</div>
+      <div class="what"><b>유럽중앙은행(ECB)</b> 0.25%p 인상 유력<span class="note">시장이 이미 99% 반영 — 관심은 "연내 한 번 더?"</span></div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item">
+      <div class="when">9/16</div>
+      <div class="what"><b>미국 연준</b> 인상 확률 <b>66.4%</b><span class="note">워시 의장이 잭슨홀에서 매파(금리 올리자는 쪽) 발언</span></div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item">
+      <div class="when">9/17~18</div>
+      <div class="what"><b>일본은행</b> 1.00% → 1.25% 전망<span class="note">현실화되면 1995년 이후 최고 수준</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">지금 각국은 어디쯤 와 있어?</div>
+  <div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>어디</th><th>현재 기준금리</th><th>물가</th><th>다음 회의</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>🇰🇷 한국</td><td><b>3.00%</b> <span class="tag done">8/27 인상</span></td><td>8월 3.1%</td><td>10월 — 일단 동결 전망</td></tr>
+      <tr><td>🇪🇺 유로존</td><td>2.25% → <span class="up">2.50% 예상</span></td><td>8월 3.3% <small>(3년 최고)</small></td><td><b>오늘</b> <span class="tag">9/10</span></td></tr>
+      <tr><td>🇺🇸 미국</td><td>동결 중 <span class="tag soon">인상 확률 66%</span></td><td>목표 2%를 계속 웃돎</td><td>9/16</td></tr>
+      <tr><td>🇯🇵 일본</td><td>1.00% → <span class="up">1.25% 전망</span></td><td>31년 만의 고금리 국면</td><td>9/17~18</td></tr>
+      <tr><td>🇦🇺 호주 · 🇳🇿 뉴질랜드</td><td>호주 올해 3회 인상 / 뉴질랜드 2.75%</td><td>—</td><td>이미 인상 진행 중</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="section-title">왜 '수요가 뜨겁지도 않은데' 금리를 올려?</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>중동 교전 → 기름값 급등</b><span class="mdesc">브렌트유 100달러 재돌파. 이건 '사람들이 돈을 많이 써서' 오른 값이 아니야 — 공급 쪽 사고야</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>운송비·전기료·식품값으로 번짐</b><span class="mdesc">기름은 거의 모든 물건의 원가에 조금씩 섞여 있어서, 한 번 오르면 전방위로 퍼져</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>"앞으로도 계속 오르겠네" 하는 기대가 자리 잡음</b><span class="mdesc">이걸 기대인플레이션이라고 해 — 물가가 오를 거라는 <b>예상</b> 자체</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>그 예상대로 임금·가격표가 미리 올라감</b><span class="mdesc">기름값이 도로 내려도 이미 올려놓은 월급·가격은 잘 안 내려와 — 물가가 눌러앉는 지점</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>그래서 3단계에서 미리 끊는다 = 선제적 금리 인상</b><span class="mdesc">금리를 올려 소비를 식히면, "계속 오를 것"이라는 예상 자체가 꺾여</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 이번 인상의 성격</b>유로존 근원물가(에너지·식품을 뺀 물가)는 오히려 2.5% → 2.4%로 내려왔어. 경기가 뜨거워서 올리는 게 아니라, <b>기름값이 물가 기대에 눌어붙기 전에 끊으려는</b> 인상이라는 뜻이야.</div>
+  </div>
+
+  <div class="section-title">나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">주요국 동시 인상</div>
+    <div class="arrow">→</div>
+    <div class="step s2">대출금리 상승 압력<small>변동금리 이자 부담</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">주가는 눌림<small>'이익 ÷ 금리'의 분모가 커짐</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">환율은 방어<small>혼자만 안 올릴 때 원화가 밀리는 걸 막음</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.10 딥다이브 내용 기반 · 금리·확률은 발표·시장 반영치 기준이라 회의 결과에 따라 바뀔 수 있어</div>
+</div>
+</body>
+</html>
