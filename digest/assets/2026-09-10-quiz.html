@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.10</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.10 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'profit_over_rate', variants:[
+    { q:'9월 9일, 브렌트유가 100달러를 재돌파했는데도 코스피가 오히려 오른 이유로 가장 알맞은 것은?',
+      opts:['AI 이익 기대(분자)가 유가발 금리 압박(분모)보다 더 세게 커져서 두 힘의 줄다리기에서 이겼기 때문',
+            '한국거래소가 그날 코스피 지수 계산 방식을 임시로 바꿨기 때문',
+            '유가가 오르면 국내 정유사 주가만 반영되고 코스피 전체엔 영향이 없기 때문',
+            '외국인 투자자들이 그날 코스피 매도를 법적으로 금지당했기 때문'], answer:0,
+      explain:'주가는 <b>이익 ÷ 금리</b>야. 유가가 올라 금리(할인율) 압박이 커졌지만, 오픈AI·씨티·골드만삭스發 AI 수요 기대가 훨씬 크게 커지면서 분자 쪽 힘이 이겼어. 힘의 방향이 바뀐 게 아니라 이번 라운드에서 이익이 이긴 거야.' },
+    { q:"9월 8일엔 유가 급등이 코스피를 눌렀는데, 9월 9일엔 유가가 더 올랐는데도 코스피가 상승했어. 이 차이를 가장 잘 설명한 것은?",
+      opts:['9일은 유가가 오히려 소폭 내렸기 때문',
+            '두 날 모두 이익 기대는 그대로였고 금리 압박만 다르게 움직였기 때문',
+            '이익 기대가 커지는 폭이 그날그날 유가발 금리 압박보다 큰지 작은지에 따라 결과가 갈리기 때문',
+            '9일부터 코스피 계산에서 반도체주를 제외했기 때문'], answer:2,
+      explain:"'이익÷금리'는 매번 같은 답을 주는 공식이 아니라 <b>두 힘 중 어느 쪽이 그날 더 세게 움직였는지</b>를 보는 틀이야. 8일은 금리 쪽이, 9일은 이익 쪽이 이겼어." },
+  ]},
+  { id:'thirty_three_days', variants:[
+    { q:'9월 9일 코스피가 "33거래일 만에" 7,000선을 탈환했다는 표현이 뜻하는 것은?',
+      opts:['코스피가 33일 동안 거래 정지 상태였다가 이날 재개됐다는 뜻',
+            '7,000선이 무너진 뒤 33거래일 동안 그 밑에 머물다가 이날 다시 넘어섰다는 뜻',
+            '이 종목이 상장된 지 33거래일밖에 안 됐다는 뜻',
+            '외국인이 33거래일 연속으로 순매도했다는 뜻'], answer:1,
+      explain:'"○거래일 만에"는 <b>그 상태가 끊겼다가 다시 돌아오기까지 걸린 실제 거래일 수</b>를 말해. 코스피가 한동안 7,000 아래에 머물렀다는 뜻이지, 거래가 멈췄다는 뜻이 아니야.' },
+  ]},
+  { id:'strait_two', variants:[
+    { q:'9월 9일 기준으로 호르무즈 해협과 바브엘만데브 해협의 상태를 가장 정확히 설명한 것은?',
+      opts:['호르무즈는 완전히 평화로워졌고 바브엘만데브만 위험하다',
+            '호르무즈는 이미 미국·이란 교전이 계속되던 곳이고, 바브엘만데브도 사우디·후티의 4년 휴전이 깨지며 새로 교전이 격화됐다',
+            '두 해협 모두 국제 협약으로 선박 통행이 전면 금지됐다',
+            '바브엘만데브는 원래 안전했고 이번에 처음으로 존재가 알려졌다'], answer:1,
+      explain:'호르무즈는 카르그 섬 유조선 타격 등으로 계속 전선이었고, 바브엘만데브는 사우디·후티 반군의 <b>4년 휴전이 이번에 깨지며</b> 교전이 새로 격화됐어. 원유·물류가 지나는 길목 두 곳이 동시에 뜨거워진 상황이야.' },
+    { q:'바브엘만데브 해협이 막히면 아시아-유럽 항로에 생기는 변화로 가장 알맞은 것은?',
+      opts:['항공 화물로 전량 대체된다',
+            '수에즈 운하 대신 아프리카 남단을 돌아가는 훨씬 먼 항로를 써야 한다',
+            '태평양을 건너는 항로로 바뀐다',
+            '변화 없이 그대로 홍해를 통과한다'], answer:1,
+      explain:'바브엘만데브는 홍해 남쪽 입구라 여기가 막히면 수에즈 운하로 들어가는 길 자체가 막혀. 그러면 배들이 <b>아프리카 남단(희망봉)</b>을 도는 훨씬 긴 항로로 우회해야 해.' },
+  ]},
+  { id:'won_strength', variants:[
+    { q:'원·달러 환율이 1,336.1원까지 내려온(원화가 강해진) 상황이 인바운드 고객에게 미치는 영향으로 가장 알맞은 것은?',
+      opts:['달러·동남아 통화권 고객이 같은 돈으로 살 수 있는 원화 상품·서비스가 줄어든다(체감 가격 상승)',
+            '원화 강세와 관계없이 외국인 관광객 체감 가격은 항상 그대로다',
+            '원화가 강해지면 외국인 여행 경비가 자동으로 절반이 된다',
+            '환율은 항공권 가격에만 영향을 주고 통신·숙박에는 영향이 없다'], answer:0,
+      explain:'원화가 강해진다는 건 <b>같은 액수의 외화로 바꿀 수 있는 원화가 줄어든다</b>는 뜻이야. 달러·동남아 통화권 고객 입장에선 한국 여행이 상대적으로 더 비싸지는 셈이라, 원화 고정가는 실질 인상이 될 수 있어.' },
+  ]},
+  { id:'yesterday_review_ash', variants:[
+    { q:'어제(9/9) 복습 — 화산재가 항공기 엔진에서 위험한 근본 이유로 가장 알맞은 것은?',
+      opts:['화산재가 유리질 성분이라 엔진 열에 녹았다가 식으며 부품에 눌러붙어 냉각 구멍을 막기 때문',
+            '화산재가 전기를 강하게 띠어 항공기 통신장비를 마비시키기 때문',
+            '화산재가 연료 탱크에 스며들어 연료를 오염시키기 때문',
+            '화산재 구름이 항상 태풍을 동반하기 때문'], answer:0,
+      explain:'화산재는 마그마가 급히 부서진 <b>유리질(규산염) 가루</b>야. 1,000℃가 넘는 연소실에서 녹았다가 상대적으로 찬 터빈 뒤쪽에서 다시 굳어 냉각 구멍을 덮어 — 그래서 소량도 치명적이고, 부분 통제가 아니라 전면 폐쇄로만 대응돼.' },
+  ]},
+  { id:'kharg_recap', variants:[
+    { q:'9월 9일 미군이 타격한 유조선들이 있던 곳이자, 이란 원유 수출의 약 90%가 지나는 곳은?',
+      opts:['카르그 섬', '수에즈 운하', '지부티 항', '호르무즈 대교'], answer:0,
+      explain:'<b>카르그 섬</b>은 이란 원유가 나가는 사실상 유일한 선적 관문이야. 이 섬 인근 소식만 나와도 유가가 먼저 반응하는 이유가 여기 있어.' },
+  ]},
+  { id:'afd_election', variants:[
+    { q:'독일 작센안할트 주의회 선거에서 AfD가 압승했다는 소식이 갖는 의미로 가장 알맞은 것은?',
+      opts:['AfD가 그 자체로 단독 과반을 확보해 즉시 집권이 확정됐다',
+            '제1당은 됐지만 과반엔 못 미쳐, 다른 정당과 손잡아야 집권 가능한 상황이 됐다',
+            '이번 선거로 독일 연방정부(총리)가 즉시 교체된다',
+            '이번 선거는 구속력 없는 여론조사여서 실제 정치엔 영향이 없다'], answer:1,
+      explain:'AfD는 44.6%로 <b>제1당</b>이 됐지만 83석 중 39석으로 과반엔 못 미쳐. 급진좌파 성향 BSW와 연정을 구성해야 나치 패망 이후 80년 만의 독일 첫 극우 주정부가 나올 수 있는 상황이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'9월 9일 브렌트유가 장중 찍은 가격은 몇 달러였을까? (숫자만, 소수점 포함)',
+    accept:['100.95','약100.95','100.95달러'],
+    explain:'정답은 <b>100.95달러</b>야. 7월 24일 이후 처음으로 100달러를 다시 넘겼어.' },
+  { q:'코스피가 9월 9일 7,000선을 다시 넘은 건 며칠 만이었을까? (숫자만)',
+    accept:['33','33거래일','33일'],
+    explain:'정답은 <b>33거래일</b>이야. 그만큼 오랫동안 7,000선 아래에 머물러 있었다는 뜻이야.' },
+  { q:'사우디아라비아와 어느 반군 세력의 4년 휴전이 이번에 깨졌을까? (○○ 반군)',
+    accept:['후티','후티반군','후티 반군','houthi'],
+    explain:'정답은 <b>후티 반군</b>이야. 예멘을 근거지로 하는 이 반군과 사우디의 휴전이 깨지며 바브엘만데브 해협에서 교전이 격화됐어.' },
+  { q:'홍해와 아덴만을 잇는, 예멘과 아프리카 사이의 좁은 해협 이름은? (○○○○○○ 해협)',
+    accept:['바브엘만데브','바브엘만데브 해협','bab-el-mandeb','바브 엘 만데브'],
+    explain:'정답은 <b>바브엘만데브 해협</b>이야. 여기가 막히면 아시아-유럽 배들이 아프리카 남단으로 멀리 돌아가야 해.' },
+  { q:'9월 9일 원·달러 환율은 얼마로 마감했을까? (숫자만)',
+    accept:['1336.1','1,336.1','1336'],
+    explain:'정답은 <b>1,336.1원</b>이야. 전일 대비 9.5원 내려 원화 강세가 이어졌어.' },
+  { q:'독일 작센안할트 주의회 선거에서 AfD가 얻은 득표율은? (숫자만, %는 빼도 됨)',
+    accept:['44.6','44.6%'],
+    explain:'정답은 <b>44.6%</b>야. 제1당이 됐지만 단독 과반은 아니었어.' },
+  { q:'화산재가 엔진 안에서 녹은 뒤 다시 굳으며 막아버리는 부위는 무엇일까? (○○ 구멍, 어제 복습)',
+    accept:['냉각','냉각구멍','냉각 구멍'],
+    explain:'정답은 <b>냉각 구멍</b>이야. 유리질 화산재가 여기를 덮으면 추력이 빠지고 최악엔 엔진이 멈춰.' },
+  { q:'국내선 유류할증료가 9월 얼마로 올랐을까? (숫자만, 원 단위 빼도 됨)',
+    accept:['20900','2만900','2만 900','20,900'],
+    explain:'정답은 <b>2만 900원</b>이야. 국제선도 다음 단계 인상이 임박한 상황이야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
