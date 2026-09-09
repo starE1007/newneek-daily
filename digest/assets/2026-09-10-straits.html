@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기름길 두 곳이 동시에 뜨거워졌다</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .choke-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .choke{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .choke .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.blocked{background:var(--red-soft);color:#C6493E}
+  .badge.risk{background:var(--orange-soft);color:#B06426}
+  .choke h3{font-size:16px;margin-bottom:6px}
+  .choke p{font-size:14px;color:var(--text2)}
+  .choke p b{color:var(--text)}
+  .choke p + p{margin-top:8px}
+  .pinrow{display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:12.5px}
+  .pinrow a{color:var(--blue);text-decoration:none;font-weight:600}
+  .pinrow a:hover{text-decoration:underline}
+  .pinrow .hint{color:var(--text2)}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .choke-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.10 데일리 뉴스 · 시각자료</div>
+  <h1>🗺️ 기름길 두 곳이 동시에 뜨거워졌다</h1>
+  <div class="sub">호르무즈는 원래 전쟁터, 이번엔 홍해 남쪽 바브엘만데브까지 4년 휴전이 깨졌어 — 어디가 왜 문제인지 지도로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="중동 지도: 호르무즈 해협과 바브엘만데브 해협 위치">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+
+      <rect x="0" y="0" width="900" height="620" fill="#F0EFED"/>
+
+      <path d="M0,0 L120,0 Q118,30 90,42 Q50,55 0,48 Z" fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5"/>
+      <line x1="67" y1="44" x2="70" y2="80" stroke="#B9D4EC" stroke-width="9" stroke-linecap="round"/>
+      <line x1="67" y1="44" x2="70" y2="80" stroke="#D8E9F7" stroke-width="6" stroke-linecap="round"/>
+
+      <path d="M70,78 C110,160 140,230 168,286 C200,370 280,470 372,532" fill="none" stroke="#B9D4EC" stroke-width="50" stroke-linecap="round"/>
+      <path d="M70,78 C110,160 140,230 168,286 C200,370 280,470 372,532" fill="none" stroke="#D8E9F7" stroke-width="46" stroke-linecap="round"/>
+
+      <path d="M508,92 L518,74 L560,95 L610,130 L672,158 L742,162 L790,185 L850,200 L900,208
+               L900,600 L560,600 L588,556 L504,570 L392,558 L372,532
+               L420,517 L526,489 L640,452 L700,414 L780,330 L834,272
+               L800,224 L764,192 L750,182 L735,188 L700,208 L660,224 L600,222 L580,200 L566,170 L540,130 Z"
+            fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <path d="M374,524 L420,511 L514,485 L498,428 L430,424 L376,452 Z" fill="#E56458" fill-opacity="0.16" stroke="#E56458" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+      <path d="M556,118 C650,145 700,150 744,168 C790,192 815,225 832,272 C848,318 856,370 858,428" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9" marker-end="url(#ah)"/>
+      <path d="M680,578 C540,584 440,548 378,528 C296,466 214,376 166,284 C138,222 102,152 76,90" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9" marker-end="url(#ah)"/>
+
+      <g font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle" font-family="inherit">
+        <text transform="translate(196,322) rotate(52)">홍  해</text>
+        <text transform="translate(622,168) rotate(21)">페르시아만</text>
+        <text transform="translate(468,545)">아덴만</text>
+        <text transform="translate(802,478)">아라비아해</text>
+        <text transform="translate(46,20)" font-size="12">지중해</text>
+      </g>
+
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="300" y="305" font-size="16">사우디아라비아</text>
+        <text x="655" y="46" font-size="15">이  란</text>
+        <text x="52" y="152" font-size="14">이집트</text>
+        <text x="130" y="432" font-size="14">아프리카</text>
+        <text x="762" y="304" font-size="14">오만</text>
+      </g>
+      <g text-anchor="middle" font-family="inherit">
+        <text x="438" y="462" font-size="14" font-weight="700" fill="#C6493E">예멘</text>
+        <text x="438" y="478" font-size="12" fill="#C6493E">후티 반군 근거지</text>
+      </g>
+
+      <g font-family="inherit">
+        <text x="128" y="32" font-size="13" font-weight="700" fill="#2C2C2B" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">수에즈 운하</text>
+        <text x="128" y="48" font-size="12" fill="#7D7A75" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">지중해 → 유럽으로 가는 길</text>
+        <line x1="98" y1="52" x2="76" y2="64" stroke="#9AA5B1" stroke-width="1.5"/>
+      </g>
+
+      <g>
+        <circle cx="748" cy="172" r="24" fill="#E56458" opacity="0.15"/>
+        <circle cx="748" cy="172" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="741" y1="179" x2="755" y2="165" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g>
+        <circle cx="372" cy="532" r="24" fill="#E56458" opacity="0.15"/>
+        <circle cx="372" cy="532" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="365" y1="539" x2="379" y2="525" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <g font-family="inherit">
+        <line x1="783" y1="122" x2="754" y2="156" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="668" y="66" width="222" height="46" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="779" y="85" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 호르무즈 해협</text>
+        <text x="779" y="103" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">계속 교전 중 (美·이란)</text>
+      </g>
+      <g font-family="inherit">
+        <line x1="276" y1="578" x2="356" y2="540" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="40" y="560" width="236" height="46" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="158" y="579" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 바브엘만데브 해협</text>
+        <text x="158" y="597" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle">4년 휴전 깨지고 교전 격화</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 실제 교전 중인 지점</span>
+      <span class="item"><span class="dash-sample"></span> 주요 원유·물류 항로</span>
+    </div>
+  </div>
+
+  <div class="section-title">두 해협, 뭐가 새로 문제야?</div>
+  <div class="choke-grid">
+    <div class="choke">
+      <span class="badge blocked">① 기존 전선</span>
+      <h3>호르무즈 해협 — 페르시아만의 유일한 출입구</h3>
+      <p>이란 원유 수출의 90%가 지나는 <b>하르그 섬</b>이 있는 곳. 9일 미군이 이 섬 인근 이란 유조선 <b>5척</b>을 타격했고, 이란은 요르단 미군기지와 美 구축함 2척을 타격했다고 주장했어.</p>
+    </div>
+    <div class="choke">
+      <span class="badge risk">② 새로 격화</span>
+      <h3>바브엘만데브 해협 — 홍해·수에즈로 가는 길목</h3>
+      <p>사우디·후티 반군의 <b>4년 휴전</b>이 깨지고 교전이 다시 붙었어. 전 세계 물동량의 약 7%가 지나는 길목이라, 막히면 아시아↔유럽 배가 아프리카 남단으로 멀리 돌아가야 해.</p>
+    </div>
+  </div>
+
+  <div class="pinrow">
+    <div><a href="https://www.google.com/maps/search/?api=1&query=Strait+of+Hormuz" target="_blank" rel="noopener">📍 호르무즈 해협 지도 보기</a> <span class="hint">— 이란과 아라비아반도 사이, 페르시아만↔인도양을 잇는 길목</span></div>
+    <div><a href="https://www.google.com/maps/search/?api=1&query=Bab-el-Mandeb+Strait" target="_blank" rel="noopener">📍 바브엘만데브 해협 지도 보기</a> <span class="hint">— 예멘과 아프리카(지부티) 사이, 홍해↔아덴만을 잇는 길목</span></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도 · 2026.09.10 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
