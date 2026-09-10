@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.11</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.11 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'ecb_hike', variants:[
+    { q:'9월 10일 ECB(유럽중앙은행)가 실제로 취한 조치로 가장 정확한 것은?',
+      opts:['예금금리를 2.50%로 0.25%p 인상 — 올해 두 번째 인상',
+            '기준금리를 동결하고 인하 시점만 예고했다',
+            '금리를 0.5%p 내려 경기 부양에 나섰다',
+            '금리 결정을 다음 회의로 한 차례 연기했다'], answer:0,
+      explain:'어제 예고됐던 대로 <b>ECB가 예금금리를 2.50%로 0.25%p 인상</b>했어. 올해 들어 두 번째 인상이고, 시장이 이미 99% 반영하고 있던 결과라 결정 자체보다 다음 발언에 관심이 쏠렸어.' },
+  ]},
+  { id:'forward_guidance', variants:[
+    { q:'라가르드 ECB 총재가 금리 인상을 발표하면서 "다음 행보는 논의하지 않았다"고 말한 것이 뉴스가 되는 이유로 가장 알맞은 것은?',
+      opts:['중앙은행이 미리 주는 정책 힌트(포워드 가이던스)를 이번엔 일부러 안 줬다는 뜻이라서',
+            '그 발언으로 이번 금리 인상 자체가 무효가 됐기 때문에',
+            'ECB가 앞으로 회의 자체를 열지 않겠다고 선언한 것이기 때문에',
+            '다음 회의 날짜가 아직 정해지지 않았다는 뜻이라서'], answer:0,
+      explain:'중앙은행은 보통 "다음엔 이렇게 할 것 같다"는 힌트(<b>포워드 가이던스</b>)를 줘서 시장을 미리 준비시켜. 이번엔 그걸 안 주고 "매 회의마다 그때 지표 보고 정한다"고 한 거라, "이번엔 올렸다"가 "다음에도 올린다"를 보장하지 않는다는 신호야.' },
+    { q:"'포워드 가이던스'라는 말이 가리키는 것으로 가장 알맞은 것은?",
+      opts:['중앙은행이 향후 정책 방향에 대해 미리 시장에 주는 신호·힌트',
+            '정부가 발표하는 다음 해 예산안',
+            '기업이 다음 분기 실적을 미리 알려주는 보고서',
+            '환율을 일정 범위로 묶어두는 고정환율 제도'], answer:0,
+      explain:'<b>포워드 가이던스</b>는 중앙은행이 "앞으로 이런 방향으로 갈 것 같다"고 미리 알려주는 소통 방식이야. 시장이 급작스러운 충격 없이 대비하게 해주는데, 이번엔 라가르드가 이걸 일부러 주지 않았어.' },
+  ]},
+  { id:'hormuz_retaliation', variants:[
+    { q:'9일 이란 혁명수비대가 호르무즈 해협에서 벌인 일로 가장 정확한 것은?',
+      opts:['美 관련 선박 2척과 유조선 8척 등 총 10척을 공격 — 전쟁 발발 후 최대 규모 보복전',
+            '호르무즈 해협을 완전히 국제법으로 봉쇄하는 데 성공했다',
+            '미국과 정식 정전 협정에 서명했다',
+            '공격 대상을 자국 유조선으로 한정해 피해가 전혀 없었다'], answer:0,
+      explain:'미군의 이란 유조선 5척 격침에 대한 보복으로 이란이 <b>선박 10척</b>(美 선박 2척+유조선 8척)을 공격했고 1명 사망·1명 실종이 나왔어. "전쟁 발발 이후 최대 규모 보복전"이라는 평가가 나올 만큼 확전 규모가 커졌어.' },
+  ]},
+  { id:'oil_milestone', variants:[
+    { q:'9월 10일 국제유가 상황을 가장 정확히 설명한 것은?',
+      opts:['WTI가 5월 이후 처음으로 배럴당 100달러를 넘었고, 브렌트유도 105달러대까지 올랐다',
+            '유가가 큰 폭으로 하락해 배럴당 80달러대로 내려왔다',
+            'WTI와 브렌트유 모두 거래가 일시 정지됐다',
+            '국내 기름값만 오르고 국제유가는 변동이 없었다'], answer:0,
+      explain:'호르무즈 보복전이 커지면서 <b>WTI가 5월 이후 처음 100달러</b>를 넘었고 브렌트유는 <b>105달러대</b>까지 뛰었어. 유가 100달러가 하루짜리 스파이크가 아니라 당분간 눌러앉을 수 있다는 신호로 읽혀.' },
+  ]},
+  { id:'kospi_pullback', variants:[
+    { q:'9월 9일 33거래일 만에 7,000선을 넘었던 코스피가 9월 10일엔 어떻게 됐을까?',
+      opts:['상승분 일부를 반납하며 7,033.92(-0.25%)로 소폭 하락 마감했다',
+            '전날보다 5% 넘게 급등해 사상 최고치를 새로 썼다',
+            '거래가 정지돼 지수가 발표되지 않았다',
+            '7,000선이 다시 무너져 6,900선대로 내려갔다'], answer:0,
+      explain:'코스피는 외국인이 2조 7천억 원어치를 팔아치우는 와중에 개인이 물량을 받아내며 <b>7,033.92(-0.25%)</b>로 7,000선은 지켰지만 전날 상승분은 일부 반납했어. 코스닥은 반대로 2일 연속 상승(836.92, +0.79%)했어.' },
+  ]},
+  { id:'bok_october', variants:[
+    { q:'한국은행이 9월 10일 통화신용정책보고서에서 밝힌 입장으로 가장 알맞은 것은?',
+      opts:['국내외 여건을 봐가며 10월 추가 인상의 시기·속도를 정하겠다는 방침을 밝혔다',
+            '10월 금리를 반드시 동결하겠다고 못박았다',
+            '기준금리를 즉시 1%p 인하하기로 결정했다',
+            '앞으로는 금리를 발표하지 않기로 했다'], answer:0,
+      explain:'한국은행은 이미 8월 27일 3.00%로 올려둔 상태에서, 중동발 물가 압력과 반도체 수출 호조 같은 국내외 여건을 봐가며 <b>10월 추가 인상의 시기·속도</b>를 정하겠다는 방침을 밝혔어 — ECB·연준과 같은 결의 흐름이야.' },
+  ]},
+  { id:'gold_safehaven', variants:[
+    { q:'전쟁·물가 불안이 커지는 국면에서 국제 금값이 9주 만에 최고치(온스당 4,419.70달러)를 찍은 이유로 가장 알맞은 것은?',
+      opts:['불확실성이 커질 때 투자자들이 상대적으로 안전한 자산으로 돈을 옮기기 때문',
+            '금이 석유를 대체하는 연료로 쓰이기 시작했기 때문',
+            '각국 정부가 금 보유를 전면 금지했기 때문',
+            '금값은 주식·채권과 전혀 무관하게 무작위로 움직이기 때문'], answer:0,
+      explain:'전쟁·물가 불안처럼 불확실성이 커지면 투자자들은 상대적으로 값어치가 잘 안 무너지는 <b>안전자산</b>(금 등)으로 돈을 옮겨. 그래서 위기 국면일수록 금값이 같이 뛰는 경우가 많아.' },
+  ]},
+  { id:'review_expected_inflation', variants:[
+    { q:'어제 복습 — 기름값이 내리면 저절로 풀릴 물가인데도 중앙은행이 선제적으로 금리를 올리는 근본 이유로 가장 알맞은 것은?',
+      opts:['"앞으로도 계속 오르겠네"라는 예상(기대인플레이션)이 임금·가격표에 먼저 반영돼 눌러앉기 때문',
+            '금리를 올리면 국제 유가 자체가 즉시 내려가기 때문',
+            '법으로 물가가 오르면 반드시 금리를 올리게 정해져 있기 때문',
+            '기름값 상승분을 세금으로 환수하기 위해서'], answer:0,
+      explain:'핵심은 <b>기대인플레이션</b>이야. "계속 오를 것"이란 예상이 굳으면 임금·가격표가 미리 올라가고, 원인(기름값)이 사라져도 물가는 안 내려와 — 그래서 예상이 굳기 전에 끊는 거야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'중앙은행이 "다음엔 이렇게 할 것 같다"고 미리 시장에 주는 정책 힌트를 뭐라고 부를까? (영어 표현, 한국어 번역 다 가능)',
+    accept:['포워드가이던스','포워드 가이던스','forward guidance','forwardguidance'],
+    explain:'정답은 <b>포워드 가이던스</b>야. 라가르드는 이번에 이걸 일부러 주지 않고 "매 회의마다 판단"한다고만 밝혔어.' },
+  { q:'9월 10일 ECB가 인상한 뒤 예금금리는 몇 %가 됐을까? (숫자만)',
+    accept:['2.5','2.50','2.5%','2.50%'],
+    explain:'정답은 <b>2.50%</b>야. 0.25%p 인상으로 올해 두 번째 인상이었어.' },
+  { q:'미군의 이란 유조선 5척 격침에 대한 보복으로 이란이 호르무즈 해협에서 공격했다고 밝힌 선박은 총 몇 척일까? (숫자만)',
+    accept:['10','10척'],
+    explain:'정답은 <b>10척</b>(美 선박 2척+유조선 8척)이야. "전쟁 발발 이후 최대 규모 보복전"이라는 평가가 나왔어.' },
+  { q:'9월 10일 WTI(서부텍사스산원유)가 몇 개월 만에 처음으로 배럴당 100달러를 넘었을까? (숫자만, 월 단위)',
+    accept:['5','5월','5개월'],
+    explain:'정답은 <b>5월</b> 이후 처음이야. 브렌트유도 같은 날 105달러대까지 올랐어.' },
+  { q:'9월 10일 코스피는 몇 포인트로 마감했을까? (숫자만, 소수점 포함)',
+    accept:['7033.92','7,033.92','7033'],
+    explain:'정답은 <b>7,033.92</b>(-0.25%)야. 전날 상승분을 일부 반납했지만 7,000선은 지켰어.' },
+  { q:'한국은행이 다음 금리 인상 여부를 결정할 시점으로 밝힌 달은 몇 월일까? (숫자만)',
+    accept:['10','10월'],
+    explain:'정답은 <b>10월</b>이야. 국내외 여건을 봐가며 시기·속도를 정하겠다고 밝혔어.' },
+  { q:'물가가 앞으로도 계속 오를 거라는 사람들의 예상 자체를 가리키는 말은? (어제 복습, ○○인플레이션)',
+    accept:['기대','기대인플레','기대인플레이션','기대 인플레이션'],
+    explain:'정답은 <b>기대인플레이션</b>이야. 이 예상이 굳으면 임금·가격표가 미리 올라가 원인이 사라져도 물가가 안 내려와.' },
+  { q:'불확실성이 커질 때 투자자들이 돈을 옮기는, 값어치가 잘 안 무너지는 자산을 뭐라고 부를까? (○○자산)',
+    accept:['안전','안전자산'],
+    explain:'정답은 <b>안전자산</b>이야. 금이 대표적이고, 이번에 온스당 4,419.70달러로 9주 만에 최고치를 찍었어.' },
+  { q:'9월 9일 미군이 이란 유조선 5척을 타격한 곳이자, 이란 원유 수출의 약 90%가 지나는 섬은? (○○ 섬)',
+    accept:['카르그','카르그섬','카르그 섬'],
+    explain:'정답은 <b>카르그 섬</b>이야. 여기 관련 소식만 나와도 유가가 먼저 반응하는 이유가 여기 있어.' },
+  { q:'국제 금값이 9주 만에 최고치를 찍었을 때 온스당 가격은 얼마였을까? (숫자만, 소수점 포함)',
+    accept:['4419.70','4,419.70','4419.7','4419'],
+    explain:'정답은 <b>4,419.70달러</b>야. 전쟁·물가 불안에 안전자산 수요가 몰린 결과야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
