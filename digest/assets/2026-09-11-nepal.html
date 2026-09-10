@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비가 아니라 빙하가 만든 홍수 — 네팔 대홍수 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .river-sample{display:inline-block;width:34px;height:0;border-top:6px solid #A9CBEA;border-radius:99px}
+  .flood-sample{display:inline-block;width:34px;height:12px;background:#F6C8C2;border-radius:99px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  /* 메커니즘 단계 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 배출 비교 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--soft)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .bar-row:last-of-type{margin-bottom:0}
+  .bar-name{flex:0 0 96px;font-size:13.5px;font-weight:600}
+  .bar-track{flex:1;display:block;background:var(--surface2);border-radius:99px;height:20px;overflow:hidden}
+  .bar-fill{display:block;height:100%;border-radius:99px;background:#B9B6B1}
+  .bar-fill.top{background:var(--orange)}
+  .bar-fill.tiny{background:var(--red);min-width:3px}
+  .bar-val{flex:0 0 66px;text-align:right;font-size:13px;font-weight:700;color:var(--text2)}
+  .bar-row.victim .bar-name,.bar-row.victim .bar-val{color:#C6493E}
+  .bars-note{margin-top:12px;font-size:13px;color:var(--text2)}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px 12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--orange-soft);color:#9A5620}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4,.step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .bar-name{flex:0 0 74px;font-size:12.5px}
+    .bar-val{flex:0 0 58px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.11 데일리 뉴스 · 시각자료</div>
+  <h1>🏔️ 비가 아니라 빙하가 만든 홍수</h1>
+  <div class="sub">네팔·티베트 국경에서 무슨 일이 있었고, 왜 '지원'이 아니라 '보상'이라는 말이 나왔는지 한 장으로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="네팔·티베트 국경 지도: 빙하 붕괴 지점과 트리슐리강 침수 구간">
+      <!-- 바탕: 네팔 쪽 -->
+      <rect x="0" y="0" width="900" height="540" fill="#EDF3EC"/>
+
+      <!-- 티베트 고원(중국) -->
+      <path d="M0,0 L900,0 L900,150 C750,185 600,155 450,200 C300,250 150,210 0,240 Z"
+            fill="#E7EAEE"/>
+
+      <!-- 인도 쪽 저지대 -->
+      <path d="M0,470 C200,455 400,500 600,480 C750,466 830,478 900,470 L900,540 L0,540 Z"
+            fill="#F0EFED"/>
+      <path d="M0,470 C200,455 400,500 600,480 C750,466 830,478 900,470"
+            fill="none" stroke="#CFCCC8" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+      <!-- 국경선 -->
+      <path d="M0,240 C150,210 300,250 450,200 C600,155 750,185 900,150"
+            fill="none" stroke="#8C949E" stroke-width="2.5" stroke-dasharray="7 5"/>
+
+      <!-- 히말라야 산줄기 -->
+      <g stroke="#AFB6BE" stroke-width="1.2">
+        <g fill="#C9CED4">
+          <path d="M58,226 L80,194 L102,226 Z"/><path d="M138,230 L160,196 L182,230 Z"/>
+          <path d="M218,242 L240,208 L262,242 Z"/><path d="M298,250 L320,214 L342,250 Z"/>
+          <path d="M378,224 L400,190 L422,224 Z"/><path d="M538,182 L560,146 L582,182 Z"/>
+          <path d="M618,170 L640,136 L662,170 Z"/><path d="M698,168 L720,134 L742,168 Z"/>
+          <path d="M778,160 L800,126 L822,160 Z"/>
+        </g>
+        <g fill="#FFFFFF" stroke="none">
+          <path d="M72,205 L80,194 L88,205 Z"/><path d="M152,207 L160,196 L168,207 Z"/>
+          <path d="M232,219 L240,208 L248,219 Z"/><path d="M312,225 L320,214 L328,225 Z"/>
+          <path d="M392,201 L400,190 L408,201 Z"/><path d="M552,157 L560,146 L568,157 Z"/>
+          <path d="M632,147 L640,136 L648,147 Z"/><path d="M712,145 L720,134 L728,145 Z"/>
+          <path d="M792,137 L800,126 L808,137 Z"/>
+        </g>
+      </g>
+
+      <!-- 침수 구간 하이라이트 (붕괴 지점 → 하류 72km) -->
+      <path d="M500,150 C492,170 478,184 470,200 C462,250 492,300 460,352"
+            fill="none" stroke="#E56458" stroke-width="22" stroke-linecap="round" opacity="0.22"/>
+
+      <!-- 트리슐리강 -->
+      <path d="M500,146 C494,166 480,182 470,200 C462,250 492,300 460,352 C432,398 452,442 436,506"
+            fill="none" stroke="#A9CBEA" stroke-width="9" stroke-linecap="round"/>
+
+      <!-- 국경 관문 (지룽·케룽 통상구) -->
+      <g>
+        <rect x="452" y="190" width="20" height="20" rx="4" fill="#D5803B" stroke="#FFFFFF" stroke-width="2.5" transform="rotate(45 462 200)"/>
+      </g>
+
+      <!-- ⊘ 빙하 붕괴 지점 -->
+      <g>
+        <circle cx="500" cy="146" r="24" fill="#E56458" opacity="0.15"/>
+        <circle cx="500" cy="146" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="493" y1="153" x2="507" y2="139" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <!-- 카트만두 -->
+      <g font-family="inherit">
+        <circle cx="596" cy="392" r="6" fill="#2C2C2B"/>
+        <text x="610" y="397" font-size="14" font-weight="700" fill="#2C2C2B" paint-order="stroke" stroke="#EDF3EC" stroke-width="4">카트만두</text>
+      </g>
+
+      <!-- 나라 이름 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#E7EAEE" stroke-width="4" font-family="inherit">
+        <text x="180" y="86" font-size="16">중국 · 티베트 자치구</text>
+      </g>
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#EDF3EC" stroke-width="4" font-family="inherit">
+        <text x="726" y="300" font-size="16">네  팔</text>
+      </g>
+      <g fill="#9C9994" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="150" y="516" font-size="14">인  도</text>
+      </g>
+      <g fill="#8C949E" font-style="italic" text-anchor="middle" font-family="inherit">
+        <text transform="translate(255,196) rotate(-6)" font-size="13">히 말 라 야  산 맥  (국경)</text>
+      </g>
+      <text x="470" y="336" font-size="12.5" font-style="italic" fill="#5B87B5" font-family="inherit" transform="rotate(74 470 336)">트리슐리강</text>
+
+      <!-- 말풍선 ① -->
+      <g font-family="inherit">
+        <line x1="640" y1="88" x2="514" y2="136" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="620" y="46" width="264" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="752" y="66" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 빙하·암석 덩어리 붕괴</text>
+        <text x="752" y="84" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">무너져 강을 막고 '임시 댐'을 만듦</text>
+      </g>
+      <!-- 말풍선 ② -->
+      <g font-family="inherit">
+        <line x1="300" y1="322" x2="452" y2="300" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="36" y="290" width="266" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="169" y="310" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 트리슐리강 72km 구간 침수</text>
+        <text x="169" y="328" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle">라수와·누와코트 마을 수십 곳</text>
+      </g>
+      <!-- 말풍선 ③ 국경 관문 -->
+      <g font-family="inherit">
+        <line x1="330" y1="150" x2="452" y2="194" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="80" y="112" width="252" height="46" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="206" y="131" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">지룽(케룽) 통상구</text>
+        <text x="206" y="149" font-size="12.5" font-weight="700" fill="#D5803B" text-anchor="middle">네팔↔중국 최대 육상 교역 관문</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 빙하 붕괴 지점</span>
+      <span class="item"><span class="river-sample"></span> 트리슐리강</span>
+      <span class="item"><span class="flood-sample"></span> 급류가 휩쓴 구간</span>
+      <span class="item"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="4" y="4" width="10" height="10" rx="2" fill="#D5803B" transform="rotate(45 9 9)"/></svg> 국경 관문</span>
+    </div>
+  </div>
+
+  <div class="section-title">비도 안 왔는데 어떻게 홍수가 났을까</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>고산지대 빙하가 약해짐</b><span class="mdesc">기온이 오르면 얼음이 바위를 붙들고 있던 힘이 풀려 — 얼음은 접착제 역할도 하거든</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>얼음·암석 덩어리가 한꺼번에 무너져 강을 막음</b><span class="mdesc">계곡을 가로막은 잔해가 '임시 댐'이 됨 — 사람이 만든 게 아니라 점검도 방류도 없는 댐</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>그 뒤로 물이 고이며 수위가 계속 올라감</b><span class="mdesc">이 동안 하류는 오히려 물이 줄어 조용해 — 그래서 경보가 늦어</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>임시 댐이 터지며 물·흙·바위가 한 번에 쏟아짐</b><span class="mdesc">며칠 치 물이 몇 시간에 몰려 내려와 72km 구간을 휩쓺</span></div>
+    </div>
+    <div class="paradox"><b>🔗 그래서 '복합재난'</b>빙하 융해 → 산사태 → 하천 막힘 → 홍수처럼, 재난 하나가 다음 재난의 방아쇠를 당기며 꼬리를 무는 것. 각각을 따로 대비해선 못 막고, 피해는 곱해져서 커져.</div>
+  </div>
+
+  <div class="section-title">왜 '지원'이 아니라 '보상'이라고 할까 — 기후불평등</div>
+  <div class="bars">
+    <div class="bar-row"><span class="bar-name">중국</span><span class="bar-track"><span class="bar-fill top" style="width:100%"></span></span><span class="bar-val">약 30%</span></div>
+    <div class="bar-row"><span class="bar-name">미국</span><span class="bar-track"><span class="bar-fill" style="width:43%"></span></span><span class="bar-val">약 13%</span></div>
+    <div class="bar-row"><span class="bar-name">인도</span><span class="bar-track"><span class="bar-fill" style="width:27%"></span></span><span class="bar-val">약 8%</span></div>
+    <div class="bar-row victim"><span class="bar-name">네팔</span><span class="bar-track"><span class="bar-fill tiny" style="width:0.1%"></span></span><span class="bar-val">0.03%</span></div>
+    <div class="bars-note">※ 세계 온실가스 배출에서 차지하는 비중(개략치). 네팔 막대는 눈에 보이게 그린 것이고, 실제로는 선 한 줄도 안 될 두께야.<br>
+    가장 적게 배출한 나라가 가장 크게 무너졌어. 그래서 네팔은 "동정으로 주는 <b>지원</b>은 언제든 끊을 수 있지만, 책임에서 나오는 <b>보상</b>은 다르다"며 단어를 바꿔 요구하는 거야.</div>
+  </div>
+
+  <div class="section-title">남 얘기가 아닌 이유 — 한국에 오는 경로</div>
+  <div class="flow">
+    <div class="step s1">여름 폭우·폭염<br>강도 심화<small>평년 대비 최근 4년 약 3배</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">집중호우 뒤 폭염<br>연달아 발생<small>한국형 복합재난</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">폭염으로<br>전력 수요는 최대</div>
+    <div class="arrow">→</div>
+    <div class="step s4">동시에 발전 설비는<br>침수·냉각 문제로 가동 차질</div>
+    <div class="arrow">→</div>
+    <div class="step s5">전력난 → 요금·물가 부담<small>기후가 생활비 문제로</small></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(정확한 국경·수계가 아님) · 2026.09.11 딥다이브 내용 기반 · 피해 규모는 9월 8일 기준</div>
+</div>
+</body>
+</html>

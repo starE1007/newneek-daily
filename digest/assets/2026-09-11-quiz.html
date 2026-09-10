@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.11</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.11 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'glof_mechanism', variants:[
+    { q:'네팔·티베트 국경 대홍수는 큰비가 내려서 생긴 게 아니야. 물이 한꺼번에 쏟아진 과정으로 가장 알맞은 것은?',
+      opts:['무너져 내린 얼음·암석이 계곡을 막아 물을 가둬뒀다가, 그 막이 터지며 한 번에 흘러내렸다',
+            '녹은 빙하가 강물에 계속 더해지면서 수위가 서서히 올라 둑을 넘었다',
+            '지진으로 강바닥이 내려앉아 지하수가 한꺼번에 솟아올랐다',
+            '상류 수력발전 댐이 방류량을 늘리면서 하류 수위가 급등했다'], answer:0,
+      explain:'핵심은 <b>임시 댐</b>이야. 고산지대에서 무너진 얼음·바위 덩어리가 하천을 가로막아 물을 가둬뒀고, 그 막이 버티지 못하고 터지면서 며칠 치 물이 몇 시간 만에 쏟아진 거야. 빙하가 녹아 물이 "많아진" 게 아니라, 물이 <b>모였다가 한 번에 풀린</b> 게 결정적이었어.' },
+    { q:"이번 홍수에서 '임시 댐'이라는 말이 특히 위험한 이유로 가장 알맞은 것은?",
+      opts:['임시 댐은 시멘트 대신 흙으로 지어 수명이 짧기 때문',
+            '사람이 만든 댐과 달리 수위 점검도, 미리 조금씩 흘려보내는 방류도 없어 터질 때까지 아무도 조절하지 못하기 때문',
+            '임시 댐은 갇힌 물의 양이 실제 댐보다 항상 많기 때문',
+            '임시 댐이 생기면 그 지점의 강물이 바로 얼어붙기 때문'], answer:1,
+      explain:'댐이 위험한 게 아니라 <b>관리되지 않는 댐</b>이 위험한 거야. 실제 댐은 수위를 재고 미리 조금씩 방류해 압력을 낮추지만, 산사태가 만든 막은 그런 장치가 없어. 언제 얼마나 터질지 아무도 모르는 채로 물만 쌓여.' },
+  ]},
+  { id:'warning_lag', variants:[
+    { q:'상류에 임시 댐이 생겼을 때, 하류 주민이 위험을 미리 알아채기 어려운 이유로 가장 알맞은 것은?',
+      opts:['상류에서 물이 막혀 있는 동안 하류는 오히려 물이 줄어 평소보다 조용해지기 때문',
+            '물이 막히면 강 주변에 안개가 짙게 깔려 시야가 막히기 때문',
+            '임시 댐이 생기면 하류 수위가 즉시 급등해 대피 시간이 아예 없기 때문',
+            '산사태가 나면 통신망이 반드시 먼저 끊기게 되어 있기 때문'], answer:0,
+      explain:'가장 무서운 대목이야. 물이 갇혀 있는 동안 하류는 수량이 <b>줄어서</b> 평소보다 잠잠해져 — 위험 신호가 아니라 안전 신호처럼 보이지. 그러다 막이 터지는 순간 한꺼번에 몰려와. "조용하다"가 곧 "안전하다"가 아닌 대표적인 경우야.' },
+    { q:'이번 재난에서 사망자보다 실종자 수가 훨씬 많게 집계된 배경으로 가장 자연스러운 설명은?',
+      opts:['산악 지역이라 애초에 인구 통계가 존재하지 않기 때문',
+            '급류가 흙·바위와 함께 마을을 통째로 쓸고 지나가 시신 수습과 접근 자체가 어려운 지형이기 때문',
+            '실종자는 시간이 지나면 자동으로 사망자에서 제외되기 때문',
+            '국경 지역이라 사망자는 중국 쪽 통계로만 잡히기 때문'], answer:1,
+      explain:'맑은 물이 넘친 게 아니라 <b>흙·바위가 섞인 급류</b>가 지나갔어. 마을과 도로가 함께 묻히면 접근도 수색도 오래 걸려서, 초기에는 실종자 규모가 사망자보다 훨씬 크게 잡히고 시간이 지나며 조정돼.' },
+  ]},
+  { id:'compound_disaster', variants:[
+    { q:"'복합재난'이라는 말이 가리키는 것으로 가장 알맞은 것은?",
+      opts:['두 나라 이상에 걸쳐 피해가 발생한 재난',
+            '자연재해와 사회적 갈등이 같은 해에 일어난 상황',
+            '재난 하나가 다음 재난의 방아쇠를 당기며 연달아 터져 피해가 곱해지는 구조',
+            '한 지역에서 같은 종류의 재난이 여러 해 반복되는 현상'], answer:2,
+      explain:'빙하 융해 → 산사태 → 하천 막힘 → 홍수처럼 <b>꼬리를 무는</b> 게 핵심이야. 각각을 따로 대비하면 못 막고, 피해도 더해지는 게 아니라 곱해져. 인도네시아의 가뭄+산불, 일본의 해수온 상승+극한 호우도 같은 구조야.' },
+    { q:'복합재난이 단일 재난보다 대응하기 까다로운 이유로 가장 알맞은 것은?',
+      opts:['앞선 재난이 도로·전력·통신 같은 대응 수단 자체를 먼저 망가뜨려, 다음 재난에 쓸 힘이 남지 않기 때문',
+            '복합재난은 예보 기술로 아예 감지되지 않기 때문',
+            '재난이 겹치면 국제 구호 규정상 지원을 받을 수 없기 때문',
+            '두 재난이 겹치면 서로 상쇄돼 피해 규모를 계산할 수 없기 때문'], answer:0,
+      explain:'대응이란 결국 <b>인프라를 쓰는 일</b>이야. 첫 재난이 길과 전기를 끊어놓으면 두 번째 재난에는 훨씬 적은 힘으로 맞서야 해. 그래서 같은 규모라도 겹쳐서 올 때 피해가 훨씬 커지는 거야.' },
+  ]},
+  { id:'climate_inequality', variants:[
+    { q:'네팔이 각국의 구호 제안에 "자선 말고 보상을 달라"고 말한 취지로 가장 알맞은 것은?',
+      opts:['구호 물품보다 현금이 행정적으로 다루기 편하다는 뜻',
+            '피해 원인을 만든 쪽의 책임 문제로 규정해야, 주는 쪽 사정에 따라 끊기지 않는 의무가 된다는 뜻',
+            '이미 받은 지원금이 부족해 액수를 더 올려달라는 뜻',
+            '앞으로 어떤 형태의 국제 지원도 받지 않겠다는 뜻'], answer:1,
+      explain:'같은 돈이라도 이름이 다르면 성격이 달라져. <b>지원</b>은 주는 쪽의 선의라 사정이 바뀌면 줄거나 끊기지만, <b>보상</b>은 책임에서 나오는 의무야. 네팔의 온실가스 배출 비중은 0.03% 수준인데 피해는 가장 크게 봤다는 점이 그 근거고 — 단어를 바꾸는 게 곧 프레임 싸움인 거지.' },
+    { q:"기후 문제에서 '기후불평등'이 지적하는 핵심으로 가장 알맞은 것은?",
+      opts:['기후변화의 원인을 만든 나라와 피해를 크게 입는 나라가 서로 다르다는 점',
+            '기후변화가 부유한 나라에서 먼저 나타난다는 점',
+            '기후 대응 기술이 나라마다 다른 속도로 발전한다는 점',
+            '기후 통계가 나라마다 다른 기준으로 집계된다는 점'], answer:0,
+      explain:'배출은 산업화한 큰 나라가 하고, 피해는 히말라야·섬나라·저지대처럼 <b>배출이 거의 없는 곳</b>이 먼저 크게 받아. 원인과 결과의 주소가 다르다는 게 핵심이라, 논의가 자연스레 책임·배상 쪽으로 옮겨가는 거야.' },
+  ]},
+  { id:'loss_and_damage', variants:[
+    { q:"네팔이 유엔 '손실과 피해 대응 기금'에 긴급 지원을 요청하며 \"12월 이사회까지 기다리기엔 너무 늦다\"고 호소한 이유로 가장 알맞은 것은?",
+      opts:['기금 규정상 12월이 지나면 신청 자격이 사라지기 때문',
+            '복구는 무너진 직후에 해야 비용이 가장 적게 들기 때문',
+            '이재민 생존과 우기 전 기반시설 복구에는 시한이 있는데, 기금 집행 일정은 그 시한과 무관하게 정해져 있기 때문',
+            '12월에는 히말라야 지역 접근이 물리적으로 불가능해지기 때문'], answer:2,
+      explain:'재난 대응의 시계와 국제기구의 시계가 안 맞는 문제야. 이재민 거처·식수·도로는 <b>지금</b> 필요한데, 기금은 정해진 회의 일정에 따라 심사·집행돼. 그래서 "제도는 있는데 제때 안 온다"는 지적이 반복되는 거지.' },
+    { q:"'손실과 피해 대응 기금'의 성격을 가장 잘 설명한 것은?",
+      opts:['기후재난을 이미 겪은 취약국의 피해 복구를 돕기 위해 만들어진 국제 기금',
+            '각국이 온실가스 감축 목표를 못 지켰을 때 내는 벌금을 모아둔 계정',
+            '기후 관련 기업에 투자해 수익을 내는 국제 펀드',
+            '재난 발생 시 자동으로 보험금이 지급되는 민간 보험 제도'], answer:0,
+      explain:'감축(줄이기)·적응(대비하기)과 달리, 이미 <b>벌어진 피해</b>를 다루는 자리라 만들어질 때부터 "누가 얼마를 책임지느냐" 논쟁이 붙었어. 네팔의 이번 요구도 정확히 이 지점에 서 있어.' },
+  ]},
+  { id:'korea_route', variants:[
+    { q:'한국에서 집중호우 뒤 폭염이 이어지는 복합재난이 잦아질 때, 전력 측면에서 가장 우려되는 상황은?',
+      opts:['폭염으로 전력 수요가 최대인 시점에, 앞선 호우 피해로 발전 설비 가동에 차질이 생겨 수요와 공급이 반대로 엇갈리는 것',
+            '호우가 발전기 냉각을 도와 전력 생산이 지나치게 늘어나는 것',
+            '폭염 기간에는 전력 요금 징수가 법으로 중단되는 것',
+            '호우와 폭염이 겹치면 송전선이 물리적으로 늘어나 전압이 오르는 것'], answer:0,
+      explain:'복합재난이 무서운 건 <b>타이밍</b>이야. 폭염은 냉방 수요를 최대로 밀어 올리는데, 바로 앞의 호우가 발전·송배전 설비를 건드려 두면 공급은 반대로 줄어. 수요 최대와 공급 차질이 겹치는 게 최악의 조합이야.' },
+    { q:'네팔의 재난이 "남의 나라 일"로만 볼 수 없는 이유로 이 글이 든 근거는?',
+      opts:['한국도 히말라야와 비슷한 빙하 지형을 갖고 있기 때문',
+            '한국의 여름철 폭우·폭염 강도가 평년 대비 최근 4년 사이 크게 심화돼, 재난이 겹쳐 오는 구조가 이미 나타나고 있기 때문',
+            '네팔이 한국의 최대 에너지 수입국이기 때문',
+            '한국이 손실과 피해 기금의 최대 출연국이기 때문'], answer:1,
+      explain:'지형이 아니라 <b>패턴</b>이 닮아가는 게 요점이야. 그린피스·카이스트 분석에서 여름철 폭우와 폭염의 강도가 평년(1991~2020년)보다 최근 4년(2021~2024년)에 3배가량 심해졌어 — 하나씩 오던 재난이 겹쳐 오기 시작했다는 신호야.' },
+  ]},
+  { id:'expected_inflation_review', variants:[
+    { q:'유럽중앙은행(ECB)이 10일 기준금리를 0.25%p 올렸어. 기름값 때문에 오른 물가는 기름값이 내리면 저절로 내려갈 텐데도 금리를 올린 이유로 가장 알맞은 것은? (어제 복습)',
+      opts:['금리를 올리면 국제 유가 자체가 내려가기 때문',
+            '물가가 오르면 반드시 금리를 올리도록 규정에 정해져 있기 때문',
+            '"앞으로도 계속 오르겠네"라는 예상이 임금·가격표에 반영되면, 기름값이 내려도 물가가 눌러앉기 때문',
+            '금리를 올려야 에너지 수입에 쓸 재원을 마련할 수 있기 때문'], answer:2,
+      explain:'핵심은 <b>기대인플레이션</b>이야. 오를 거라는 예상이 굳으면 사람들은 미리 임금을 올려 받고 가게는 미리 가격표를 고쳐 — 한 번 올라간 월급·가격은 원인이 사라져도 잘 안 내려와. 그래서 예상이 굳기 <b>전에</b> 끊는 거고, 이걸 선제적 인상이라고 해.' },
+    { q:'각국 중앙은행 금리 결정 일정에서, ECB 다음으로 이어지는 순서로 맞는 것은?',
+      opts:['16일 미국 연준 → 17~18일 일본은행',
+            '17~18일 일본은행 → 30일 미국 연준',
+            '16일 일본은행 → 25일 유럽중앙은행 재소집',
+            '16일 한국은행 → 18일 미국 연준'], answer:0,
+      explain:'ECB(10일)가 첫 타자였고, <b>16일 미국 연준</b>, <b>17~18일 일본은행</b>이 이어져. 한국은 이미 8월 27일에 3.00%로 올려둔 상태라 이번 3주 캘린더에서는 결과를 지켜보는 쪽이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'재난 하나가 다음 재난의 방아쇠를 당기며 꼬리를 물고 이어져 피해가 곱해지는 것을 뭐라고 부를까? (○○○○)',
+    accept:['복합재난','복합 재난','복합재해'],
+    explain:'정답은 <b>복합재난</b>이야. 빙하 융해 → 산사태 → 하천 막힘 → 홍수처럼 연쇄로 이어지는 구조를 말해.' },
+  { q:'네팔이 세계 온실가스 배출에서 차지하는 비중은 몇 %일까? (숫자만)',
+    accept:['0.03','0.03%'],
+    explain:'정답은 <b>0.03%</b>야. 거의 배출하지 않은 나라가 가장 크게 무너졌다는 점이 "보상" 요구의 근거야.' },
+  { q:'무너진 얼음·바위가 계곡을 막아 물을 가둬 만든, 관리되지 않는 자연 상태의 둑을 뭐라고 표현했을까? (○○ 댐)',
+    accept:['임시','임시댐','임시 댐'],
+    explain:'정답은 <b>임시 댐</b>이야. 점검도 방류도 없이 물만 쌓이다가 터져서, 며칠 치 물이 몇 시간 만에 쏟아져 내렸어.' },
+  { q:'대홍수가 휩쓸고 지나간, 네팔 라수와·누와코트 지역을 흐르는 강의 이름은? (○○○○강)',
+    accept:['트리슐리','트리슐리강','trishuli'],
+    explain:'정답은 <b>트리슐리강</b>이야. 티베트 국경에서 남쪽으로 흘러내리는 강으로, 72km 구간이 침수됐어.' },
+  { q:'네팔이 긴급 지원을 요청한, 기후재난 피해국 복구를 돕는 유엔 기금의 이름은? (○○과 ○○ 대응 기금)',
+    accept:['손실과 피해','손실과피해','손실','손실 피해'],
+    explain:"정답은 <b>'손실과 피해' 대응 기금</b>이야. 네팔은 이사회가 열리는 12월까지 기다리기엔 너무 늦다며 긴급 집행을 호소했어." },
+  { q:'유럽중앙은행(ECB)이 9월 10일 기준금리를 몇 %p 올렸을까? (숫자만)',
+    accept:['0.25','0.25%p','0.25%','25bp'],
+    explain:'정답은 <b>0.25%p</b>야. 예금금리가 연 2.50%가 됐고, 올해 두 번째 인상이야.' },
+  { q:'브렌트유가 9월 10일 종가 기준으로 몇 달러를 넘어섰을까? (숫자만, 100 단위)',
+    accept:['101','101.21','100'],
+    explain:'정답은 <b>101.21달러</b>야. 종가 기준으로 100달러를 넘긴 건 7월 23일 이후 처음이야.' },
+  { q:'기름값이 내려도 물가가 눌러앉게 만드는, "앞으로도 계속 오를 것"이라는 예상을 뭐라고 부를까? (○○○○○○○, 어제 복습)',
+    accept:['기대인플레이션','기대 인플레이션','기대인플레'],
+    explain:'정답은 <b>기대인플레이션</b>이야. 이 예상이 임금·가격표에 반영되기 전에 끊으려는 게 선제적 금리 인상의 목적이야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
