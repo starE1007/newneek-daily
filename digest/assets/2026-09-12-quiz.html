@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.12</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.12 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'control_zone', variants:[
+    { q:"이란 혁명수비대가 9일 새로 선포한 '해상통제구역'의 성격으로 가장 알맞은 것은?",
+      opts:['차바하르 앞바다부터 오만해·아라비아해 일부까지 넓힌 구역으로, 지나는 배는 보험·항만 지원을 즉시 끊고 위반 시 호르무즈 통과 자체를 영구히 막겠다는 경고',
+            '이란 영해 안에서만 적용되는 국내용 안전 항로 지정',
+            '유엔이 공인한 국제 해상 교통 관제구역',
+            '오만이 자국 영해를 넓히기 위해 선포한 구역'], answer:0,
+      explain:'핵심은 <b>지리적 확대</b>와 <b>불이익의 크기</b>야. 기존 호르무즈·오만해를 넘어 아라비아해 일부까지 넓혔고, 위반하면 보험·항만 서비스를 끊는 데 그치지 않고 앞으로 호르무즈 통과 자체를 영구히 막겠다고 했어 — 판돈을 훨씬 키운 경고인 거지.' },
+    { q:'이란의 새 해상통제구역이 시작되는 지점으로 지도에 표시된 곳은 어디일까?',
+      opts:['차바하르 — 이란 남동부, 오만해와 맞닿은 항구도시',
+            '카르그섬 — 페르시아만 안, 이란 원유 선적 관문',
+            '수에즈 운하 — 지중해와 홍해를 잇는 인공 수로',
+            '바브엘만데브 해협 — 예멘과 아프리카 사이'], answer:0,
+      explain:'정답은 <b>차바하르</b>야. 페르시아만 안쪽이 아니라 호르무즈 해협을 이미 지난 오만해 쪽 항구에서 통제구역이 시작해, 아라비아해 쪽으로 더 넓게 뻗어나가는 그림이야.' },
+  ]},
+  { id:'talks_paradox', variants:[
+    { q:'통제구역을 넓히면서 동시에 14일 회담을 여는 게 모순처럼 보이지 않는 이유로 가장 알맞은 것은?',
+      opts:['통제구역 확대가 협상 앞에서 먼저 판돈을 올려두는 카드고, 회담은 그 판돈을 실제 협상력으로 바꾸려는 자리이기 때문',
+            '통제구역과 회담은 서로 전혀 관련 없는 별개의 사안이기 때문',
+            '이란이 통제구역 선포를 이미 철회했기 때문',
+            'GCC가 통제구역 확대를 먼저 요청했기 때문'], answer:0,
+      explain:'압박과 대화가 <b>같은 목표를 향한 순서</b>야. 이란·오만은 GCC를 끌어들여 "미국이 봉쇄를 풀도록 같이 압박해달라"는 쪽이고, 통제구역 확대는 그 협상에서 쓸 지렛대를 먼저 키워둔 것에 가까워.' },
+    { q:'GCC 국가들이 14일 회담에서 취하는 입장으로 가장 알맞은 것은?',
+      opts:['안전한 통항 보장에 초점을 맞추고, 이번 합의는 임시적이라는 점을 분명히 하려는 입장',
+            '이란의 통제구역 확대를 전면적으로 지지하는 입장',
+            '미국의 해상봉쇄 완화 요구를 GCC가 대신 전면 거부하는 입장',
+            '오만을 GCC에서 제외하자는 입장'], answer:0,
+      explain:'GCC는 이란·오만과 달리 <b>선 긋기</b>를 분명히 해. 선박의 안전한 통항 확보가 목적이고, 이번 합의가 항구적 해법이 아니라 <b>임시</b>라는 점을 못박으려는 쪽이야.' },
+  ]},
+  { id:'talks_significance', variants:[
+    { q:'9월 14일 오만 살랄라에서 열리는 회담이 뉴스가 되는 이유로 가장 알맞은 것은?',
+      opts:['지난 2월 이란 전쟁 발발 후 GCC 6개국과 이란이 처음으로 갖는 장관급 회담이기 때문',
+            '이란과 미국이 정식으로 종전에 서명하는 자리이기 때문',
+            '살랄라가 새로 세워진 국제기구의 본부이기 때문',
+            'GCC가 이 자리에서 신규 회원국 가입을 발표하기 때문'], answer:0,
+      explain:'포인트는 <b>처음</b>이라는 것. 전쟁이 시작된 2월 이후 GCC 6개국(사우디·UAE·쿠웨이트·카타르·바레인·오만)과 이란의 고위급이 한자리에 모이는 게 이번이 최초야.' },
+    { q:'이번 회담의 발판이 된, 지난달 말 이란·오만 사이의 임시 합의 내용으로 가장 알맞은 것은?',
+      opts:['페르시아만에 들어올 땐 이란 영해로, 나갈 땐 오만 영해로 다니는 항로에 잠정 합의',
+            '호르무즈 해협을 완전히 폐쇄하기로 합의',
+            '이란이 오만에 해군 기지를 임대하기로 합의',
+            '오만이 이란의 원유를 전량 대신 수출하기로 합의'], answer:0,
+      explain:'정답은 <b>들어올 땐 이란 영해, 나갈 땐 오만 영해</b>로 다니는 임시 항로 합의야. 이게 선박 통항의 최소한의 틀을 만들어뒀고, 이번 14일 회담이 그 틀을 더 넓히는 자리인 셈이야.' },
+  ]},
+  { id:'market_impact', variants:[
+    { q:'11일 코스피·환율 움직임을 가장 정확히 설명한 것은?',
+      opts:['미 국채금리·유가·뉴욕 기술주 급락이 겹쳐 코스피가 6,909.91(-1.76%)로 사흘 만에 다시 7,000선이 무너지고, 원·달러도 1,345.9원까지 올랐다',
+            '코스피가 사상 최고치를 새로 쓰며 7,200선을 돌파했다',
+            '원·달러 환율이 1,200원대로 크게 내려갔다',
+            '국내 증시와 환율 모두 보합권에서 움직임이 없었다'], answer:0,
+      explain:'유가·금리 불안이 겹친 <b>삼중 악재</b>였어. 코스피는 <b>6,909.91</b>(-1.76%)로 7,000선이 무너졌고, 원·달러는 <b>1,345.9원</b>까지 올라 원화도 약세로 돌아섰어.' },
+    { q:'14일 회담 결과가 앞으로의 금리 국면에 미칠 영향을 가장 잘 설명한 것은?',
+      opts:['회담이 불발되면 16일 미 연준 금리 결정을 유가 100달러 위에서 맞이해 인상 압박이 더 쌓이고, 통항 합의가 나오면 유가·환율 부담이 함께 풀릴 수 있다',
+            '회담 결과와 상관없이 연준 금리 결정에는 아무 영향이 없다',
+            '회담이 성사되면 오히려 유가가 더 오른다',
+            '연준은 이미 회담 전에 금리 결정을 마쳤다'], answer:0,
+      explain:'회담은 <b>분수령</b>이야. 불발 시 유가 100달러 위에서 16일 연준 결정을 맞아 인상 압박이 한 겹 더 쌓이고, 통항 합의가 나오면 유가·환율 부담이 동시에 풀릴 여지가 생겨.' },
+  ]},
+  { id:'apple_duo', variants:[
+    { q:"애플 '아이폰 듀오'에 대한 설명으로 가장 정확한 것은?",
+      opts:['애플 첫 폴더블폰으로 국내 출고가 329만 원부터, 10월 16일 예약·10월 23일 출시된다',
+            '애플이 아이폰 최초로 출시한 5G 전용 모델이다',
+            '애플과 삼성이 공동 개발한 폴더블폰이다',
+            '국내에는 출시되지 않고 해외에서만 판매된다'], answer:0,
+      explain:'애플 <b>첫 폴더블폰</b>이야. 국내 출고가 <b>329만 원</b>부터고, 10월 16일 사전예약을 받아 <b>10월 23일</b> 한국 등 주요 시장에 동시 출시돼.' },
+  ]},
+  { id:'expected_inflation_review', variants:[
+    { q:'"앞으로도 계속 오르겠네"라는 예상이 임금·가격표에 눌어붙는 현상을 가리키는 말은? (지난 회차 복습)',
+      opts:['기대인플레이션', '기저효과', '스태그플레이션', '디플레이션'], answer:0,
+      explain:'정답은 <b>기대인플레이션</b>이야. 이 예상이 굳으면 원인(기름값 등)이 사라져도 한 번 올라간 임금·가격이 잘 안 내려와 — 그래서 중앙은행들이 예상이 굳기 전에 선제적으로 금리를 올려.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'전쟁 발발 후 처음으로 GCC 6개국과 이란이 만나는, 9월 14일 회담이 열리는 오만의 도시는? (○○○)',
+    accept:['살랄라','salalah'],
+    explain:'정답은 <b>살랄라</b>야. 오만 남부, 아라비아해 연안의 도시로 오만이 중재한 첫 장관급 회담이 열려.' },
+  { q:'이란의 새 해상통제구역이 시작되는, 이란 남동부의 항구도시 이름은? (○○○○)',
+    accept:['차바하르','chabahar'],
+    explain:'정답은 <b>차바하르</b>야. 오만해와 맞닿은 이 항구 앞바다부터 아라비아해 일부까지 통제구역이 넓어졌어.' },
+  { q:'걸프협력회의(GCC)는 총 몇 개국으로 구성돼 있을까? (숫자만)',
+    accept:['6','6개국','여섯'],
+    explain:'정답은 <b>6개국</b>이야. 사우디아라비아·UAE·쿠웨이트·카타르·바레인·오만이 회원국이야.' },
+  { q:'11일 코스피가 마감한 지수는 얼마일까? (숫자만, 소수점 포함)',
+    accept:['6909.91','6,909.91','6909'],
+    explain:'정답은 <b>6,909.91</b>이야. 전일 대비 1.76% 내려 사흘 만에 다시 7,000선이 무너졌어.' },
+  { q:'11일 원·달러 환율은 얼마까지 올랐을까? (숫자만)',
+    accept:['1345.9','1,345.9','1345'],
+    explain:'정답은 <b>1,345.9원</b>이야. 유가·금리 불안에 원화가 약세로 돌아섰어.' },
+  { q:"애플 '아이폰 듀오'의 국내 출고가는 얼마부터일까? (숫자만, 단위 만원)",
+    accept:['329','329만원','329만 원'],
+    explain:'정답은 <b>329만 원</b>부터야. 10월 23일 한국 등 주요 시장에 동시 출시돼.' },
+  { q:'이란·오만이 지난달 말 합의한 임시 항로 방식은 "들어올 땐 ○○ 영해, 나갈 땐 ○○ 영해"일까? (두 나라 이름만)',
+    accept:['이란','이란,오만','이란 오만','이란/오만'],
+    explain:'정답은 <b>이란 영해로 들어오고 오만 영해로 나가는</b> 방식이야. 이 틀이 14일 회담의 발판이 됐어.' },
+  { q:'이란의 새 통제구역을 위반하고 지나간 선박에게 이란이 경고한, 앞으로 영구히 막겠다는 대상은 어디 통과일까? (○○○○ 해협)',
+    accept:['호르무즈','호르무즈해협','호르무즈 해협'],
+    explain:'정답은 <b>호르무즈 해협</b>이야. 위반 시 보험·항만 지원 중단에 더해, 앞으로 호르무즈 통과 자체를 영구히 막겠다고 경고했어.' },
+  { q:'16일로 예정된 통화정책 결정의 주체는 어느 나라 중앙은행일까? (○○)',
+    accept:['미국','미 연준','연준','美','Fed'],
+    explain:'정답은 <b>미국 연방준비제도(연준)</b>야. 14일 회담이 불발되면 유가 100달러 위에서 이 결정을 맞게 돼 인상 압박이 커져.' },
+  { q:'재난이 꼬리를 물어 피해가 곱해지는 구조를 부르는 말은? (○○○○, 어제 복습)',
+    accept:['복합재난','복합 재난','복합재해'],
+    explain:'정답은 <b>복합재난</b>이야. 네팔 홍수에서 빙하 붕괴가 산사태·홍수로 이어진 사례가 그거였어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
