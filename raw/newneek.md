@@ -1,7 +1,7 @@
-<!-- scraped_at_kst: 2026-09-12 07:42 -->
-<!-- date_kst: 2026-09-12 (Sat) -->
+<!-- scraped_at_kst: 2026-09-13 07:27 -->
+<!-- date_kst: 2026-09-13 (Sun) -->
 
-## 뉴닉 데일리 — 2026-09-12
+## 뉴닉 데일리 — 2026-09-13
 원문: https://stibee.com/api/v1.0/emails/share/Ld3U2j4EQCKi3lrqI78_gy8GvWGbsDM
 
 뉴닉 데일리: 9월 둘째 주 주간 결산
