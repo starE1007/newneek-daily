@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.13</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.13 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'salalah_meeting', variants:[
+    { q:'내일(14일) 오만 살랄라에서 열리는 회담에 대한 설명으로 가장 정확한 것은?',
+      opts:['이란과 GCC 6개국(사우디·UAE·쿠웨이트·카타르·바레인·오만) 외교장관이 지난달 이란·오만 임시 항로 합의를 넓혀 안전 통항을 논의하는 첫 자리',
+            '이란과 미국이 정식으로 종전 협정에 서명하는 자리',
+            '오만이 GCC 탈퇴를 공식 선언하는 자리',
+            '이란이 호르무즈 해협을 완전 개방하겠다고 발표하는 자리'], answer:0,
+      explain:'전쟁 발발 후 이란과 GCC 6개국이 처음 갖는 장관급 회담이야. 지난달 이란·오만이 잠정 합의한 "들어올 땐 이란 영해, 나갈 땐 오만 영해" 항로를 넓혀서 안전 통항 합의로 매듭짓는 게 의제야.' },
+    { q:'14일 회담의 의제가 딛고 서 있는 지난달 이란·오만 임시 합의 내용은?',
+      opts:['페르시아만에 들어올 땐 이란 영해로, 나갈 땐 오만 영해로 다니는 항로에 잠정 합의',
+            '호르무즈 해협을 영구 폐쇄하기로 합의',
+            '이란이 오만에 원유 정제시설을 넘기기로 합의',
+            'GCC 6개국이 이란의 통제구역을 인정하기로 합의'], answer:0,
+      explain:'정답은 <b>들어올 땐 이란 영해, 나갈 땐 오만 영해</b>로 다니는 임시 항로 합의야. 이 틀이 14일 회담의 발판이 됐어.' },
+  ]},
+  { id:'us_obstacle', variants:[
+    { q:'지역 당사자끼리 합의를 다듬어도 실제 봉쇄 완화까지 못 가는 이유로 가장 알맞은 것은?',
+      opts:['호르무즈 봉쇄에는 이란의 통제구역뿐 아니라 미 해군의 제재·검문도 걸려 있는데, 미국이 지난 6월 잠정합의(MOU) 되살리기를 거부하고 있기 때문',
+            'GCC 6개국이 회담 참석 자체를 거부했기 때문',
+            '오만이 회담 장소 제공을 취소했기 때문',
+            '이란이 이미 통항 합의에 서명을 마쳤기 때문'], answer:0,
+      explain:'실제로 봉쇄를 쥐고 있는 건 이란 통제구역만이 아니라 <b>미 해군의 제재·검문</b>이야. 워싱턴이 6월 MOU를 되살리길 거부하고 더 큰 "포괄적 해법"을 요구 중이라, 지역끼리 합의해도 미국이 안 풀면 종이 위 합의로 남을 위험이 커.' },
+  ]},
+  { id:'iran_conditions', variants:[
+    { q:'미국의 "포괄적 해법" 요구에 맞서 이란이 내건 조건으로 가장 알맞은 것은?',
+      opts:['항구 봉쇄 해제·원유수출 제재 면제·동결자산 접근',
+            '미국이 요구한 6월 MOU를 이란이 즉시 재가동하겠다는 약속',
+            'GCC 6개국이 먼저 내놓은 안전 통항 보장 선언',
+            '이란이 호르무즈 해협을 조건 없이 완전 개방하겠다는 선언'], answer:0,
+      explain:'이란은 <b>항구 봉쇄 해제, 원유수출 제재 면제, 동결자산 접근</b> 이 세 가지를 조건으로 걸었어. 미국이 원하는 "포괄적 해법"(핵·미사일 협상까지 얹은 더 큰 대가)에 맞서는 이란 쪽 청구서인 셈이야.' },
+  ]},
+  { id:'cpi_fed_odds', variants:[
+    { q:'11일 발표된 미 8월 CPI와 그 여파를 가장 정확히 설명한 것은?',
+      opts:['근원물가가 전월 대비 +0.3%로 7월(+0.2%)보다 반등하며 예상보다 뜨거워, 연준의 9/16 인상 확률이 66.4%에서 85~90%로 급등했다',
+            '근원물가가 예상보다 낮게 나와 연준의 인상 확률이 크게 낮아졌다',
+            'CPI 발표가 연기되며 시장에 아무 영향이 없었다',
+            '헤드라인 물가만 올랐고 근원물가는 그대로였다'], answer:0,
+      explain:'근원물가가 <b>+0.3%</b>(7월 +0.2%에서 반등)로 뜨겁게 나오면서, 연준의 9/16 인상 확률이 <b>66.4%에서 85~90%</b>로 급등했어.' },
+    { q:'11일 브렌트유 움직임에 대한 설명으로 가장 알맞은 것은?',
+      opts:['살랄라 회담 기대 등 디에스컬레이션 신호에 장중 2%가량 밀려 105달러대로 내려왔다',
+            '전쟁 확전 소식에 장중 10% 넘게 폭등했다',
+            '80달러대로 크게 떨어지며 안정세로 돌아섰다',
+            '거래가 정지돼 가격 변동이 없었다'], answer:0,
+      explain:'회담 기대와 후티 휴전 선언 같은 <b>디에스컬레이션 신호</b>에 브렌트유가 장중 2%가량 밀려 <b>105달러대</b>로 내려왔어. 다만 연준 인상 확률은 오히려 굳어지는 중이라 안심할 단계는 아니야.' },
+  ]},
+  { id:'control_zone_review', variants:[
+    { q:'(어제 복습) 이란이 통제구역을 넓히면서 동시에 14일 회담을 여는 이유를 가장 잘 설명한 것은?',
+      opts:['통제구역 확대가 협상 앞에서 먼저 판돈을 올려두는 카드고, 회담은 그 판돈을 실제 협상력으로 바꾸려는 자리이기 때문',
+            '통제구역과 회담은 서로 전혀 관련 없는 별개의 사안이기 때문',
+            '이란이 통제구역 선포를 이미 철회했기 때문',
+            'GCC가 통제구역 확대를 먼저 요청했기 때문'], answer:0,
+      explain:'압박과 대화가 <b>같은 목표를 향한 순서</b>야. 통제구역 확대로 먼저 판돈을 올려두고, 회담에서 그 판돈을 실제 협상력으로 바꾸려는 거지.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'14일 이란·GCC 첫 장관급 회담이 열리는 오만의 도시는? (○○○)',
+    accept:['살랄라','salalah'],
+    explain:'정답은 <b>살랄라</b>야. 오만 남부, 아라비아해 연안의 도시로 오만이 중재한 첫 장관급 회담이 열려.' },
+  { q:'미국이 통항 합의보다 더 큰 대가를 얹어 요구 중인, 이란 측이 우려하는 그 요구를 뭐라고 압축해 부를까? (○○○ 해법)',
+    accept:['포괄적','포괄적 해법','포괄적해법'],
+    explain:'정답은 <b>포괄적 해법</b>이야. 통항 허용을 넘어 핵·미사일 협상까지 얹겠다는 뜻이라, 14일 회담이 성사돼도 실제 봉쇄 완화까지는 한 단계가 더 남아.' },
+  { q:'이란이 미국에 요구한 조건 중, 얼어붙은 돈에 접근하게 해달라는 요구를 뭐라고 부를까? (○○○ 접근)',
+    accept:['동결자산','동결자산 접근','동결 자산'],
+    explain:'정답은 <b>동결자산 접근</b>이야. 항구 봉쇄 해제·원유수출 제재 면제와 함께 이란이 내건 세 가지 조건 중 하나야.' },
+  { q:'11일 미 8월 CPI에서 근원물가는 전월 대비 몇 % 올랐을까? (숫자만, 소수점 포함)',
+    accept:['0.3','+0.3','0.3%'],
+    explain:'정답은 <b>+0.3%</b>야. 7월 +0.2%에서 반등해 예상보다 뜨거웠고, 이게 연준 인상 확률을 끌어올린 직접 원인이야.' },
+  { q:'11일 CPI 발표 후 연준의 9/16 인상 확률은 66.4%에서 대략 몇 %대로 뛰었을까? (숫자만, 예: 70)',
+    accept:['85','90','85~90','85-90','88'],
+    explain:'정답은 <b>85~90%</b>야. 그제(10일) 66.4%였던 확률이 하루 만에 크게 뛴 거야.' },
+  { q:'11일 장중 밀려 105달러대로 내려온 유종은 무엇일까? (○○○유)',
+    accept:['브렌트유','브렌트','brent'],
+    explain:'정답은 <b>브렌트유</b>야. 살랄라 회담 기대 등 디에스컬레이션 신호에 장중 2%가량 밀렸어.' },
+  { q:'걸프협력회의(GCC)는 총 몇 개국으로 구성돼 있을까? (숫자만)',
+    accept:['6','6개국','여섯'],
+    explain:'정답은 <b>6개국</b>이야. 사우디아라비아·UAE·쿠웨이트·카타르·바레인·오만이 회원국이야.' },
+  { q:'이란·오만이 지난달 말 합의한 임시 항로 방식은 "들어올 땐 ○○ 영해, 나갈 땐 ○○ 영해"일까? (두 나라 이름만)',
+    accept:['이란','이란,오만','이란 오만','이란/오만'],
+    explain:'정답은 <b>들어올 땐 이란 영해, 나갈 땐 오만 영해</b>로 다니는 방식이야. 이 틀이 14일 회담의 발판이 됐어.' },
+  { q:'이란이 통제구역을 넓히면서 동시에 회담을 여는 건, 확대가 먼저 무엇을 올려두는 카드이기 때문일까? (두 글자)',
+    accept:['판돈'],
+    explain:'정답은 <b>판돈</b>이야. 회담은 그 판돈을 실제 협상력으로 바꾸려는 자리고.' },
+  { q:'16일로 예정된 통화정책 결정의 주체는 어느 나라 중앙은행일까? (○○)',
+    accept:['미국','미 연준','연준','美','Fed'],
+    explain:'정답은 <b>미국 연방준비제도(연준)</b>야. CPI 발표 후 인상 확률이 85~90%까지 뛴 상태로 이 결정을 맞아.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
