@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>살랄라 회담은 왜 열리기도 전에 연기됐나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  /* 3중 잠금 */
+  .lock{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .lstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .lstep:last-of-type{padding-bottom:0}
+  .lstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .lstep:last-of-type::before{display:none}
+  .lnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--orange-soft);color:#9A5620;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .lstep.hot .lnum{background:var(--red-soft);color:#C6493E}
+  .ltxt{padding-top:4px;font-size:14.5px}
+  .ltxt b{font-size:15px}
+  .ltxt .ldesc{display:block;font-size:13.5px;color:var(--text2);margin-top:3px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 160px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.dead{background:var(--red-soft);border-color:#F3CFCA}
+  .t-item.dead .when{color:#C6493E}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 영향 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3,.step.s4{background:var(--orange-soft);color:#9A5620}
+  .step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.14 데일리 뉴스 · 시각자료</div>
+  <h1>🗺️ 살랄라 회담, 열리기도 전에 연기됐다</h1>
+  <div class="sub">회담장은 호르무즈에서 한참 떨어진 오만 남쪽 — 어디서 무슨 일이 있었고, 왜 한 나라가 빠지자 판이 깨졌는지 지도로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="페르시아만 지도: 호르무즈 해협, 바레인, 오만 살랄라의 위치">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+
+      <!-- 육지 바탕 -->
+      <rect x="0" y="0" width="900" height="620" fill="#F0EFED"/>
+
+      <!-- 바다: 페르시아만 → 호르무즈 → 오만만 → 아라비아해 -->
+      <path d="M120,88 L175,78 L420,196 L520,238 L556,252 L588,240 L640,262 L700,300 L760,352 L900,420
+               L900,600 L300,600 L420,470 L560,400 L610,352 L596,300 L556,286 L520,272 L400,232 L160,120 Z"
+            fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 원유 항로 -->
+      <path d="M250,168 C360,208 470,248 556,268 C640,300 720,352 820,424" fill="none"
+            stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9" marker-end="url(#ah)"/>
+
+      <!-- 바레인 섬 -->
+      <ellipse cx="336" cy="176" rx="9" ry="14" fill="#F0EFED" stroke="#B9D4EC" stroke-width="1.5"/>
+
+      <!-- 바다 이름 -->
+      <g font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle" font-family="inherit">
+        <text transform="translate(255,208) rotate(22)">페르시아만</text>
+        <text transform="translate(668,318) rotate(30)">오만만</text>
+        <text transform="translate(770,520)">아라비아해</text>
+      </g>
+
+      <!-- 나라 이름 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="330" y="104" font-size="17">이  란</text>
+        <text x="235" y="330" font-size="16">사우디아라비아</text>
+        <text x="497" y="322" font-size="13">UAE</text>
+        <text x="455" y="392" font-size="14">오  만</text>
+        <text x="250" y="470" font-size="13">예멘</text>
+      </g>
+
+      <!-- ① 호르무즈 (봉쇄) -->
+      <g>
+        <circle cx="570" cy="266" r="23" fill="#E56458" opacity="0.15"/>
+        <circle cx="570" cy="266" r="12" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="563" y1="273" x2="577" y2="259" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g font-family="inherit">
+        <line x1="640" y1="196" x2="578" y2="250" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="612" y="148" width="252" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="738" y="168" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 호르무즈 해협</text>
+        <text x="738" y="186" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">2월 전쟁 이후 봉쇄 — 세계 원유 1/5의 길</text>
+      </g>
+
+      <!-- ② 바레인 (불참) -->
+      <g>
+        <circle cx="336" cy="176" r="23" fill="#D5803B" opacity="0.16"/>
+        <circle cx="336" cy="176" r="7" fill="#D5803B" stroke="#FFFFFF" stroke-width="2.5"/>
+      </g>
+      <g font-family="inherit">
+        <line x1="232" y1="132" x2="320" y2="166" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="28" y="84" width="204" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="130" y="104" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 바레인</text>
+        <text x="130" y="122" font-size="12.5" font-weight="700" fill="#D5803B" text-anchor="middle">이란 건너편 섬나라 · 회담 불참</text>
+      </g>
+
+      <!-- ③ 살랄라 (회담 예정지 → 연기) -->
+      <g>
+        <circle cx="508" cy="430" r="23" fill="#2783DE" opacity="0.15"/>
+        <circle cx="508" cy="430" r="7" fill="#2783DE" stroke="#FFFFFF" stroke-width="2.5"/>
+      </g>
+      <g font-family="inherit">
+        <line x1="378" y1="536" x2="494" y2="444" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="176" y="536" width="238" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="295" y="556" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">③ 살랄라 (오만 남부)</text>
+        <text x="295" y="574" font-size="12.5" font-weight="700" fill="#2783DE" text-anchor="middle">14일 회담 예정지 → 연기됨</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 봉쇄 지점</span>
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="#D5803B"/></svg> 회담 불참국</span>
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="#2783DE"/></svg> 회담 예정지</span>
+      <span class="item"><span class="dash-sample"></span> 주요 원유 항로</span>
+    </div>
+  </div>
+
+  <div class="section-title">판이 깨진 이유 — 자물쇠가 3개다</div>
+  <div class="lock">
+    <div class="lstep">
+      <div class="lnum">1</div>
+      <div class="ltxt"><b>바레인이 빠졌다 (12일)</b><span class="ldesc">이란과 만 하나 사이인 섬나라라 공격에 제일 먼저 노출돼. 2016년 단교 이후 외교관계도 끊긴 상태 — "관계 복원이 먼저"라며 불참을 선언했어.</span></div>
+    </div>
+    <div class="lstep">
+      <div class="lnum">2</div>
+      <div class="ltxt"><b>GCC는 만장일치로 움직인다</b><span class="ldesc">6개국이 한목소리를 내야 '걸프 전체의 결정'이 돼. 한 곳이 빠진 5개국 회담은 이란이 원한 '지역 안보 틀'의 명분을 못 채워 — 그래서 오만이 "합의를 위해" 연기했어.</span></div>
+    </div>
+    <div class="lstep hot">
+      <div class="lnum">3</div>
+      <div class="ltxt"><b>진짜 자물쇠는 미국이 쥐고 있다</b><span class="ldesc">이란 외교장관은 "미국이 이슬라마바드 MOU 약속을 지켜야 해협이 열린다", "오만과의 합의는 결코 재개방을 뜻하지 않는다"고 못 박았어.</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 그래서 연기가 아프다</b>바레인은 셋 중 제일 바깥 자물쇠였을 뿐인데 거기서 막혔어. 안쪽 두 개(GCC 합의·미국)는 아직 손도 못 댄 상태야.</div>
+  </div>
+
+  <div class="section-title">여기까지 온 길</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">6/17</div><div class="what">미국·이란 <b>이슬라마바드 MOU</b> 서명 — 14개항, 60일 무료 통항</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item dead"><div class="when">8월 중순</div><div class="what">MOU 만료·사실상 폐기, 교전 재개</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">8월 말</div><div class="what">이란·오만 임시 항로 잠정 합의</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item dead"><div class="when">9/12~13</div><div class="what">바레인 불참 → <b>회담 연기</b>(새 날짜 미정)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">9/15~16</div><div class="what"><b>미 연준 결정</b> — 유가·환율 다음 분기점</div></div>
+  </div>
+
+  <div class="section-title">나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">회담 연기<small>봉쇄 풀릴 기대가 사라짐</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">호르무즈 봉쇄 장기화</div>
+    <div class="arrow">→</div>
+    <div class="step s3">유가 상방 압력<small>브렌트 주간 +9%</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">물가·물류비 상승</div>
+    <div class="arrow">→</div>
+    <div class="step s5">금리 인상 압박<small>9/15~16 연준과 겹침</small></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(정확한 국경·축척 아님) · 2026.09.14 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
