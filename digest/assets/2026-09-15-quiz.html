@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.15</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.15 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'mokha_fact', variants:[
+    { q:'지난 10일 예멘 후티 반군에게 벌어진 일로 가장 정확한 것은?',
+      opts:['사우디군에 밀려 홍해 연안 근거지를 모두 상실했다',
+            '지상전 끝에 홍해 요충 항구 모카를 점령했다',
+            'GCC와 정전 협정에 서명했다',
+            '유엔 중재로 무장 해제에 합의했다'], answer:1,
+      explain:'후티 반군은 <b>지상전 끝에 모카항을 점령</b>했어. 다음 날엔 바브엘만데브 해협 코앞의 페림섬까지 진출했고, 사우디와의 교전도 이달 들어 부쩍 잦아졌어.' },
+    { q:'모카항이 함락된 다음 날 후티 반군이 추가로 진출한 곳은?',
+      opts:['호르무즈 해협 안쪽 게슘섬',
+            '수에즈 운하 인근',
+            '바브엘만데브 해협 한복판의 페림섬',
+            '사우디 수도 리야드 인근'], answer:2,
+      explain:'다음 날 후티는 <b>페림섬</b>(바브엘만데브 해협 한복판)까지 진출했어. 해협을 사실상 눈앞에서 감시할 수 있는 자리라 위협 수준이 한 단계 올라간 거야.' },
+  ]},
+  { id:'two_chokepoints', variants:[
+    { q:'모카항 함락이 "기름길 두 곳이 동시에 흔들린다"는 말이 나오게 된 이유로 가장 알맞은 것은?',
+      opts:['호르무즈 해협이 이번에 새로 뚫렸기 때문에',
+            '이미 전쟁으로 막힌 호르무즈에 이어, 세계 물동량 7%가 지나는 바브엘만데브까지 실제 군사 충돌 반경에 들어왔기 때문에',
+            '두 해협 모두 이번 주에 완전히 폐쇄가 선언됐기 때문에',
+            '모카항이 호르무즈 해협 바로 안쪽에 있기 때문에'], answer:1,
+      explain:'호르무즈는 <b>이미 전쟁으로 봉쇄</b>된 상태였고, 이번엔 별개의 통로인 <b>바브엘만데브</b>까지 실제 군사 충돌 반경에 들어왔어. 위협 수준의 해협이 하나 더 늘었다는 게 핵심이야.' },
+    { q:'바브엘만데브 해협이 막히면 아시아↔유럽 뱃길에 생기는 변화로 가장 정확한 것은?',
+      opts:['수에즈 운하를 그대로 통과할 수 있어 변화가 없다',
+            '아프리카 남단(희망봉)을 돌아가는 우회로를 써야 한다',
+            '호르무즈 해협으로 노선을 바꿔 타야 한다',
+            '전 세계 해상 물류가 전면 중단된다'], answer:1,
+      explain:'바브엘만데브가 막히면 배들이 수에즈 운하 대신 <b>아프리카 남단으로 멀리 돌아가야</b> 해. 거리·시간·연료비가 모두 늘어나는 우회로야.' },
+  ]},
+  { id:'yield_5pct', variants:[
+    { q:'14일 미국 10년물 국채금리가 장중 찍은 수치와 그 의미로 가장 정확한 것은?',
+      opts:['4.0%까지 올라 3년 만의 최고치를 기록했다',
+            '5.01%까지 올라 2023년 이후 처음 5%를 넘었다',
+            '3.5%로 내려가 올해 최저치를 기록했다',
+            '변동이 없어 4.5%대를 유지했다'], answer:1,
+      explain:'미 10년물 국채금리는 14일 장중 <b>5.01%</b>까지 올랐어. <b>2023년 이후 처음</b>으로 5%를 넘은 거고, 이후 4.97%대로 살짝 반락했어.' },
+    { q:'국채금리가 오르면 내 대출이자에도 영향이 가는 이유로 가장 알맞은 것은?',
+      opts:['국채금리와 대출금리는 서로 완전히 무관하기 때문',
+            '국채금리가 주택담보대출·회사채 금리가 따라가는 기준점 역할을 하기 때문',
+            '국채금리가 오르면 정부가 세금을 낮추기 때문',
+            '국채금리는 주식시장에서만 쓰이는 지표이기 때문'], answer:1,
+      explain:'국채금리는 <b>주택담보대출·회사채 금리가 따라가는 기준점</b>이야. 그래서 국채금리가 오르면 전 세계 대출 비용도 같이 올라가는 흐름이 생겨.' },
+  ]},
+  { id:'kospi_triple', variants:[
+    { q:'14일 코스피가 3거래일 연속 급락(-3.26%, 6,684.37)한 원인으로 지목된 세 가지가 아닌 것은?',
+      opts:['AI 속도조절론에 따른 반도체주 급락',
+            '미국 8월 근원물가가 예상보다 뜨거웠던 점',
+            '국제유가의 108달러 재돌파',
+            '국내 기준금리의 전격 인하 발표'], answer:3,
+      explain:'세 원인은 <b>AI 속도조절론(반도체 급락)·미 근원물가 예상치 상회·유가 108달러 재돌파</b>였어. 국내 기준금리 인하 발표는 없었어 — 오히려 미 연준 인상 압박이 커지는 쪽이었지.' },
+    { q:"'AI 속도조절론'이 뜻하는 바로 가장 정확한 것은?",
+      opts:['정부가 AI 기업의 성장 속도를 규제로 늦춘 것',
+            'AI 업계 스스로 첨단 모델 개발 속도를 늦추자고 나선 것',
+            'AI 반도체 생산량을 두 배로 늘리기로 한 것',
+            'AI 기업들이 파업에 들어간 것'], answer:1,
+      explain:"'AI 속도조절론'은 <b>AI 업계 리더들이 스스로 첨단 모델 개발 속도를 늦추자</b>고 나선 움직임이야. 이 여파로 반도체주가 흔들리며 코스피 하락에 힘을 보탰어." },
+  ]},
+  { id:'gcc_consensus_review', variants:[
+    { q:'(어제 복습) 살랄라 회담이 무산된 진짜 이유로 가장 알맞은 것은?',
+      opts:['이란이 회담 자체를 거부했기 때문',
+            'GCC는 만장일치로 움직이는 협의체라, 바레인 한 곳의 불참으로도 대표성이 깨졌기 때문',
+            '미국이 회담장 사용을 불허했기 때문',
+            '오만이 중재를 포기했기 때문'], answer:1,
+      explain:'GCC는 <b>만장일치(합의)로 움직이는 협의체</b>야. 바레인 한 곳이 빠지면서 "걸프 전체의 결정"이라는 명분이 사라져 회담이 무산됐어. 실제 봉쇄를 쥔 손은 GCC가 아니라 미국이었다는 것도 함께 짚었었지.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'예멘 후티 반군이 10일 점령한, 홍해 연안의 항구도시 이름은? (○○)',
+    accept:['모카','mokha'],
+    explain:'정답은 <b>모카</b>야. 바브엘만데브 해협에서 약 80km 거리에 있는 홍해 요충 항구도시야.' },
+  { q:'모카항 함락 다음 날 후티 반군이 추가로 진출한, 바브엘만데브 해협 한복판의 섬 이름은? (○○○)',
+    accept:['페림섬','페림','perim'],
+    explain:'정답은 <b>페림섬</b>이야. 해협 한복판에 있어 통항을 사실상 눈앞에서 감시할 수 있는 위치야.' },
+  { q:'예멘과 지부티 사이, 홍해와 아덴만을 잇는 해협의 이름은? (○○○○○○ 해협)',
+    accept:['바브엘만데브','bab-el-mandeb','바브 엘 만데브'],
+    explain:'정답은 <b>바브엘만데브 해협</b>이야. 전 세계 물동량의 약 7%가 지나는 길목이라, 여기가 흔들리면 물류비 전체가 영향을 받아.' },
+  { q:'14일 장중 미국 10년물 국채금리가 찍은 수치는? (숫자만, 예: 4.5)',
+    accept:['5.01','5','5%','5.01%'],
+    explain:'정답은 <b>5.01%</b>야. 2023년 이후 처음으로 5%를 넘었고, 이후 4.97%대로 반락했어.' },
+  { q:'국채금리 5% 돌파가 2023년 이후 몇 년 만에 처음 있는 일일까? (숫자만)',
+    accept:['3','3년'],
+    explain:'정답은 <b>3년</b>이야(2023년→2026년). 그만큼 이례적인 수준까지 금리가 뛴 거야.' },
+  { q:'14일 코스피가 몇 %(약) 급락했을까? (숫자만, 예: 2)',
+    accept:['3.26','3.3','3'],
+    explain:'정답은 <b>-3.26%</b>야. 6,684.37로 마감하며 3거래일 연속 하락했어.' },
+  { q:'14일 코스피 종가는 몇 포인트였을까? (숫자만, 반올림 가능)',
+    accept:['6684','6684.37','6,684','6684.4'],
+    explain:'정답은 <b>6,684.37</b>이야. 전 거래일(6,909.91) 대비 225.54포인트 내렸어.' },
+  { q:'국내 반도체주 급락을 부른, AI 업계가 스스로 개발 속도를 늦추자고 나선 흐름을 뭐라 부를까? (AI ○○○○론)',
+    accept:['속도조절론','속도조절'],
+    explain:'정답은 <b>AI 속도조절론</b>이야. AI 리더들이 첨단 모델 개발 속도를 늦추자고 나서면서 반도체주가 흔들렸어.' },
+  { q:'국채금리가 오를 때 함께 오르는, 집 살 때 받는 대출의 이름은? (○○○○대출)',
+    accept:['주택담보대출','주담대'],
+    explain:'정답은 <b>주택담보대출</b>이야. 국채금리는 주택담보대출·회사채 금리가 따라가는 기준점이라, 국채금리가 오르면 대출 비용도 같이 올라.' },
+  { q:'16일 미 연준 회의에서 금리 인상이 이뤄질 확률은 몇 %를 넘어섰을까? (숫자만)',
+    accept:['90','90%'],
+    explain:'정답은 <b>90%</b>야. 유가·물가·국채금리가 한꺼번에 오르는 방향으로 겹치면서 인상 확률이 크게 높아졌어.' },
+  { q:'회담 무산의 방아쇠가 됐던, GCC 6개국 중 불참을 선언한 나라는? (○○○, 어제 복습)',
+    accept:['바레인','bahrain'],
+    explain:'정답은 <b>바레인</b>이야. 2016년 이란과 단교한 뒤 관계가 끊긴 상태라 "관계 복원이 먼저"라며 불참했었어.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
