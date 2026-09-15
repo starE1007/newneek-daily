@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>왜 연준이 오늘 밤 금리를 올리려 하나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 기준금리 30초 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 쟁점 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--green-soft);color:#2F7A52}
+  .badge.wait{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .tax-op{align-self:center}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.16 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 왜 연준이 오늘 밤 금리를 올리려 하나</h1>
+  <div class="sub">우회로까지 끊긴 유가가 물가를, 물가가 연준의 결정을 밀어붙이는 경로 한 장으로</div>
+
+  <div class="section-title">기준금리 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>현재 기준금리</b><span>3.50~3.75% · 7월까지 3연속 동결</span></div>
+    <div class="tax-op">+</div>
+    <div class="tax-box"><b>오늘 밤 유력 시나리오</b><span>0.25%p 인상</span></div>
+    <div class="tax-op">=</div>
+    <div class="tax-box result"><b>인상 시</b><span>3.75~4.00%로 <b>석 달 만의 인상</b></span></div>
+  </div>
+  <div class="tax-note">두 달 전만 해도 시장은 동결에 무게를 뒀는데, 유가·물가 지표가 잇달아 뜨거워지며 인상 확률이 78~90%까지 뛰었어.</div>
+
+  <div class="section-title">인상 쪽으로 굳어진 경로</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>호르무즈 해협은 이미 전쟁으로 봉쇄</b><span class="mdesc">페르시아만 원유가 나가는 사실상 유일한 출구가 막혀 있는 상태</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>그 우회로였던 사우디 동서 송유관마저 가동 중단</b><span class="mdesc">이라크발 드론 공격으로 사우디가 자체 폐쇄 — 하루 최대 700만 배럴, 세계 공급의 최대 4%</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>대체 경로가 사라지며 브렌트유 107달러대</b><span class="mdesc">4개월래 최고 수준까지 급등</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>물가지표도 예상보다 뜨거움</b><span class="mdesc">생산자물가 +0.4%, 근원소비자물가 예상치 상회 — 반면 고용은 견조(8월 +16.2만 명·실업률 4.1%)해 "경기 나빠서 못 올린다"는 핑계도 없음</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>연준, 오늘 밤 인상 유력(78~90%)</b><span class="mdesc">동결할 명분이 사라진 상태로 결정일을 맞음</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 핵심</b>고용 걱정이 없는 상태에서 유가발 물가 압박만 남으니, 연준이 인상을 미룰 이유가 없어진 거야.</div>
+  </div>
+
+  <div class="section-title">그래도 갈리는 소수 의견</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">인상 쪽 (다수)</span>
+      <h3>로이터 이코노미스트 서베이 85%</h3>
+      <p>물가 지표·유가 흐름을 근거로 <b>이번 주 0.25%p 인상</b>을 예상하는 쪽이 다수야. 상당수는 연말까지 추가 인상도 가능하다고 봐.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">동결 쪽 (소수)</span>
+      <h3>골드만삭스 "9월 인상 매우 낮음"</h3>
+      <p>일부 기관은 <b>연내 동결 유지</b>를 예상해. 유가발 물가는 일시적 충격이라 성급한 인상이 되레 경기를 흔들 수 있다는 논리야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">이번 주 흐름</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">9/10~11</div><div class="what">생산자·소비자물가 예상치 상회 + 사우디 송유관 드론 공격</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/13~14</div><div class="what">송유관 가동 중단 공식화, 브렌트유 급등</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/15</div><div class="what">코스피 4거래일 연속 하락, 원/달러 1,359.4원</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">9/17 새벽 3시(KST)</div><div class="what"><b>FOMC 결정 발표</b> — 인상 여부로 이번 주 흐름의 방향이 갈림</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.16 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
