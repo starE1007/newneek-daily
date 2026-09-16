@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>왜 유가는 풀리는데 연준은 더 세졌을까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 금리 30초 */
+  .rate-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .rate-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .rate-box b{display:block;font-size:15px;margin-bottom:2px}
+  .rate-box span{font-size:13px;color:var(--text2)}
+  .rate-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .rate-box.result{background:var(--red-soft);border-color:#F6D4D0}
+  .rate-box.result b{color:#B23F34}
+  .rate-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mstep.cool .mnum{background:var(--green-soft);color:#2F7A52}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 쟁점 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--red-soft);color:#C6493E}
+  .badge.wait{background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 220px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .rate-op{align-self:center}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.17 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 유가는 풀리는데, 연준은 왜 더 세게 나왔을까</h1>
+  <div class="sub">송유관 위기는 풀리기 시작했는데 연준은 더 매파적으로 돌아선 이유를 한 장으로 보기</div>
+
+  <div class="section-title">기준금리 30초 정리</div>
+  <div class="rate-row">
+    <div class="rate-box"><b>3.50~4.00% 이전</b><span>7월까지 석 달 연속 동결</span></div>
+    <div class="rate-op">+0.25%p</div>
+    <div class="rate-box result"><b>3.75~4.00%</b><span>2023년 이후 <b>3년 만의 인상</b> · 18명 만장일치</span></div>
+  </div>
+  <div class="rate-note">점도표(위원들의 향후 금리 전망)까지 같이 나왔는데, <b>18명 중 16명이 연내 추가 인상</b>을 내다봤어 — 그중 4명은 두 번 더, 4명은 0.50%p어치까지 적절하다고 봤고, 추가 인상이 없다고 본 위원은 단 2명뿐이었어.</div>
+
+  <div class="section-title">"풀리는 유가 vs 더 세진 연준" 메커니즘</div>
+  <div class="mech">
+    <div class="mstep hot">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>지난주 — 사우디 동서 송유관, 드론 공격으로 가동 중단</b><span class="mdesc">호르무즈 우회로가 사라지며 유가·물가 압박 급등</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>어제 — 그 압박을 이유로 연준, 인상 쪽으로 급선회</b><span class="mdesc">시장 반영 인상 확률 78~90%까지 상승</span></div>
+    </div>
+    <div class="mstep cool">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>오늘 — 사우디 "며칠 안에 송유관 재가동"</b><span class="mdesc">브렌트 -2.7%(105.83달러) · WTI -3.2%(102.43달러)로 되돌림</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>그런데도 연준은 예정대로 0.25%p 인상 + 매파적 점도표</b><span class="mdesc">워시 의장 "이번 여름 물가 지표, 근원 흐름 개선 신호 아니다"</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>미국 증시, 초반 랠리 후 급반전 마감</b><span class="mdesc">다우 -631.21(-1.21%) · S&P500 -0.45% · 나스닥 -0.01%</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 유가발 명분은 풀리는데 왜 더 세게 나왔나</b>연준은 "유가라는 일시적 충격"이 아니라 "물가의 밑바닥 흐름 자체가 아직 안 식었다"고 본 거야 — 그래서 송유관이 고쳐져도 인상·매파 신호는 그대로 갔어.</div>
+  </div>
+
+  <div class="section-title">점도표, 매파 쪽이 압도적</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">16명 · 추가 인상</span>
+      <h3>"올해 안에 최소 한 번 더"</h3>
+      <p>18명 중 <b>16명</b>이 연내 추가 인상을 전망. 이 중 <b>4명은 두 번 더</b>, <b>4명은 0.50%p어치</b>까지 적절하다고 봤어.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">2명 · 동결 유지</span>
+      <h3>"이 정도면 충분하다"</h3>
+      <p>추가 인상이 필요 없다고 본 위원은 <b>단 2명</b>뿐 — 위원회 내 매파 우위가 뚜렷하게 갈렸어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">9/16(현지)</div><div class="what">FOMC 0.25%p 인상 확정 · 만장일치</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/17~18</div><div class="what">일본은행(BOJ) 회의 — 1.25% 인상 유력 전망</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">오늘 9시</div><div class="what"><b>코스피·원달러 오늘 개장</b> — 매파 신호를 어떻게 받아 안을지 첫 반응</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.17 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.17</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.17 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'fed_hike_confirmed', variants:[
+    { q:'16일(현지시간) 미국 연준의 FOMC 결정으로 가장 정확한 것은?',
+      opts:['기준금리를 3.75~4.00%로 0.25%p 인상, 18명 만장일치',
+            '기준금리를 동결하되 인상 가능성만 시사했다',
+            '기준금리를 0.50%p 인하했다',
+            '결정을 다음 회의로 연기했다'], answer:0,
+      explain:'연준은 기준금리를 <b>3.50~3.75%에서 3.75~4.00%로 0.25%p 인상</b>했어. <b>2023년 이후 3년 만의 인상</b>이고, 18명 위원 전원이 찬성한 만장일치 결정이었어.' },
+    { q:'이번 인상이 "3년 만"이라는 표현이 가리키는 의미로 가장 정확한 것은?',
+      opts:['연준이 생긴 지 3년밖에 안 됐다는 뜻',
+            '2023년 이후 처음으로 실제 인상이 단행됐다는 뜻',
+            '3년 동안 매번 금리를 올렸다는 뜻',
+            '3년 뒤에나 다음 인상이 있을 거라는 뜻'], answer:1,
+      explain:'연준은 그동안 동결을 이어오다, <b>2023년 이후 처음으로</b> 이번에 실제 인상을 단행했어. 그래서 "3년 만의 인상"이라는 표현이 붙었어.' },
+  ]},
+  { id:'dot_plot', variants:[
+    { q:'이번 FOMC와 함께 나온 점도표(위원들의 향후 금리 전망)의 내용으로 가장 정확한 것은?',
+      opts:['18명 중 16명이 연내 추가 인상을 전망했다',
+            '18명 전원이 올해는 더 이상 인상이 없다고 봤다',
+            '점도표 자체가 이번엔 발표되지 않았다',
+            '전원이 오히려 인하가 필요하다고 봤다'], answer:0,
+      explain:'점도표에서 <b>18명 중 16명이 연내 추가 인상</b>을 내다봤어. 그중 4명은 두 번 더, 4명은 0.50%p어치까지 적절하다고 봤고, 추가 인상이 없다고 본 위원은 단 2명뿐이었어.' },
+    { q:'점도표에서 "추가 인상이 필요 없다"고 본 위원 수로 가장 정확한 것은?',
+      opts:['0명', '2명', '9명', '18명 전원'], answer:1,
+      explain:'추가 인상이 필요 없다고 본 위원은 <b>단 2명</b>뿐이었어. 나머지 16명은 정도 차이는 있어도 연내 추가 인상 쪽에 무게를 뒀어 — 매파 우위가 뚜렷했다는 뜻이야.' },
+  ]},
+  { id:'warsh_hawkish', variants:[
+    { q:'케빈 워시 연준 의장의 기자회견 발언이 시장에 준 신호로 가장 정확한 것은?',
+      opts:['물가가 이미 목표치에 도달했다고 안심시켰다',
+            '이번 여름 물가 지표가 근원 흐름 개선을 보여주지 않는다며 매파적 태도를 유지했다',
+            '앞으로는 금리를 올리지 않겠다고 못박았다',
+            '트럼프 대통령과의 통화 내용을 상세히 공개했다'], answer:1,
+      explain:'워시 의장은 "이번 여름 물가 지표가 근원 흐름이 의미 있게 개선됐다고 말해주진 않는다"고 했어. <b>매파적(금리를 더 올리자는 쪽)</b> 태도를 분명히 한 거야. 트럼프와의 통화에 대해선 언급을 피했어.' },
+    { q:'발표 당일 미국 3대 지수의 움직임 흐름으로 가장 정확한 것은?',
+      opts:['하루 종일 하락만 이어갔다',
+            '결정 발표 전까지는 3대 지수 모두 상승했다가, 이후 급락 반전했다',
+            '하루 종일 상승만 이어갔다',
+            '아예 변동이 없었다'], answer:1,
+      explain:'인상 발표 전까지는 <b>3대 지수 모두 상승</b>했었어. 그런데 결정과 워시 의장의 매파적 기자회견 이후 분위기가 뒤집혀 급락 반전했어.' },
+  ]},
+  { id:'market_reversal', variants:[
+    { q:'16일 미국 증시 마감 결과로 가장 정확한 것은?',
+      opts:['다우 -631.21(-1.21%), S&P500 -0.45%, 나스닥 -0.01%',
+            '3대 지수 모두 2% 이상 상승 마감했다',
+            '다우만 하락하고 S&P·나스닥은 큰 폭 상승했다',
+            '거래가 중단돼 마감가가 없다'], answer:0,
+      explain:'다우존스는 <b>631.21포인트(-1.21%)</b> 내린 51,461.90에 마감했고, S&P500 -0.45%, 나스닥은 -0.01%로 소폭 하락했어. 발표 전 상승분을 대부분 반납한 거야.' },
+    { q:'초반 랠리에도 결국 3대 지수가 하락 반전한 이유로 가장 알맞은 것은?',
+      opts:['인상 자체는 예상됐지만, 워시 의장의 매파적 발언과 점도표가 예상보다 강했기 때문에',
+            '인상이 전혀 예상 밖의 일이었기 때문에',
+            '거래량이 부족해 가격이 왜곡됐기 때문에',
+            '다른 나라 증시 휴장의 여파 때문에'], answer:0,
+      explain:'인상 자체는 시장이 대체로 예상하고 있었어. 반전의 진짜 계기는 <b>워시 의장의 매파적 발언과, 예상보다 매파적으로 나온 점도표</b>였어.' },
+  ]},
+  { id:'pipeline_restart', variants:[
+    { q:'오늘 다룬 사우디 송유관 관련 새 소식으로 가장 정확한 것은?',
+      opts:['영구 폐쇄가 결정됐다',
+            '며칠 안에 재가동하겠다고 밝히며 유가가 되돌림세를 보였다',
+            '새로운 우회로가 추가로 뚫렸다',
+            '완전히 파괴돼 복구가 불가능해졌다'], answer:1,
+      explain:'사우디 정부는 <b>손상된 동서 송유관을 며칠 안에 재가동</b>하겠다고 밝혔어. 이 소식에 브렌트유·WTI 모두 하락 반전했어.' },
+    { q:'이 소식 이후 16일 국제유가 움직임으로 가장 정확한 것은?',
+      opts:['브렌트유 -2.7%(105.83달러), WTI -3.2%(102.43달러)로 되돌림',
+            '두 유종 모두 사상 최고치를 경신했다',
+            '브렌트유만 오르고 WTI는 그대로였다',
+            '유가 데이터가 발표되지 않았다'], answer:0,
+      explain:'재가동 소식에 <b>브렌트유는 2.7% 내린 105.83달러</b>, <b>WTI는 3.2% 내린 102.43달러</b>로 되돌림세를 보였어. 급한 불이 꺼지는 신호였던 거야.' },
+  ]},
+  { id:'oil_vs_fed_paradox', variants:[
+    { q:'"유가 압박은 줄어드는데 연준은 왜 더 매파적으로 나왔을까"에 대한 설명으로 가장 알맞은 것은?',
+      opts:['연준이 유가 소식을 아직 못 봐서 실수로 그런 것',
+            '연준이 유가발 충격을 일시적 문제가 아니라 물가의 근원 흐름 문제로 봤기 때문',
+            '연준은 애초에 유가와 무관하게 결정을 내려서',
+            '연준이 오히려 유가 하락을 이유로 인상을 결정했기 때문'], answer:1,
+      explain:'연준은 유가 급등을 "일시적 충격"이 아니라 <b>물가의 밑바닥 흐름(근원 인플레) 자체가 아직 식지 않은 신호</b>로 봤어. 그래서 송유관이 고쳐지는 것과 별개로 인상·매파 신호를 그대로 유지한 거야.' },
+    { q:'점도표와 유가 상황을 종합했을 때, 앞으로의 원/달러·대출금리에 대한 합리적 예상으로 가장 알맞은 것은?',
+      opts:['유가가 안정되니 원화 약세·금리 부담도 곧바로 사라질 것이다',
+            '유가는 진정돼도 매파적 금리 경로 때문에 원화 약세·대출 부담이 쉽게 안 풀릴 수 있다',
+            '이번 결정과 원/달러·대출금리는 전혀 무관하다',
+            '금리 경로와 상관없이 원화는 무조건 강세로 돌아선다'], answer:1,
+      explain:'유가라는 급한 불은 꺼지고 있지만, <b>점도표상 매파적 금리 경로가 유지</b>되고 있어서 원/달러 약세·대출금리 부담이 바로 풀리긴 어렵다는 게 합리적인 해석이야.' },
+  ]},
+  { id:'bus_strike_averted', variants:[
+    { q:'어제(16일) 예고됐던 서울 시내버스 파업의 실제 결말로 가장 정확한 것은?',
+      opts:['예고대로 새벽 4시부터 전면 파업에 들어갔다',
+            '예고된 파업 시각 이전(새벽 1시 50분)에 노사가 타결해 파업 없이 정상 운행했다',
+            '파업이 일주일 넘게 이어졌다',
+            '노사협상 자체가 무기한 중단됐다'], answer:1,
+      explain:'노사는 예고된 파업 시각보다 앞선 <b>새벽 1시 50분에 극적으로 타결</b>했어. 그 결과 실제 파업 없이 첫차부터 정상 운행이 이어졌어.' },
+    { q:'이번 서울 시내버스 노사 합의 내용과 남은 쟁점으로 가장 정확한 것은?',
+      opts:['시급 3.2% 인상엔 합의했지만, 통상임금 산정 기준시간은 연말로 논의를 미뤘다',
+            '통상임금 문제까지 모두 이번에 합의로 해결됐다',
+            '임금 인상은 없이 기준시간만 정했다',
+            '노사가 아무 합의도 이루지 못했다'], answer:0,
+      explain:'노사는 <b>호봉별 시급 3.2% 인상</b>에는 합의했지만, 가장 큰 이견이었던 <b>통상임금 산정 기준시간</b>은 연말 법원 판결 이후로 논의를 미뤘어 — 갈등의 불씨는 남은 셈이야.' },
+  ]},
+  { id:'pipeline_review', variants:[
+    { q:'(어제 복습) 호르무즈 우회로였던 사우디 송유관의 이름과, 완전 봉쇄 시 사라질 수 있는 세계 공급 비중으로 가장 정확한 것은?',
+      opts:['동서 송유관 · 최대 4%',
+            '남북 송유관 · 최대 40%',
+            '수에즈 송유관 · 최대 1%',
+            '페르시아 송유관 · 최대 20%'], answer:0,
+      explain:'정답은 <b>동서 송유관(East-West Pipeline)</b>, 완전 봉쇄 시 세계 공급의 <b>최대 4%(하루 최대 700만 배럴)</b>가 사라질 수 있어. 오늘 다룬 것처럼 이 송유관은 며칠 안에 재가동될 예정이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'16일 FOMC에서 인상돼 확정된 미국 기준금리 상단은 몇 %일까? (숫자만, 예: 4.00)',
+    accept:['4.00','4','4%'],
+    explain:'정답은 <b>4.00%</b>야. 3.50~3.75%에서 3.75~4.00%로 올랐어.' },
+  { q:'점도표에서 18명 중 몇 명이 연내 추가 인상을 전망했을까? (숫자만)',
+    accept:['16'],
+    explain:'정답은 <b>16명</b>이야. 그중 4명은 두 번 더, 4명은 0.50%p어치까지 적절하다고 봤어.' },
+  { q:'추가 인상이 필요 없다고 본 위원은 18명 중 몇 명뿐이었을까? (숫자만)',
+    accept:['2'],
+    explain:'정답은 <b>2명</b>이야. 나머지 16명은 정도 차이는 있어도 추가 인상 쪽에 무게를 실었어.' },
+  { q:'16일 발표 후 급반전한 다우존스의 하락률은 몇 %였을까? (숫자만, 예: 1.5)',
+    accept:['1.21','1.2'],
+    explain:'정답은 <b>-1.21%</b>(631.21포인트)야. 발표 전까지는 상승세였다가 워시 의장 발언 이후 급락 반전했어.' },
+  { q:'며칠 안에 재가동하겠다고 사우디가 밝힌, 호르무즈 우회로 역할을 하던 송유관의 이름은? (○○ 송유관)',
+    accept:['동서','east-west','동서송유관'],
+    explain:'정답은 <b>동서 송유관(East-West Pipeline)</b>이야. 재가동 소식에 유가가 되돌림세를 보였어.' },
+  { q:'재가동 소식 이후 16일 브렌트유는 몇 % 내렸을까? (숫자만, 예: 3.0)',
+    accept:['2.7'],
+    explain:'정답은 <b>-2.7%</b>(105.83달러)야. WTI는 -3.2%(102.43달러)로 더 크게 내렸어.' },
+  { q:'케빈 워시 연준 의장의 기자회견 발언은 어떤 태도(매파/비둘기파)로 평가됐을까? (한 단어)',
+    accept:['매파','매파적','hawkish'],
+    explain:'정답은 <b>매파(금리를 더 올리자는 쪽)</b>야. "물가 근원 흐름이 개선됐다는 신호는 아니다"라는 발언이 대표적이야.' },
+  { q:'서울 시내버스 노사가 실제로 타결한 시각은 파업 예고 시각보다 몇 시간 앞선 새벽 몇 시였을까? (숫자만, 예: 3)',
+    accept:['1시50분','1:50','1.5','01:50','1시 50분'],
+    explain:'정답은 <b>새벽 1시 50분</b>이야. 예고된 파업 시각(새벽 4시)보다 두 시간여 앞서 타결하면서 파업 자체가 없던 일이 됐어.' },
+  { q:'이번 서울 시내버스 합의에서 결정된 호봉별 시급 인상률은 몇 %일까? (숫자만)',
+    accept:['3.2','3.2%'],
+    explain:'정답은 <b>3.2%</b>야. 다만 가장 큰 쟁점이던 통상임금 산정 기준시간은 연말로 논의를 미뤘어.' },
+  { q:'일본은행(BOJ)이 9/17~18 회의에서 인상할 경우 유력한 기준금리 수준은 몇 %일까? (숫자만)',
+    accept:['1.25','1.25%'],
+    explain:'정답은 <b>1.25%</b>야. 시장은 이번 회의의 인상 확률을 90%대로 높게 보고 있어.' },
+  { q:'(어제 복습) 사우디 동서 송유관이 완전히 막히면 사라질 수 있는 세계 원유 공급 비중은 최대 몇 %일까? (숫자만)',
+    accept:['4','4%'],
+    explain:'정답은 <b>최대 4%</b>(하루 최대 700만 배럴)야. 어제는 이 리스크 때문에 연준이 인상 쪽으로 기울었다고 했었지.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
