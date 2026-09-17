@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>조지아 이민단속, 1년의 타임라인</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item .what b{color:var(--text)}
+  .t-item.hot{background:var(--red-soft);border-color:#F3D3CF}
+  .t-item.hot .when{color:#C6493E}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 관계 카드 */
+  .rel-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .rel{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .rel .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.claim{background:var(--red-soft);color:#C6493E}
+  .badge.stand{background:var(--orange-soft);color:#B06426}
+  .rel h3{font-size:15.5px;margin-bottom:6px}
+  .rel p{font-size:13.5px;color:var(--text2)}
+  .rel p b{color:var(--text)}
+  .rel p + p{margin-top:8px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .rel-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.18 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 이민단속 1년, 여기까지 왔다</h1>
+  <div class="sub">조지아 배터리공장 단속부터 손해배상 행정청구까지 — 1년의 흐름을 한눈에</div>
+
+  <div class="section-title">타임라인</div>
+  <div class="timeline">
+    <div class="t-item hot">
+      <div class="when">2025.9.4</div>
+      <div class="what"><b>ICE, 조지아 엘라벨 배터리공장 급습</b><br>현대차·LG에너지솔루션 합작 공장 건설현장</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot">
+      <div class="when">단속 당일</div>
+      <div class="what"><b>475명 억류, 300명 이상이 한국인</b><br>수갑·족쇄, 통역 미제공 주장</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item">
+      <div class="when">2025~2026</div>
+      <div class="what"><b>구금·강제 귀국</b><br>1년 가까이 법적 대응 준비</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next">
+      <div class="when">2026.9(현재)</div>
+      <div class="what"><b>9개 연방기관에 행정청구 시작</b><br>FTCA상 소송 전 필수 절차</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item">
+      <div class="when">연내~향후</div>
+      <div class="what"><b>기관 응답 후 연방소송 가능</b><br>배상 규모는 아직 미공개</div>
+    </div>
+  </div>
+
+  <div class="section-title">누가 무슨 입장이야?</div>
+  <div class="rel-grid">
+    <div class="rel">
+      <span class="badge claim">청구인</span>
+      <h3>한국인 노동자 300여 명</h3>
+      <p>정당한 서류 없이 <b>수갑·족쇄</b>를 채우고, <b>통역 지원 없이</b> 서류에 서명하도록 압박받았다고 주장. DHS·ICE·CBP·FBI·법무부 등 <b>9개 연방기관</b>을 상대로 청구.</p>
+    </div>
+    <div class="rel">
+      <span class="badge stand">거리 두는 중</span>
+      <h3>현대차그룹 · LG에너지솔루션</h3>
+      <p>"근로자 <b>개인의 결정</b>이라 회사는 관여하지 않는다"는 입장. LG에너지솔루션 측은 <b>보도 전까지 인지하지 못했다</b>고 밝혀 — 파견 인력이 리스크를 홀로 떠안는 구도.</p>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.18 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>

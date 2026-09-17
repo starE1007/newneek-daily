@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.18</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.18 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'raid_basic', variants:[
+    { q:'2025년 9월 4일 조지아 엘라벨에서 벌어진 일로 가장 정확한 것은?',
+      opts:['ICE가 현대차·LG에너지솔루션 합작 배터리공장 건설현장을 급습해 475명을 억류했다',
+            '노조가 자발적으로 파업을 벌여 공장이 멈췄다',
+            '공장 화재로 근로자 475명이 대피했다',
+            '한국 정부가 먼저 근로자 철수를 지시했다'], answer:0,
+      explain:'미국 이민단속국(ICE)이 조지아주 엘라벨의 <b>현대차그룹·LG에너지솔루션 합작 배터리공장</b> 건설현장을 급습해 <b>475명</b>을 억류했어.' },
+    { q:'이 배터리공장이 미국에 지어진 배경으로 가장 알맞은 것은?',
+      opts:['미국 인플레이션감축법(IRA)의 전기차·배터리 보조금에 올라탄 대규모 투자였기 때문',
+            '한국 내 공장 부지가 전부 소진돼서',
+            '순전히 인건비가 더 싸서',
+            '미국 정부가 무상으로 부지를 준다고 해서'], answer:0,
+      explain:'이 공장은 <b>IRA(인플레이션감축법)의 전기차·배터리 보조금</b>을 노린 한국 기업들의 대표적 대미 투자 현장이었어.' },
+  ]},
+  { id:'detained_composition', variants:[
+    { q:'억류된 475명 중 한국인 비중으로 가장 정확한 것은?',
+      opts:['300명 이상이 한국인이었다', '전원이 한국인이었다', '한국인은 10명 미만이었다', '한국인은 아예 없었다'], answer:0,
+      explain:'억류된 <b>475명 중 300명 이상</b>이 한국 국적자였어.' },
+  ]},
+  { id:'ftca_process', variants:[
+    { q:'노동자들이 곧바로 연방정부를 상대로 소송을 내지 않고 "행정청구"부터 하는 이유로 가장 정확한 것은?',
+      opts:['연방불법행위청구법(FTCA)에 따라 소송 전에 반드시 해당 기관에 먼저 행정청구를 해야 하기 때문',
+            '행정청구가 소송보다 배상금이 더 크기 때문',
+            '한국 정부가 소송 대신 행정청구만 허용했기 때문',
+            '행정청구는 아무 법적 의미가 없는 요식행위이기 때문'], answer:0,
+      explain:'미국 <b>연방정부</b>를 상대로 배상받으려면 <b>FTCA(연방불법행위청구법)</b>에 따라 소송 전에 먼저 관련 기관에 <b>행정청구</b>를 접수하는 게 필수 선행 절차야.' },
+    { q:'이번 행정청구의 대상 기관 수로 가장 정확한 것은?',
+      opts:['9개 연방기관(DHS·ICE·CBP·FBI·법무부 등)', '1개 기관(ICE만)', '50개 주 정부', '유엔 산하 기구'], answer:0,
+      explain:'국토안보부(DHS)·이민세관단속국(ICE)·세관국경보호청(CBP)·FBI·법무부 등 <b>9개 연방기관</b>을 상대로 청구했어.' },
+  ]},
+  { id:'allegations', variants:[
+    { q:'노동자들이 주장하는 단속 당시 처우로 가장 정확한 것은?',
+      opts:['정당한 서류 없이 수갑·족쇄를 채우고 통역 지원 없이 서류에 서명하도록 압박받았다',
+            '즉시 변호인이 배정돼 충분히 소명할 수 있었다',
+            '전원이 현장에서 바로 석방됐다',
+            '한국어 통역이 상시 제공됐다'], answer:0,
+      explain:'노동자들은 <b>정당한 서류 없이 수갑·족쇄</b>를 채우고, <b>통역 지원 없이</b> 이해 못 하는 서류에 서명하도록 압박받았다고 주장해.' },
+  ]},
+  { id:'company_stance', variants:[
+    { q:'현대차그룹·LG에너지솔루션의 이번 소송에 대한 입장으로 가장 정확한 것은?',
+      opts:['근로자 개인의 결정이라 회사는 관여하지 않는다는 입장이다',
+            '회사가 소송비 전액을 지원하겠다고 나섰다',
+            '회사가 소송을 주도적으로 기획했다',
+            '회사는 미국 정부와 함께 맞소송을 준비 중이다'], answer:0,
+      explain:'두 회사 모두 "<b>근로자 개인의 결정</b>"이라며 관여하지 않겠다는 입장이고, LG에너지솔루션 측은 <b>보도 전까지 인지하지 못했다</b>고 밝혔어.' },
+  ]},
+  { id:'liaison_office_ruling', variants:[
+    { q:'16일 서울중앙지법 판결 내용으로 가장 정확한 것은?',
+      opts:['2020년 개성 남북공동연락사무소 폭파에 대해 북한이 우리 정부에 약 446억 원을 배상하라고 판결했다',
+            '북한이 이미 배상금을 완납했다고 확인했다',
+            '연락사무소 폭파 책임이 한국 정부에 있다고 판결했다',
+            '소송 자체가 기각됐다'], answer:0,
+      explain:'서울중앙지법은 2020년 <b>개성 남북공동연락사무소 폭파</b>에 대해 북한이 우리 정부에 <b>약 446억 원</b>을 배상해야 한다고 판결했어.' },
+    { q:'이 판결이 갖는 의미로 가장 알맞은 것은?',
+      opts:['한국 정부가 북한을 상대로 낸 손해배상 소송의 첫 승소 사례라는 점',
+            '북한과 이미 배상 협상이 완료됐다는 점',
+            '국제사법재판소의 최종 판결이라는 점',
+            '한국이 북한에 배상금을 지급하게 됐다는 점'], answer:0,
+      explain:'북한이 실제로 낼 가능성은 낮지만, <b>한국 정부가 북한 상대로 낸 손배소의 첫 승소 사례</b>라는 점에서 향후 청구권 논의의 법적 근거가 될 수 있어.' },
+  ]},
+  { id:'mifegymiso', variants:[
+    { q:'미프진(임신중지 약물) 국내 도입 발표의 배경으로 가장 정확한 것은?',
+      opts:['2019년 헌법재판소 헌법불합치 결정 이후 7년 만에 정부가 공식 도입 방안을 발표했다',
+            '올해 처음으로 낙태죄 위헌 논의가 시작됐다',
+            '이미 10년 전부터 자유롭게 유통되고 있었다',
+            '국회가 관련 법을 이미 통과시켰다'], answer:0,
+      explain:'2019년 헌재의 <b>헌법불합치</b> 결정 후 <b>7년</b>간의 입법 공백을 거쳐, 16일 정부(성평등가족부·복지부·식약처)가 공식 도입 방안을 발표했어.' },
+  ]},
+  { id:'fomc_review', variants:[
+    { q:'(어제 복습) 16일 미 연준이 확정한 기준금리와 점도표 내용으로 가장 정확한 것은?',
+      opts:['3.75~4.00%로 인상, 18명 중 16명이 연내 추가 인상 전망',
+            '동결하고 점도표 발표는 없었다',
+            '3.75~4.00%로 인하, 전원 추가 인하 전망',
+            '5.00%로 인상, 추가 인상 계획 없음'], answer:0,
+      explain:'연준은 기준금리를 <b>3.75~4.00%로 0.25%p 인상</b>했고, 점도표에서 <b>18명 중 16명이 연내 추가 인상</b>을 전망했어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'조지아 배터리공장 단속으로 억류된 총 인원은 몇 명일까? (숫자만)',
+    accept:['475'],
+    explain:'정답은 <b>475명</b>이야. 이 중 300명 이상이 한국인이었어.' },
+  { q:'억류된 475명 중 한국인은 몇 명 이상이었을까? (숫자만)',
+    accept:['300'],
+    explain:'정답은 <b>300명 이상</b>이야. 1년 만에 이들이 미국 정부를 상대로 행정청구에 들어갔어.' },
+  { q:'이번 행정청구의 대상이 된 연방기관은 총 몇 개일까? (숫자만)',
+    accept:['9'],
+    explain:'정답은 <b>9개</b>야. DHS·ICE·CBP·FBI·법무부 등이 포함돼.' },
+  { q:'미국 연방정부를 상대로 소송을 내기 전에 반드시 거쳐야 하는 절차를 규정한 법의 약칭은? (알파벳 4글자)',
+    accept:['ftca','FTCA'],
+    explain:'정답은 <b>FTCA(연방불법행위청구법)</b>야. 이 법에 따라 소송 전에 먼저 행정청구를 접수해야 해.' },
+  { q:'남북공동연락사무소는 몇 년에 폭파됐을까? (숫자만, 서기 4자리)',
+    accept:['2020'],
+    explain:'정답은 <b>2020년</b>이야. 개성에 있던 남북공동연락사무소가 북한에 의해 폭파됐어.' },
+  { q:'16일 판결에서 북한이 배상하라고 나온 금액은 약 얼마일까? (숫자만, 단위: 억 원)',
+    accept:['446'],
+    explain:'정답은 <b>약 446억 원</b>이야. 한국 정부가 북한 상대로 낸 손배소의 첫 승소 사례야.' },
+  { q:'헌법재판소가 낙태죄에 헌법불합치 결정을 내린 해는? (숫자만, 서기 4자리)',
+    accept:['2019'],
+    explain:'정답은 <b>2019년</b>이야. 그로부터 7년 만인 올해 미프진 도입 방안이 공식 발표됐어.' },
+  { q:'헌재 결정 이후 미프진 도입까지 걸린 시간은 몇 년일까? (숫자만)',
+    accept:['7'],
+    explain:'정답은 <b>7년</b>이야. 그동안 입법 공백 상태로 남아 있었어.' },
+  { q:'(어제 복습) 16일 FOMC에서 인상된 미국 기준금리 상단은 몇 %일까? (숫자만, 예: 4.00)',
+    accept:['4.00','4','4%'],
+    explain:'정답은 <b>4.00%</b>야. 3.75~4.00%로 0.25%p 올랐어.' },
+  { q:'(어제 복습) 점도표에서 18명 중 몇 명이 연내 추가 인상을 전망했을까? (숫자만)',
+    accept:['16'],
+    explain:'정답은 <b>16명</b>이야. 매파 우위가 뚜렷했던 결정이었어.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
