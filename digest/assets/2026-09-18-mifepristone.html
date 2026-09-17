@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>낙태죄가 사라진 7년, 약은 왜 이제야 들어올까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 타임라인 */
+  .tl{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .tstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .tstep:last-of-type{padding-bottom:0}
+  .tstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .tstep:last-of-type::before{display:none}
+  .tdot{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .tstep.gap .tdot{background:var(--surface2);color:var(--text2)}
+  .tstep.hot .tdot{background:var(--red-soft);color:#C6493E}
+  .tstep.now .tdot{background:var(--green-soft);color:#2F7A52}
+  .ttxt{padding-top:3px;font-size:14.5px}
+  .ttxt .when{display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:1px}
+  .tstep.gap .ttxt .when{color:var(--text2)}
+  .tstep.hot .ttxt .when{color:#C6493E}
+  .tstep.now .ttxt .when{color:#2F7A52}
+  .ttxt b{font-size:15px}
+  .ttxt .tdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  /* 사라진 것 / 안 생긴 것 */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .sbox{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .sbox .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.gone{background:var(--green-soft);color:#2F7A52}
+  .badge.missing{background:var(--red-soft);color:#C6493E}
+  .sbox h3{font-size:15.5px;margin-bottom:6px}
+  .sbox p{font-size:13.5px;color:var(--text2)}
+  .sbox p b{color:var(--text)}
+  .gapnote{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .gapnote b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 세 주체 */
+  .who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .who{border:1px solid var(--border);border-radius:12px;padding:15px 16px;background:var(--soft)}
+  .who .mark{font-size:22px;font-weight:700;line-height:1;margin-bottom:8px}
+  .who.ok .mark{color:var(--green)}
+  .who.no .mark{color:var(--red)}
+  .who h4{font-size:14.5px;margin-bottom:4px}
+  .who p{font-size:13px;color:var(--text2)}
+  .who.no{background:var(--red-soft);border-color:#F3CFCA}
+  .detour{margin-top:14px;display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2{background:var(--orange-soft);color:#9A5620}
+  .step.s3{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 남은 과제 */
+  .todo{display:flex;gap:10px;flex-wrap:wrap}
+  .t-item{flex:1 1 220px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .tag{font-size:12.5px;font-weight:700;color:var(--orange);margin-bottom:2px}
+  .t-item .what{font-size:13.5px;color:var(--text2)}
+  .t-item .what b{color:var(--text)}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .split{grid-template-columns:1fr}
+    .who-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.18 데일리 뉴스 · 시각자료</div>
+  <h1>💊 낙태죄가 사라진 지 7년, 약은 왜 이제야 들어올까</h1>
+  <div class="sub">처벌법은 없어졌는데 절차법은 안 생긴 7년 — 그 공백이 '약국 판매 금지'라는 이상한 결론으로 이어진 과정</div>
+
+  <div class="section-title">① 7년이 흐른 과정</div>
+  <div class="tl">
+    <div class="tstep">
+      <div class="tdot">19</div>
+      <div class="ttxt"><span class="when">2019. 4. 11.</span><b>헌법재판소, 낙태죄 헌법불합치</b><span class="tdesc">"위헌이지만 당장 없애면 혼란하니 국회가 고쳐라" — 시한을 주는 결정이야</span></div>
+    </div>
+    <div class="tstep hot">
+      <div class="tdot">⏰</div>
+      <div class="ttxt"><span class="when">2020. 12. 31.</span><b>국회가 법을 고쳐야 할 시한 — 그냥 넘김</b><span class="tdesc">정부안(14주 이내 허용)은 나왔지만 국회에서 합의 실패</span></div>
+    </div>
+    <div class="tstep">
+      <div class="tdot">21</div>
+      <div class="ttxt"><span class="when">2021. 1. 1.</span><b>낙태죄 조항, 효력 상실</b><span class="tdesc">처벌 근거가 저절로 사라짐 — 대체 입법 없이</span></div>
+    </div>
+    <div class="tstep gap">
+      <div class="tdot">···</div>
+      <div class="ttxt"><span class="when">2021 ~ 2026</span><b>입법 공백 7년</b><span class="tdesc">합법 절차를 정한 법이 없어 약을 정식 수입할 근거도 없음 → 해외 직구·음성 유통만 남음</span></div>
+    </div>
+    <div class="tstep now">
+      <div class="tdot">📋</div>
+      <div class="ttxt"><span class="when">2026. 9. 16.</span><b>정부, 미프진 도입 방안 발표</b><span class="tdesc">성평등가족부·보건복지부·식약처 합동 — 국회 입법이 아니라 행정으로 먼저 움직인 것</span></div>
+    </div>
+    <div class="tstep now">
+      <div class="tdot">🎯</div>
+      <div class="ttxt"><span class="when">2027년 1분기 (목표)</span><b>품목허가 → 임신 63일(9주) 이내 처방</b><span class="tdesc">초기 2년은 병원 안에서만 조제(원내조제)</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">② 뭐가 사라졌고, 뭐가 안 생겼나</div>
+  <div class="split">
+    <div class="sbox">
+      <span class="badge gone">사라진 것</span>
+      <h3>처벌하는 법</h3>
+      <p>낙태죄 조항이 <b>2021년 1월 1일부로 효력을 잃었어.</b> 임신중지를 했다고 여성이나 의사를 처벌할 근거는 이제 없어.</p>
+    </div>
+    <div class="sbox">
+      <span class="badge missing">안 생긴 것</span>
+      <h3>절차를 정한 법</h3>
+      <p>"몇 주까지, 어떤 상담·동의 절차로, 누가 어떻게" — 이걸 정한 <b>대체 입법은 끝내 안 만들어졌어.</b></p>
+    </div>
+  </div>
+  <div class="gapnote"><b>⚠️ 그래서 생긴 회색지대</b>처벌은 안 받지만 '정식 절차'도 없는 상태가 7년. 제도가 없으니 약도 정식으로는 못 들어왔고, 그 자리를 해외 직구와 음성 유통이 채웠어.</div>
+
+  <div class="section-title">③ 왜 약국이 아니라 '병원 안'에서만?</div>
+  <div class="who-grid">
+    <div class="who ok">
+      <div class="mark">○</div>
+      <h4>임신한 여성</h4>
+      <p>자기낙태죄 — <b>헌법불합치 대상</b>이라 처벌 근거 없음</p>
+    </div>
+    <div class="who ok">
+      <div class="mark">○</div>
+      <h4>의사</h4>
+      <p>업무상동의낙태죄 — <b>헌법불합치 대상</b>이라 처벌 근거 없음</p>
+    </div>
+    <div class="who no">
+      <div class="mark">✕</div>
+      <h4>약사</h4>
+      <p>헌재 결정에 <b>빠져 있음</b> — 법무부는 "형법상 처벌이 여전히 가능"하다고 해석</p>
+    </div>
+  </div>
+  <div class="detour">
+    <div class="step s1">약국에서 내주면<br>약사가 처벌 위험</div>
+    <div class="arrow">→</div>
+    <div class="step s2">약국 유통을 피해야 함</div>
+    <div class="arrow">→</div>
+    <div class="step s3">병원 안에서 의사가<br>직접 조제<small>'원내조제' · 초기 2년</small></div>
+  </div>
+
+  <div class="section-title">④ 아직 안 정해진 것들</div>
+  <div class="todo">
+    <div class="t-item"><div class="tag">약값</div><div class="what">건강보험 적용 여부 미정 — 도입 초기엔 <b>비급여(전액 본인부담)</b> 가능성이 커</div></div>
+    <div class="t-item"><div class="tag">미성년자</div><div class="what">처방 절차·<b>보호자 동의 기준</b>이 아직 안 정해졌어</div></div>
+    <div class="t-item"><div class="tag">의료진</div><div class="what">형법이 개정되기 전까진 처방·투약 의료진의 <b>형사 불확실성</b>이 남아</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.18 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
