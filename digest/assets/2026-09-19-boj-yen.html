@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일본은행이 금리 올렸는데, 엔화는 왜 약해졌을까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 예상 vs 실제 */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .sbox{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .sbox .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.expect{background:var(--surface2);color:var(--text2)}
+  .badge.actual{background:var(--red-soft);color:#C6493E}
+  .sbox h3{font-size:15.5px;margin-bottom:6px}
+  .sbox p{font-size:13.5px;color:var(--text2)}
+  .sbox p b{color:var(--text)}
+  .sbox .big{font-size:20px;font-weight:700;margin:6px 0;color:var(--text)}
+  .sbox.actual .big{color:#C6493E}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--yellow-soft,#FBF3D9);border-radius:10px;padding:12px 16px;font-size:14px;color:#8A6D1B}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 두 갈래 영향 */
+  .diverge{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .dpath{border-radius:12px;padding:14px 16px}
+  .dpath.won{background:var(--red-soft)}
+  .dpath.kospi{background:var(--green-soft)}
+  .dpath .dtag{font-size:12px;font-weight:700;margin-bottom:6px}
+  .dpath.won .dtag{color:#C6493E}
+  .dpath.kospi .dtag{color:#2F7A52}
+  .dpath h3{font-size:15px;margin-bottom:6px}
+  .dpath p{font-size:13.5px;color:var(--text)}
+  .dpath .num{font-size:19px;font-weight:700;display:block;margin:4px 0}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .split{grid-template-columns:1fr}
+    .diverge{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.19 데일리 뉴스 · 시각자료</div>
+  <h1>💴 일본은행이 금리 올렸는데, 엔화는 왜 약해졌을까</h1>
+  <div class="sub">금리 올리면 통화가 강해지는 게 정석인데 — 이번엔 반대로 갔다. 무엇이 다르게 계산됐는지 한 장으로 보기</div>
+
+  <div class="section-title">① 원래 예상 vs 실제 반응</div>
+  <div class="split">
+    <div class="sbox">
+      <span class="badge expect">보통의 공식</span>
+      <h3>금리 인상 → 통화 강세</h3>
+      <div class="big">엔화 강세 기대</div>
+      <p>금리를 올리면 그 통화를 사려는 돈이 몰려 <b>통화 가치가 오르는 게</b> 교과서적 반응이야. 미일 금리차가 좁혀질 거란 기대 때문.</p>
+    </div>
+    <div class="sbox actual">
+      <span class="badge actual">실제 결과</span>
+      <h3>엔화, 오히려 약세</h3>
+      <div class="big">달러당 157엔대 (+0.7%)</div>
+      <p>일본은행이 31년 만의 최고 금리(<b>1.25%</b>)로 올렸는데도, 정작 엔화는 <b>더 약해졌어.</b></p>
+    </div>
+  </div>
+
+  <div class="section-title">② 왜 정반대로 움직였을까</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>인상 확률, 이미 94~98%로 선반영</b><span class="mdesc">시장이 며칠 전부터 거의 확정적으로 점쳐온 결과라, 발표는 "새 정보"가 아니라 "확인"에 그침</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>이틀 전 미 연준도 먼저 인상 (3.75~4.00%)</b><span class="mdesc">일본이 이번에 올려도 미일 금리차는 여전히 2.5%p 넘게 벌어진 채</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>"금리차, 결국 안 좁혀진다"는 계산이 시장을 움직임</b><span class="mdesc">싼 통화(엔)에서 비싼 통화(달러)로 흐르는 돈의 방향 자체는 그대로라는 뜻</span></div>
+    </div>
+  </div>
+  <div class="paradox"><b>⚠️ '예고된 악재'는 발작을 잘 안 부른다</b>2024년 7월 깜짝 인상 땐 닛케이가 하루 만에 -12.4% 빠졌지만, 이번엔 인상이 몇 주 전부터 예고돼 있었던 터라 같은 충격이 안 나타났어.</div>
+
+  <div class="section-title">③ 나한테 오는 영향 — 같은 날, 반대로 간 두 흐름</div>
+  <div class="diverge">
+    <div class="dpath won">
+      <div class="dtag">🔴 원/달러 — 엔화에 동조</div>
+      <h3>7거래일 연속 상승</h3>
+      <span class="num">1,383.3원</span>
+      <p>엔화 약세가 그대로 옮아 붙어 원화도 같이 밀림. 10월 22일 한은 금통위 부담 요인.</p>
+    </div>
+    <div class="dpath kospi">
+      <div class="dtag">🟢 코스피 — 반도체 훈풍에 별개로 급등</div>
+      <h3>+2.66% 급등</h3>
+      <span class="num">6,894.23</span>
+      <p>미국 반도체주 강세·유가와 국채금리 하락이 겹치며, BOJ 이슈와 무관하게 외국인·기관 동반 매수.</p>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.19 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>

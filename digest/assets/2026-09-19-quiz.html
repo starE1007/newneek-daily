@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.19</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.19 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'boj_hike', variants:[
+    { q:'18일 일본은행이 발표한 금리 결정으로 가장 정확한 것은?',
+      opts:['기준금리를 1.00%에서 1.25%로 올려 31년 만의 최고 수준을 기록했다',
+            '기준금리를 1.25%에서 1.00%로 내렸다',
+            '기준금리를 동결했다',
+            '기준금리를 5.00%까지 올렸다'], answer:0,
+      explain:'일본은행은 기준금리를 <b>1.00% → 1.25%</b>로 올렸어. <b>1995년 이후 31년 만의 최고 수준</b>이고, 최근 10개월 새 세 번째 인상이야.' },
+    { q:'이번 일본은행 금리 결정의 표결 결과로 가장 정확한 것은?',
+      opts:['심의위원 9명 중 7명 찬성, 2명 반대로 갈렸다',
+            '전원 만장일치로 찬성했다',
+            '표결 없이 총재 단독으로 결정했다',
+            '9명 중 2명만 찬성해 부결됐다'], answer:0,
+      explain:'심의위원 <b>9명 중 7명이 찬성</b>했고 <b>2명은 반대</b>표를 던졌어.' },
+  ]},
+  { id:'yen_reaction', variants:[
+    { q:'금리 인상 정석대로라면 엔화가 어떻게 움직여야 했을까?',
+      opts:['강세(엔화 가치 상승)', '약세(엔화 가치 하락)', '아무 영향 없음', '즉시 폐지'], answer:0,
+      explain:'보통 금리를 올리면 그 통화를 사려는 수요가 몰려 <b>통화가 강세</b>로 가는 게 교과서적 반응이야.' },
+    { q:'그런데 실제로 18일 엔화는 어떻게 움직였을까?',
+      opts:['오히려 약세로 가 달러당 157엔대까지 밀렸다',
+            '예상대로 급격히 강세로 갔다',
+            '거의 변동 없이 보합을 유지했다',
+            '전날보다 3% 넘게 급락했다'], answer:0,
+      explain:'정석과 반대로 엔화는 <b>0.7% 약세</b>를 보이며 달러당 <b>157엔대</b>까지 밀렸어.' },
+  ]},
+  { id:'why_yen_weak', variants:[
+    { q:'일본은행이 금리를 올렸는데도 엔화가 약해진 이유로 가장 정확한 것은?',
+      opts:['인상이 이미 90%대로 선반영돼 있었고, 미 연준도 먼저 올려 미일 금리차가 여전히 넓게 남았기 때문',
+            '일본은행이 이번 인상 발표를 돌연 취소했기 때문',
+            '엔화가 이미 세계에서 가장 강한 통화였기 때문',
+            '미국이 같은 날 기준금리를 큰 폭으로 인하했기 때문'], answer:0,
+      explain:'① 인상 확률이 이미 94~98%로 선반영돼 발표가 "확인"에 그쳤고, ② 이틀 전 미 연준도 <b>3.75~4.00%</b>로 먼저 올려 미일 금리차가 <b>2.5%p 넘게</b> 남았기 때문이야.' },
+    { q:'"예고된 인상은 발작을 잘 안 부른다"는 설명의 근거로 가장 적절한 것은?',
+      opts:['2024년 7월 깜짝 인상 때 닛케이가 하루 -12.4% 폭락한 반면, 이번엔 몇 주 전부터 예고돼 같은 충격이 없었다',
+            '이번에도 닛케이가 2024년과 똑같이 하루 12% 넘게 폭락했다',
+            '2024년 인상 때는 반대로 닛케이가 급등했다',
+            '2024년과 이번 모두 시장에 아무 영향이 없었다'], answer:0,
+      explain:'2024년 7월 <b>깜짝 인상</b> 직후엔 닛케이가 하루 만에 <b>-12.4%</b> 폭락했지만, 이번엔 인상이 미리 예고돼 있어서 같은 청산 충격이 나타나지 않았어.' },
+  ]},
+  { id:'won_kospi_diverge', variants:[
+    { q:'18일 원/달러 환율과 코스피가 보인 움직임으로 가장 정확한 것은?',
+      opts:['원/달러는 7거래일 연속 상승했고, 코스피는 반도체 훈풍을 타고 급등했다 — 서로 다른 이유로 반대 방향을 보였다',
+            '원/달러와 코스피 모두 하락했다',
+            '원/달러와 코스피 모두 보합이었다',
+            '코스피가 폭락하고 원화만 강세를 보였다'], answer:0,
+      explain:'원/달러는 엔화 약세에 동조해 <b>1,383.3원까지 7거래일 연속 상승</b>했고, 코스피는 이와 무관하게 미국 반도체주 훈풍을 타고 <b>+2.66%, 6,894.23</b>으로 급등했어.' },
+    { q:'18일 코스피 급등을 이끈 주요 요인으로 가장 정확한 것은?',
+      opts:['미국 반도체주 강세와 유가·국채금리 동반 하락에 힘입어 삼성전자·SK하이닉스가 동반 상승했다',
+            '일본은행의 금리 인상이 직접적인 호재로 작용했다',
+            '한국은행이 전격적으로 기준금리를 인하했다',
+            '외국인이 대규모로 매도에 나섰다'], answer:0,
+      explain:'미국 반도체주 강세(엔비디아 등)와 유가·국채금리 동반 하락에 힘입어 <b>삼성전자 +3.37%, SK하이닉스 +6.42%</b>로 지수를 끌어올렸고, 외국인은 <b>8거래일 만에 순매수</b>로 돌아섰어.' },
+  ]},
+  { id:'approval_rating', variants:[
+    { q:'리얼미터 조사에서 나타난 이재명 대통령 지지율 흐름으로 가장 정확한 것은?',
+      opts:['9주 연속 하락해 취임 후 최저치인 33.8%를 기록했고, 부정평가가 처음 60%대에 올라섰다',
+            '9주 연속 상승해 역대 최고치를 기록했다',
+            '3주 연속 소폭 반등해 40%대를 회복했다',
+            '지지율이 50%대로 급등했다'], answer:0,
+      explain:'지지율은 <b>9주 연속 하락</b>해 취임 후 최저치인 <b>33.8%</b>를 기록했고, 부정평가는 <b>63.3%</b>로 처음 60%대에 올라섰어.' },
+    { q:'정당 지지도 조사에서 나타난 변화로 가장 정확한 것은?',
+      opts:['국민의힘(42.1%)이 민주당(36.1%)을 처음 앞섰다',
+            '민주당 지지도가 80%를 넘었다',
+            '민주당이 50%를 넘어 압도적 1위를 지켰다',
+            '두 당의 지지도가 처음으로 완전히 같아졌다'], answer:0,
+      explain:'국민의힘이 <b>42.1%</b>로 민주당 <b>36.1%</b>를 처음 앞섰어(격차는 오차범위 내).' },
+  ]},
+  { id:'hormuz_deploy', variants:[
+    { q:'정부의 "호르무즈 파병 검토"에 대한 현재 상황으로 가장 정확한 것은?',
+      opts:['아직 결정된 방침이 없으며, 해상초계기·기뢰제거팀 등 비전투 위주로 "파병"보다 "기여"를 강조하고 있다',
+            '이미 대규모 전투부대 파병이 확정됐다',
+            '국회 동의 없이 이미 파병을 강행했다',
+            '미국이 파병을 공식 거부했다'], answer:0,
+      explain:'아직 결정된 방침은 없고, 정부는 해상초계기·기뢰제거팀 등 <b>비전투·방어 성격</b>의 전력 위주로 "파병"보다 "기여"라는 표현을 강조하고 있어.' },
+  ]},
+  { id:'chuseok_price', variants:[
+    { q:'정부의 추석 물가 대책으로 가장 정확한 것은?',
+      opts:['19대 성수품 18.5만 톤을 공급하고 1,930억 원 규모의 역대 최대 할인 지원에 나섰다',
+            '성수품 공급량을 오히려 작년보다 줄였다',
+            '할인 지원 예산을 작년 수준에서 동결했다',
+            '유류세 인하 조치를 이달 말로 앞당겨 종료했다'], answer:0,
+      explain:'배추·소고기·고등어 등 19대 성수품을 <b>18.5만 톤</b> 공급하고, <b>1,930억 원</b> 규모의 역대 최대 할인 지원과 유류세 인하 2개월 연장에 나섰어.' },
+  ]},
+  { id:'fomc_review', variants:[
+    { q:'(어제 복습) 조지아 배터리공장 이민단속으로 억류됐던 한국인 규모로 가장 정확한 것은?',
+      opts:['300명 이상', '전원 무혐의 즉시 석방', '10명 미만', '한국인은 없었음'], answer:0,
+      explain:'억류된 475명 중 <b>300명 이상</b>이 한국인이었고, 1년 만에 이들이 미국 정부 상대 손해배상 절차에 들어갔어.' },
+    { q:'(어제 복습) 조지아 사건 행정청구의 대상 연방기관 수로 가장 정확한 것은?',
+      opts:['9개', '1개', '50개', '0개'], answer:0,
+      explain:'DHS·ICE·CBP·FBI·법무부 등 <b>9개 연방기관</b>을 상대로 청구했어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'18일 일본은행이 올린 기준금리는 몇 %일까? (숫자만, 예: 1.00)',
+    accept:['1.25','1.25%'],
+    explain:'정답은 <b>1.25%</b>야. 1995년 이후 31년 만의 최고 수준이야.' },
+  { q:'일본은행 금리 인상 심의위원 표결에서 반대표를 던진 위원은 몇 명일까? (숫자만)',
+    accept:['2'],
+    explain:'정답은 <b>2명</b>이야. 9명 중 7명이 찬성했어.' },
+  { q:'18일 미일 금리차 계산에서, 이틀 전 미 연준이 올린 기준금리 상단은 몇 %일까? (숫자만, 예: 4.00)',
+    accept:['4.00','4','4%'],
+    explain:'정답은 <b>4.00%</b>야(3.75~4.00%). 일본이 올려도 미일 금리차는 2.5%p 넘게 남았어.' },
+  { q:'18일 엔화는 달러당 몇 엔대로 밀렸을까? (숫자만, 예: 150)',
+    accept:['157'],
+    explain:'정답은 <b>157엔대</b>야. 0.7% 약세로 움직였어.' },
+  { q:'2024년 7월 일본은행 깜짝 인상 직후 닛케이225가 하루에 몇 % 폭락했을까? (숫자만, 예: 5.0)',
+    accept:['12.4','12.4%','-12.4'],
+    explain:'정답은 <b>12.4%</b>야. 예고 없는 인상이 부른 청산 충격의 대표 사례야.' },
+  { q:'18일 원/달러 환율 종가는 얼마였을까? (숫자만, 예: 1350.0)',
+    accept:['1383.3','1,383.3','1383'],
+    explain:'정답은 <b>1,383.3원</b>이야. 7거래일 연속 상승했어.' },
+  { q:'18일 코스피 상승률은 몇 %였을까? (숫자만, 예: 1.0)',
+    accept:['2.66','2.66%'],
+    explain:'정답은 <b>+2.66%</b>야. 6,894.23으로 마감했어.' },
+  { q:'18일 코스피 급등을 이끈 반도체 대장주 중 SK하이닉스의 상승률은 몇 %였을까? (숫자만, 예: 1.0)',
+    accept:['6.42','6.42%'],
+    explain:'정답은 <b>6.42%</b>야. 삼성전자도 3.37% 올랐어.' },
+  { q:'리얼미터 조사에서 이재명 대통령 지지율은 몇 %로 취임 후 최저치를 기록했을까? (숫자만, 예: 40.0)',
+    accept:['33.8','33.8%'],
+    explain:'정답은 <b>33.8%</b>야. 9주 연속 하락한 결과야.' },
+  { q:'정당 지지도 조사에서 민주당을 처음 앞선 정당의 지지율은 몇 %였을까? (숫자만, 예: 40.0)',
+    accept:['42.1','42.1%'],
+    explain:'정답은 국민의힘 <b>42.1%</b>야. 민주당 36.1%를 처음 앞섰어.' },
+  { q:'정부가 발표한 추석 성수품 할인 지원 규모는 얼마일까? (숫자만, 단위: 억 원)',
+    accept:['1930','1,930'],
+    explain:'정답은 <b>1,930억 원</b>이야. 역대 최대 규모야.' },
+  { q:'추석 물가 대책으로 공급하기로 한 19대 성수품의 총량은 몇 만 톤일까? (숫자만, 예: 10)',
+    accept:['18.5','18.5만','18.5톤'],
+    explain:'정답은 <b>18.5만 톤</b>이야. 최대 50% 할인 지원과 함께 공급돼.' },
+  { q:'(어제 복습) 조지아 배터리공장 이민단속으로 억류된 한국인은 몇 명 이상이었을까? (숫자만)',
+    accept:['300'],
+    explain:'정답은 <b>300명 이상</b>이야. 억류 총 인원은 475명이었어.' },
+  { q:'(어제 복습) 조지아 사건 행정청구 대상 연방기관은 몇 개였을까? (숫자만)',
+    accept:['9'],
+    explain:'정답은 <b>9개</b>야. DHS·ICE·CBP·FBI·법무부 등이 포함돼.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
