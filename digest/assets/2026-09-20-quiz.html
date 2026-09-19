@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.20</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.20 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'tariff_swap', variants:[
+    { q:'작년 11월 타결된 한미 관세협상의 핵심 거래 구조로 가장 정확한 것은?',
+      opts:['미국이 상호관세를 25%에서 15%로 낮추는 대신, 한국이 2029년 1월까지 3,500억 달러를 미국에 투자하기로 했다',
+            '한국이 미국산 제품 관세를 전면 철폐했다',
+            '미국이 한국에 무상 원조를 제공하기로 했다',
+            '양국이 관세를 동시에 0%로 낮췄다'], answer:0,
+      explain:'미국의 상호관세를 <b>25%→15%</b>(자동차 포함)로 낮추는 대신, 한국이 <b>2029년 1월까지 3,500억 달러</b>를 투자하기로 한 거래야.' },
+  ]},
+  { id:'invest_breakdown', variants:[
+    { q:'3,500억 달러 대미투자의 구성으로 가장 정확한 것은?',
+      opts:['전략투자 2,000억 달러 + 조선 협력 1,500억 달러',
+            '전액 조선 협력에만 투입된다',
+            '전액 현금 없이 관세 감면으로만 대체된다',
+            '전략투자 3,000억 달러 + 조선 500억 달러'], answer:0,
+      explain:'<b>전략투자 2,000억 달러</b>와 <b>조선 협력 1,500억 달러</b>로 구성돼 있어.' },
+  ]},
+  { id:'sticking_point', variants:[
+    { q:'협상이 막판에 다시 막힌 핵심 이유로 가장 정확한 것은?',
+      opts:['정상회담 공동설명자료에 담긴 "상업적 합리성" 원칙에 따라 투자금 회수·수익배분·손실 책임을 심사해야 하기 때문',
+            '미국이 투자 자체를 전면 취소했기 때문',
+            '한국이 투자 총액을 3,500억 달러에서 7,000억 달러로 늘리자고 제안했기 때문',
+            '환율이 안정돼 투자할 이유가 사라졌기 때문'], answer:0,
+      explain:'작년 합의문의 <b>"상업적 합리성"</b> 원칙 때문에, 투자금을 어떻게 회수할지·수익을 어떻게 나눌지·손실은 누가 책임질지를 심사해야 하는 게 병목이야.' },
+    { q:'세부 사업 협상에서 사업비를 둘러싼 갈등으로 가장 정확한 것은?',
+      opts:['텍사스 엔시날 가스복합화력발전소 사업비를 미국이 200억에서 최대 250억 달러까지 올려 요구했다',
+            '엔시날 발전소 사업비가 오히려 절반으로 줄었다',
+            '알래스카 LNG 사업이 전면 백지화됐다',
+            '모든 사업비가 처음 제시된 금액 그대로 확정됐다'], answer:0,
+      explain:'엔시날 가스복합화력발전소는 당초 <b>200억 달러</b> 안팎이었는데 미국이 <b>250억 달러</b>까지 요구해 <b>220억 달러</b> 선에서 절충 중이야.' },
+  ]},
+  { id:'lee_statement', variants:[
+    { q:'18일 기자회견에서 이재명 대통령이 밝힌 대미투자 협상 상황으로 가장 정확한 것은?',
+      opts:['"거의 합의가 됐다고 하는데 동의하기 쉽지 않은 부분들이 있어서 다시 이야기하는 중"이라고 밝혔다',
+            '"협상이 완전히 결렬됐다"고 선언했다',
+            '"모든 조건에 이미 서명했다"고 밝혔다',
+            '대미투자 관련 언급을 전혀 하지 않았다'], answer:0,
+      explain:'이 대통령은 "거의 합의가 됐다고 하는데... 동의하기가 쉽지 않은 부분들이 있어서 다시 또 이야기를 하는 중"이라며 "밤잠을 설칠 만큼 고민한다"고 했어.' },
+  ]},
+  { id:'no_deployment', variants:[
+    { q:'같은 기자회견에서 이재명 대통령의 호르무즈 관련 발언으로 가장 정확한 것은?',
+      opts:['"전쟁에 관여하거나 개입하는 파병은 없다"는 원칙을 재확인했다',
+            '전투부대의 대규모 파병을 즉시 승인했다',
+            '호르무즈 관련 언급을 전혀 하지 않았다',
+            '미국의 파병 요구를 전면 수용했다고 밝혔다'], answer:0,
+      explain:'"전쟁에 관여하거나 개입하는 파병은 없다"는 원칙을 지금까지 지켜왔고 앞으로도 변함없다고 밝혔어.' },
+    { q:'이후 열린 한미 외교장관회담(워싱턴)에서 조현 장관의 태도로 가장 정확한 것은?',
+      opts:['호르무즈 해협 통항 자유 회복에 비전투 방식의 실질적 기여 의지를 전달했다',
+            '전투 파병을 즉각 약속했다',
+            '회담에서 호르무즈 문제를 아예 논의하지 않았다',
+            '한미동맹 재검토를 요구했다'], answer:0,
+      explain:'조현 장관은 호르무즈 해협 통항 자유 회복을 위해 <b>비전투 방식</b>의 실질적 기여 의지를 전달했어.' },
+  ]},
+  { id:'no_amendment', variants:[
+    { q:'이재명 대통령의 개헌·특검법 관련 발언으로 가장 정확한 것은?',
+      opts:['개헌을 통한 연임 시도는 없다고 선을 긋고, 특검법의 "공소취소" 조항 삭제를 국회에 요청했다',
+            '개헌을 통해 연임하겠다는 뜻을 처음 밝혔다',
+            '특검법 자체를 전면 폐기해달라고 요청했다',
+            '개헌·특검법 관련 질문에 답변을 거부했다'], answer:0,
+      explain:'개헌을 통한 연임 시도는 없다고 밝혔고, 특검이 기존 기소 사건까지 넘겨받아 처분하게 하는 <b>"공소취소" 조항</b>은 삭제해달라고 국회에 요청했어.' },
+  ]},
+  { id:'market_recap', variants:[
+    { q:'19일(현지시간) 뉴욕 증시·채권시장 상황으로 가장 정확한 것은?',
+      opts:['S&P500·나스닥은 소폭 올랐지만 다우는 한 주간 1.69% 빠졌고, 미 10년물 국채금리는 4.998%로 5%에 근접했다',
+            '3대 지수 모두 5% 넘게 폭등했다',
+            '국채금리가 2%대로 급락했다',
+            '금값이 폭락해 온스당 1,000달러 밑으로 떨어졌다'], answer:0,
+      explain:'S&P500(+0.17%)·나스닥(+0.39%)은 소폭 올랐지만 다우는 주간 <b>-1.69%</b>였고, 10년물 국채금리는 <b>4.998%</b>로 5%에 바짝 붙었어.' },
+  ]},
+  { id:'boj_review', variants:[
+    { q:'(어제 복습) 어제 다룬 일본은행의 금리 결정으로 가장 정확한 것은?',
+      opts:['기준금리를 1.00%에서 1.25%로 올려 31년 만의 최고 수준을 기록했다',
+            '기준금리를 동결했다',
+            '기준금리를 1.25%에서 1.00%로 내렸다',
+            '기준금리를 5%까지 올렸다'], answer:0,
+      explain:'일본은행은 기준금리를 <b>1.00%→1.25%</b>로 올려 <b>31년 만의 최고 수준</b>을 기록했어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'한미 관세협상에서 미국이 낮춰준 상호관세율은 몇 %일까? (숫자만, 예: 10)',
+    accept:['15','15%'],
+    explain:'정답은 <b>15%</b>야. 원래 25%였던 상호관세(자동차 포함)를 낮춘 결과야.' },
+  { q:'한국의 대미투자 총 규모는 몇 억 달러일까? (숫자만, 예: 1000)',
+    accept:['3500','3,500'],
+    explain:'정답은 <b>3,500억 달러</b>야. 전략투자 2,000억 + 조선 협력 1,500억 달러로 구성돼.' },
+  { q:'3,500억 달러 중 조선 협력에 배정된 금액은 몇 억 달러일까? (숫자만, 예: 1000)',
+    accept:['1500','1,500'],
+    explain:'정답은 <b>1,500억 달러</b>야. 나머지 2,000억 달러는 전략투자야.' },
+  { q:'대미투자 이행 시한은 몇 년 몇 월까지일까? (예: 2029.01)',
+    accept:['2029.01','2029년 1월','2029-01','2029.1'],
+    explain:'정답은 <b>2029년 1월</b>까지야.' },
+  { q:'텍사스 엔시날 가스복합화력발전소 사업비를 미국이 최대 얼마까지 요구했을까? (숫자만, 단위: 억 달러)',
+    accept:['250'],
+    explain:'정답은 <b>250억 달러</b>야. 당초 200억 안팎에서 220억 선으로 절충 중이야.' },
+  { q:'18일 기자회견에서 이재명 대통령이 대미투자 고민의 정도를 표현하며 쓴 말은? (예: 밤잠을 ____)',
+    accept:['설칠','설친다','설칠 만큼','설쳐'],
+    explain:'정답은 <b>"밤잠을 설칠 만큼"</b>이야. 그만큼 고민이 많다는 뜻이야.' },
+  { q:'대미투자 협상에서 문제가 된 정상회담 공동설명자료 속 원칙은 무엇일까? (한 단어~한 문장)',
+    accept:['상업적 합리성'],
+    explain:'정답은 <b>"상업적 합리성"</b>이야. 회수 방법·수익배분·손실 책임을 심사하게 만든 조항이야.' },
+  { q:'19일(현지시간) 미 10년물 국채금리는 몇 %였을까? (숫자만, 예: 4.50)',
+    accept:['4.998'],
+    explain:'정답은 <b>4.998%</b>야. 5%에 바짝 붙었어.' },
+  { q:'같은 날 금값은 온스당 몇 달러였을까? (숫자만, 예: 3000)',
+    accept:['4380','4,380'],
+    explain:'정답은 <b>4,380달러</b>야.' },
+  { q:'이재명 대통령이 삭제를 요청한 특검법 조항의 이름은 무엇일까? (한 단어)',
+    accept:['공소취소'],
+    explain:'정답은 <b>"공소취소"</b> 조항이야. 특검이 기존 기소 사건까지 넘겨받아 처분하게 하는 조항이었어.' },
+  { q:'(어제 복습) 일본은행이 올린 기준금리는 몇 %일까? (숫자만, 예: 1.00)',
+    accept:['1.25','1.25%'],
+    explain:'정답은 <b>1.25%</b>야. 1995년 이후 31년 만의 최고 수준이야.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
