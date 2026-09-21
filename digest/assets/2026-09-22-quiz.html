@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.22</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.22 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'signing_timing', variants:[
+    { q:'대미투자 1호 MOU 서명이 이뤄질 걸로 보이는 시점으로 가장 정확한 것은?',
+      opts:['22일 국회 비공개 보고 이후, 이르면 오늘 밤 늦게 또는 늦어도 23일',
+            '이미 지난주 초에 서명이 끝났다',
+            '내년 1월 이행 시한에 맞춰 서명한다',
+            '서명 계획 자체가 아예 취소됐다'], answer:0,
+      explain:'22일 오전 국회 보고 뒤, 시차를 감안해 <b>오늘 밤 늦게</b> 또는 늦어도 <b>23일</b>에 서명할 걸로 보여.' },
+  ]},
+  { id:'reactor_split', variants:[
+    { q:'텍사스 원전 8기 건설을 둘러싼 절충안으로 가장 정확한 것은?',
+      opts:['미국 웨스팅하우스산(AP1000) 6기 + 한국형(APR1400) 2기로 나누는 안',
+            '8기 전부 한국형 APR1400으로 짓는 안',
+            '8기 전부 취소하고 가스발전소로만 대체하는 안',
+            '미국산 4기 + 한국형 4기로 정확히 절반씩 나누는 안'], answer:0,
+      explain:'8기 전부 미국산을 원했던 미국과 한국형도 넣자던 한국이 <b>6(美):2(韓)</b>로 절충한 걸로 전해져.' },
+    { q:"8기 중 '2기'에 배정된 원전 기종으로 가장 정확한 것은?",
+      opts:['한국형 APR1400', '미국 웨스팅하우스 AP1000', '프랑스형 EPR', '중국형 화룽원'], answer:0,
+      explain:'2기가 배정된 건 <b>한국형 APR1400</b>이야. 나머지 6기는 미국 웨스팅하우스산 AP1000.' },
+  ]},
+  { id:'prepayment', variants:[
+    { q:'협상 막판까지 이견이 있었던 미국의 선납 압박 내용으로 가장 정확한 것은?',
+      opts:['연말까지 약 100억 달러가량을 먼저 보내라는 요구',
+            '연말까지 3,500억 달러 전액을 한 번에 보내라는 요구',
+            '선납 없이 10년에 걸쳐 나눠 보내라는 요구',
+            '선납 대신 관세를 0%로 낮춰달라는 요구'], answer:0,
+      explain:'미국은 연말까지 <b>약 100억 달러</b>가량을 먼저 보내라고 압박해왔어.' },
+  ]},
+  { id:'tranche_cap', variants:[
+    { q:'이번에 가닥이 잡힌 것으로 전해지는 송금 구조로 가장 정확한 것은?',
+      opts:['이번 달 첫 투자금 220억 달러 안팎을 보내고, 내년부터 연간 상한 200억 달러 안에서 집행',
+            '이번 달에 3,500억 달러 전액을 일시불로 송금',
+            '내년까지는 한 푼도 보내지 않고 전부 유예',
+            '매달 균등하게 정액으로 나눠 보내는 방식'], answer:0,
+      explain:'이번 달 <b>220억 달러</b> 안팎을 첫 투자금으로 보내고, 내년부터는 연간 상한 <b>200억 달러</b> 안에서 집행하는 쪽으로 가닥이 잡혔대.' },
+  ]},
+  { id:'opposition_view', variants:[
+    { q:'대미투자 협상에 대한 국민의힘 일각의 반응으로 가장 정확한 것은?',
+      opts:['"송금 조건이 여전히 불리하다"며 리스크를 경고하고 있다',
+            '협상 내용에 전적으로 동의하며 즉각 서명을 촉구했다',
+            '협상 자체를 폐기하라고 요구했다',
+            '원전 절충안에 대해 별다른 입장을 내지 않았다'], answer:0,
+      explain:'국민의힘 일각에서는 여전히 <b>"송금 조건이 불리하다"</b>는 리스크 경고를 내고 있어.' },
+  ]},
+  { id:'commercial_rationality', variants:[
+    { q:"대미투자 협상에서 말하는 '상업적 합리성' 원칙의 의미로 가장 정확한 것은?",
+      opts:['투자한 돈을 예상 수익으로 회수할 수 있는지를 따지는 원칙',
+            '투자 여부를 대통령이 단독으로 결정한다는 원칙',
+            '사업 심사 없이 정해진 금액을 무조건 먼저 송금해야 한다는 원칙',
+            '미국 기업에만 이익이 돌아가도록 설계한다는 원칙'], answer:0,
+      explain:"<b>상업적 합리성</b>은 투자 원리금을 예상 수익으로 회수할 수 있는지를 따지는 원칙이야. 오늘 원전 6:2 절충도 이 원칙을 지키려는 안전장치의 연장선이야." },
+  ]},
+  { id:'oil_price', variants:[
+    { q:'21일 국제유가 흐름에 대한 설명으로 가장 정확한 것은?',
+      opts:['브렌트유가 배럴당 104.68달러, WTI가 101.06달러까지 올라 이틀째 반등했다',
+            '브렌트유가 배럴당 50달러 아래로 급락했다',
+            '유가가 전일과 완전히 동일하게 유지됐다',
+            '브렌트유만 오르고 WTI는 그대로였다'], answer:0,
+      explain:'브렌트유 <b>104.68달러</b>, WTI <b>101.06달러</b>로 전일 대비 약 0.8% 오르며 이틀째 반등했어 — 리야드 공습 여파야.' },
+  ]},
+  { id:'adb_forecast', variants:[
+    { q:'ADB(아시아개발은행)의 한국 성장률 전망 발표 일정과 흐름으로 가장 정확한 것은?',
+      opts:['23일 수정 전망 발표 예정이며, 4월 1.9%→7월 2.6%로 이미 올린 상태에서 3%대 가능성까지 거론된다',
+            '이미 지난주에 발표를 마쳤고 수치는 0%대로 낮아졌다',
+            'ADB는 한국 성장률을 아예 전망하지 않는다',
+            '내년까지 발표가 없다고 공식 발표했다'], answer:0,
+      explain:'<b>23일</b> 수정 전망이 나와. 4월 <b>1.9%</b>→7월 <b>2.6%</b>로 이미 올렸는데, 최근엔 <b>3%대</b> 가능성까지 거론돼.' },
+  ]},
+  { id:'seoul_welcome_week', variants:[
+    { q:"'2026 서울환대주간'에 대한 설명으로 가장 정확한 것은?",
+      opts:['9/19~10/11 진행되며, 명동 중심이던 환대 프로그램을 인천·김포공항까지 확장했다',
+            '명동 상권에서만 열리고 공항과는 무관하다',
+            '중국인 관광객만을 위한 전용 행사다',
+            '올해 처음으로 딱 3일만 진행된다'], answer:0,
+      explain:'<b>9/19~10/11</b> 총 23일간, 기존 명동 중심에서 <b>인천·김포공항</b>까지 환대 체계를 확장한 캠페인이야.' },
+  ]},
+  { id:'china_visa_forecast', variants:[
+    { q:'중국 단체관광객 무비자 조치의 기대 효과에 대한 설명으로 가장 정확한 것은?',
+      opts:['정부는 내년 상반기까지 약 100만 명의 추가 방한객을 기대하고 있다',
+            '무비자 조치로 중국인 관광객이 오히려 줄어들 것으로 예상된다',
+            '무비자는 개별 여행객에게만 적용되고 단체는 제외된다',
+            '기대 효과가 없어 조치가 곧 철회될 예정이다'], answer:0,
+      explain:'정부는 이 조치로 내년 상반기까지 약 <b>100만 명</b>의 중국인 관광객이 추가로 한국을 찾을 걸로 기대하고 있어.' },
+  ]},
+  { id:'chuseok_short', variants:[
+    { q:'2026년 추석 연휴와 여행 트렌드에 대한 설명으로 가장 정확한 것은?',
+      opts:['연휴가 4일로 짧아지면서 비행시간 5시간 안팎의 근거리 국가(일본·중국 등)로 예약이 몰렸다',
+            '연휴가 작년보다 길어져 장거리 여행 예약이 늘었다',
+            '올해는 해외여행 예약이 전면 금지됐다',
+            '추석 연휴가 10일로 역대 최장을 기록했다'], answer:0,
+      explain:'올해 추석은 <b>4일</b>로 짧아지면서 비행시간 5시간 안팎 근거리(일본·중국 등)로 예약의 약 88%가 몰렸어.' },
+  ]},
+  { id:'review_0921', variants:[
+    { q:'(어제 복습) 한국이 요구한 연간 송금 상한과 손실 분담용 특수목적법인에 대한 설명으로 가장 정확한 것은?',
+      opts:['연간 송금 상한 200억 달러, 손실 나눠 메꾸는 우산형 특수목적법인은 I-SPV',
+            '연간 송금 상한 100억 달러, 특수목적법인 명칭은 없다',
+            '연간 송금 상한이라는 개념 자체가 없었다',
+            '특수목적법인은 미국이 아니라 중국이 요구했다'], answer:0,
+      explain:'어제는 연간 송금 상한 <b>200억 달러</b>, 손실 분담용 우산형 특수목적법인 <b>I-SPV</b>를 다뤘어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'텍사스 원전 8기 중 한국형(APR1400)으로 지어지는 건 몇 기일까? (숫자만)',
+    accept:['2','2기'],
+    explain:'정답은 <b>2기</b>야. 나머지 6기는 미국 웨스팅하우스산 AP1000.' },
+  { q:'텍사스 원전 8기 중 미국 웨스팅하우스산(AP1000)은 몇 기일까? (숫자만)',
+    accept:['6','6기'],
+    explain:'정답은 <b>6기</b>야.' },
+  { q:'이번 달 보낼 것으로 전해지는 첫 투자금(1차 트랜치) 규모는 몇 억 달러일까? (숫자만)',
+    accept:['220','220억'],
+    explain:'정답은 <b>220억 달러</b> 안팎이야.' },
+  { q:'내년부터 적용되는 연간 송금 상한은 몇 억 달러일까? (숫자만)',
+    accept:['200','200억'],
+    explain:'정답은 <b>200억 달러</b>야.' },
+  { q:'미국이 연말까지 먼저 보내라고 압박했던 선납 요구 금액은 몇 억 달러일까? (숫자만)',
+    accept:['100','100억'],
+    explain:'정답은 <b>100억 달러</b>야.' },
+  { q:'21일 브렌트유는 배럴당 몇 달러까지 올랐을까? (숫자만, 소수점 둘째자리까지)',
+    accept:['104.68','104'],
+    explain:'정답은 <b>104.68달러</b>야.' },
+  { q:'21일 WTI는 배럴당 몇 달러까지 올랐을까? (숫자만)',
+    accept:['101.06','101'],
+    explain:'정답은 <b>101.06달러</b>야.' },
+  { q:'ADB가 한국 성장률 수정 전망을 발표하는 날짜는 며칠일까? (숫자만)',
+    accept:['23','23일'],
+    explain:'정답은 <b>23일</b>이야.' },
+  { q:"'2026 서울환대주간'은 몇 월 며칠부터 몇 월 며칠까지일까? (예: 9.19~10.11)",
+    accept:['9.19~10.11','9/19~10/11','9월19일~10월11일','9.19-10.11'],
+    explain:'정답은 <b>9/19~10/11</b>(23일간)이야.' },
+  { q:'중국 무비자 조치로 정부가 내년 상반기까지 기대하는 추가 방한객 수는 몇 만 명일까? (숫자만, 단위: 만 명)',
+    accept:['100'],
+    explain:'정답은 <b>100만 명</b>이야.' },
+  { q:'2026년 추석 연휴는 총 며칠일까? (숫자만)',
+    accept:['4','4일'],
+    explain:'정답은 <b>4일</b>이야. 작년보다 짧아지면서 근거리 여행 수요가 몰렸어.' },
+  { q:'(어제 복습) 한국이 요구한 연간 송금 상한은 몇 억 달러였을까? (숫자만)',
+    accept:['200','200억'],
+    explain:'정답은 <b>200억 달러</b>야.' },
+  { q:"(어제 복습) 손실 나눠 메꾸기 위해 한국이 요구한 우산형 특수목적법인의 영문 약칭은? (예: SPV류 3~5글자)",
+    accept:['i-spv','ispv','I-SPV'],
+    explain:'정답은 <b>I-SPV</b>야.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
