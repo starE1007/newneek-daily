@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지휘탑 4자리가 통째로 비었다</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item .what b{color:var(--text)}
+  .t-item.hot{background:var(--red-soft);border-color:#F3D3CF}
+  .t-item.hot .when{color:#C6493E}
+  .t-item.next{background:var(--red-soft);border-color:#F3D3CF}
+  .t-item.next .when{color:#C6493E}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 빈 자리 카드 */
+  .seat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .seat{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .seat .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.longest{background:var(--red-soft);color:#C6493E}
+  .badge.restart{background:var(--orange-soft);color:#B06426}
+  .badge.blocked{background:var(--orange-soft);color:#B06426}
+  .badge.stuck{background:var(--orange-soft);color:#B06426}
+  .seat h3{font-size:15.5px;margin-bottom:6px}
+  .seat p{font-size:13.5px;color:var(--text2)}
+  .seat p b{color:var(--text)}
+  .seat p + p{margin-top:8px}
+
+  /* 임명 체인 */
+  .chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:6px}
+  .clink{flex:1 1 120px;border-radius:10px;padding:10px 10px;font-size:12.5px;font-weight:600;text-align:center;background:var(--surface2);color:var(--text2)}
+  .clink.empty{background:var(--red-soft);color:#B23F34}
+  .c-arrow{align-self:center;color:#B9B6B1;font-size:15px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .seat-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.23 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 지휘탑 4자리가 통째로 비었다</h1>
+  <div class="sub">10월 2일 검찰청 폐지까지 D-9 — 새 형사사법 체계를 이끌 자리들이 왜 하나같이 비어 있는지 한눈에 보기</div>
+
+  <div class="section-title">D-9까지 흘러온 시간</div>
+  <div class="timeline">
+    <div class="t-item hot">
+      <div class="when">2024.12</div>
+      <div class="what"><b>12·3 비상계엄</b><br>경찰청장, 국회 봉쇄 가담 혐의로 직무정지</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item">
+      <div class="when">2025.7</div>
+      <div class="what"><b>검찰총장 퇴임</b><br>후임 인선 없이 공석 시작</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item">
+      <div class="when">2026.8</div>
+      <div class="what"><b>치안정감 4명 승진 내정</b><br>"청장 곧 나오나" 기대 → 이후 무소식</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot">
+      <div class="when">2026.9.19</div>
+      <div class="what"><b>법무부장관 후보 자진사퇴</b><br>지명부터 원점 재시작</div>
+    </div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next">
+      <div class="when">2026.10.2 (D-9)</div>
+      <div class="what"><b>검찰청 폐지, 중수청·공소청 개청</b><br>지휘탑 없이 새 체제 시작</div>
+    </div>
+  </div>
+
+  <div class="section-title">지금 비어 있는 자리 넷</div>
+  <div class="seat-grid">
+    <div class="seat">
+      <span class="badge longest">1년 9개월째 공백</span>
+      <h3>경찰청장</h3>
+      <p>조지호 전 청장이 12·3 비상계엄 당시 국회 봉쇄 가담 혐의로 <b>직무정지</b>된 뒤 대행 체제만 이어져. 8월 차기 후보군(치안정감 4명) 승진 내정 이후로도 인선 소식이 없어.</p>
+    </div>
+    <div class="seat">
+      <span class="badge restart">지명부터 재시작</span>
+      <h3>법무부장관</h3>
+      <p>김승원 후보자가 19일 <b>자진사퇴</b>하면서 새 후보 지명 → 검증 → 인사청문회를 처음부터 다시 거쳐야 해. 10/2 전 취임은 물리적으로 빠듯해.</p>
+    </div>
+    <div class="seat">
+      <span class="badge longest">400일+ 공백</span>
+      <h3>검찰총장 (=공소청장)</h3>
+      <p>작년 7월 퇴임 후 400일 넘게 비어 있어. 법무부장관이 추천위를 꾸려야 임명 절차가 시작되는데, 그 장관 자리부터 없으니 절차 자체가 멈춰 있어.</p>
+    </div>
+    <div class="seat">
+      <span class="badge stuck">청문회 전 단계 정지</span>
+      <h3>중수청장</h3>
+      <p>행안부 장관이 김지용 후보를 제청했지만, 후보자의 과거 검찰개혁 반대 발언을 문제 삼는 <b>여당 반발</b>에 걸려 다음 단계로 못 넘어가.</p>
+    </div>
+  </div>
+
+  <div class="section-title">공소청장이 왜 법무부장관에 걸려 있어?</div>
+  <div class="chain">
+    <div class="clink empty">법무부장관<br><span style="font-size:11px">(공석)</span></div>
+    <div class="c-arrow">→</div>
+    <div class="clink">검찰총장추천위 구성</div>
+    <div class="c-arrow">→</div>
+    <div class="clink">대통령에게 임명 제청</div>
+    <div class="c-arrow">→</div>
+    <div class="clink empty">검찰총장<br>(=공소청장)</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.23 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>

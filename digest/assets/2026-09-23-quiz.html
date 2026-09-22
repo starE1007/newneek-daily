@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.23</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.23 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'reform_split', variants:[
+    { q:'10월 2일 검찰청이 폐지되면서 기존 검찰의 역할은 어떻게 나뉠까?',
+      opts:['수사는 경찰·중수청이, 기소·공소유지는 공소청이 맡는다',
+            '수사와 기소 모두 중수청 한 곳으로 합쳐진다',
+            '검찰청 명칭만 바뀌고 조직과 권한은 그대로 유지된다',
+            '모든 형사사건을 법원이 직접 수사하게 된다'], answer:0,
+      explain:'수사 기능은 경찰·행안부 산하 <b>중수청</b>으로, 기소·공소유지는 법무부 산하 <b>공소청</b>으로 나뉘어. 이게 이른바 검수완박이야.' },
+    { q:'공소청이 맡게 되는 업무로 가장 정확한 것은?',
+      opts:['기소 여부 판단과 재판에서 유죄를 입증하는 공소유지',
+            '범죄 현장에서의 직접 수사와 압수수색',
+            '판결 확정 뒤 형벌을 집행하는 업무',
+            '경찰 인사와 예산을 심의하는 업무'], answer:0,
+      explain:'공소청 소속 검사는 수사는 안 하고, <b>기소</b>할지·<b>공소유지</b>를 어떻게 할지를 판단해.' },
+  ]},
+  { id:'police_vacancy', variants:[
+    { q:'경찰청장 자리가 1년 9개월째 비어 있는 직접적 이유는?',
+      opts:['전임 청장이 12·3 비상계엄 당시 국회 봉쇄 가담 혐의로 직무정지됐기 때문',
+            '경찰청장 직위 자체가 이번 개편으로 폐지됐기 때문',
+            '국회가 예산 부족으로 후임 인선을 보류했기 때문',
+            '전임 청장이 정년퇴직 규정에 걸렸기 때문'], answer:0,
+      explain:'조지호 전 청장이 <b>국회 봉쇄 가담 혐의</b>로 직무정지된 뒤, 후임 없이 <b>대행 체제</b>만 이어지고 있어.' },
+  ]},
+  { id:'minister_vacancy', variants:[
+    { q:'법무부장관 자리가 다시 원점에서 시작하게 된 이유는?',
+      opts:['김승원 후보자가 지명 20일 만에 자진사퇴했기 때문',
+            '국회가 후보자를 표결로 부결시켰기 때문',
+            '전임 장관이 임기를 마치고 정상적으로 퇴임했기 때문',
+            '대통령이 법무부장관 직제를 폐지하기로 했기 때문'], answer:0,
+      explain:'김승원 후보자가 19일 <b>자진사퇴</b>하면서 지명·검증·인사청문회를 처음부터 다시 거쳐야 하는 상황이 됐어.' },
+  ]},
+  { id:'chain', variants:[
+    { q:'검찰총장(공소청장) 임명 절차가 지금 멈춰 있는 근본 이유는?',
+      opts:['추천위원회를 꾸려야 할 법무부장관 자리부터 비어 있기 때문',
+            '검찰총장 후보 지원자가 한 명도 없기 때문',
+            '대통령이 검찰총장 제도 자체를 없애기로 했기 때문',
+            '검찰총장 임명에는 국회 표결이 필수인데 정기국회가 끝났기 때문'], answer:0,
+      explain:'검찰총장추천위원회는 <b>법무부장관</b>이 꾸리는데, 그 장관 자리가 비어 있으니 절차 자체가 못 시작돼.' },
+  ]},
+  { id:'nsib', variants:[
+    { q:'중수청장 인선이 청문회 전 단계에서 멈춘 이유는?',
+      opts:['여당 일부가 후보자의 과거 검찰개혁 반대 발언을 문제 삼아 반발하고 있어서',
+            '후보자가 스스로 사퇴 의사를 밝혀서',
+            '행정안전부 장관이 아직 후보를 제청하지 않아서',
+            '중수청이라는 조직이 아직 법적으로 존재하지 않아서'], answer:0,
+      explain:'행안부 장관이 김지용 후보를 이미 제청했는데, 후보자의 과거 <b>검찰개혁 반대</b> 이력을 문제 삼는 여당 반발에 걸려 있어.' },
+  ]},
+  { id:'mou', variants:[
+    { q:'22일 국회 보고에서 대미투자 1호 사업에 대해 확인된 내용은?',
+      opts:["20년간 430억~450억 달러 수익이 예상돼 '상업적 합리성'을 확보했다는 것",
+            '사업 자체가 백지화됐다는 것',
+            '투자 규모가 기존보다 두 배로 늘었다는 것',
+            '국회 표결로 최종 부결됐다는 것'], answer:0,
+      explain:'텍사스 엔시날 가스복합화력 사업이 20년간 <b>430억~450억 달러</b> 수익을 낼 것으로 예상되면서 상업적 합리성이 확인됐어.' },
+    { q:'대미투자 1호 사업이 국회 절차상 가지는 의미로 가장 정확한 것은?',
+      opts:['상업적 합리성이 확인돼 국회 별도 승인 없이 보고만으로 진행이 정해졌다',
+            '국회 재적 의원 3분의 2 찬성을 얻어야 확정된다',
+            '국회가 아니라 대법원의 승인이 필요하다',
+            '지방자치단체 의회의 동의를 별도로 받아야 한다'], answer:0,
+      explain:'상업성이 확인된 사업은 국회에 <b>보고</b>만 하면 되고, 별도 승인 절차는 필요 없어.' },
+  ]},
+  { id:'trumpxi', variants:[
+    { q:'24일 백악관에서 열리는 트럼프-시진핑 정상회담의 의미로 가장 정확한 것은?',
+      opts:['시진핑 주석이 11년 만에 백악관을 방문해 관세·희토류·대만 등을 논의하는 자리',
+            '시진핑 주석의 첫 해외 순방이자 첫 미국 방문',
+            '무역 의제만 다루고 안보 이슈는 제외된 회담',
+            '트럼프 대통령이 베이징을 방문해 열리는 회담'], answer:0,
+      explain:'시진핑 주석이 <b>11년 만에</b> 백악관을 찾는 자리로, 관세휴전 연장·희토류·첨단기술 수출규제·대만 문제 등이 의제로 꼽혀.' },
+  ]},
+  { id:'market', variants:[
+    { q:'22일 한국 금융시장 마감 상황을 가장 정확하게 설명한 것은?',
+      opts:['코스피는 소폭 올랐고, 원/달러 환율은 22.8원 내려 원화가 강세를 보였다',
+            '코스피와 원화 모두 큰 폭으로 하락했다',
+            '코스피가 사상 최고치를 경신했다',
+            '환율이 급등해 원화 가치가 크게 떨어졌다'], answer:0,
+      explain:'코스피는 <b>7,017.91</b>(+0.15%), 원/달러는 <b>1,358.2원</b>(-22.8원)으로 원화 강세 흐름이었어.' },
+  ]},
+  { id:'kang', variants:[
+    { q:'강훈식 대통령 비서실장이 사의를 표명한 배경으로 꼽히는 것은?',
+      opts:['장관 후보자들의 잇단 낙마로 인사검증 논란이 커지고, 대통령 지지율이 취임 후 최저로 떨어진 것',
+            '본인이 다음 총선 출마를 선언했기 때문',
+            '대통령과의 정책 노선 차이로 공개 결별을 선언했기 때문',
+            '해외 이주 계획이 확정됐기 때문'], answer:0,
+      explain:'인사검증 시스템 논란과 <b>9주 연속</b> 하락한 지지율(33.8%, 최저치)이 맞물린 결과로 해석돼.' },
+  ]},
+  { id:'pressban', variants:[
+    { q:'트럼프 대통령이 18일 발표한 조치의 내용은?',
+      opts:['행정부에 비판적 보도를 해온 CNN·MSNBC·폴리티코 기자들의 백악관 출입을 금지한 것',
+            '모든 외신 기자의 백악관 출입을 전면 금지한 것',
+            '언론사에 대한 정부 광고 집행을 전면 중단한 것',
+            '백악관 출입기자단 제도 자체를 폐지한 것'], answer:0,
+      explain:'CNN·MSNBC·폴리티코 소속 기자들만 출입이 막혔고, 세 언론사는 <b>법적 대응</b>을 예고했어.' },
+  ]},
+  { id:'review_0922', variants:[
+    { q:'(어제 복습) 기름의 실제 도착 단가를 결정하는 세 요소는?',
+      opts:['원유값 + 운임(뱃삯) + 보험',
+            '원유값 + 정제비 + 유통마진',
+            '운임만으로 전부 결정된다',
+            '환율 + 세금 + 배송비'], answer:0,
+      explain:'원유값에 <b>운임(뱃삯)</b>과 보험이 더해져 실제 도착 단가가 정해져. 원유값이 내려도 운임이 오르면 도착 단가는 안 내려가.' },
+    { q:'(어제 복습) 페르시아만→중국 항로 VLCC 하루 용선료가 사상 처음 넘어선 금액은?',
+      opts:['100만 달러', '10만 달러', '1,000만 달러', '1만 달러'], answer:0,
+      explain:'<b>103만 5천 달러</b>(약 14억 원)를 찍으며 사상 처음 하루 <b>100만 달러</b>를 넘었어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'검찰청이 폐지되는 날짜는? (월.일 형식, 예: 10.2)',
+    accept:['10.2','10월2일','10월 2일'],
+    explain:'정답은 <b>10월 2일</b>이야. 78년 역사의 검찰청이 이날 사라져.' },
+  { q:'검찰의 수사 기능을 이어받는 새 기관의 이름은? (한 단어)',
+    accept:['중수청','중대범죄수사청'],
+    explain:'정답은 <b>중대범죄수사청(중수청)</b>이야. 경찰·행안부 산하에 생겨.' },
+  { q:'검사들이 기소·공소유지를 담당하게 되는 새 기관의 이름은? (한 단어)',
+    accept:['공소청'],
+    explain:'정답은 <b>공소청</b>이야. 법무부 산하에 생기고, 수장은 검찰총장이 맡아.' },
+  { q:'경찰청장 자리는 몇 년 몇 개월째 공백일까? (예: 1년9개월)',
+    accept:['1년9개월','1년 9개월','21개월'],
+    explain:'정답은 <b>1년 9개월</b>이야. 12·3 비상계엄 때 직무정지된 뒤 이어지고 있어.' },
+  { q:'검찰총장 자리는 며칠째 공석일까? (숫자만, 예: 300)',
+    accept:['400'],
+    explain:'정답은 <b>400일</b>이야. 작년 7월 퇴임 후 후임 없이 비어 있어.' },
+  { q:'법무부장관 후보자에서 자진사퇴한 인물의 이름은? (한 단어)',
+    accept:['김승원'],
+    explain:'정답은 <b>김승원</b>이야. 지명 20일 만에 사퇴했어.' },
+  { q:'중수청장 후보로 제청된 인물의 이름은? (한 단어)',
+    accept:['김지용'],
+    explain:'정답은 <b>김지용</b>이야. 행안부 장관이 제청했지만 여당 반발에 걸려 있어.' },
+  { q:'대미투자 1호 사업이 진행되는 미국의 주(州) 이름은? (한 단어)',
+    accept:['텍사스','texas'],
+    explain:'정답은 <b>텍사스</b>야. 엔시날 가스복합화력발전 사업이 1호로 거론돼.' },
+  { q:'22일 원/달러 환율 마감가는? (숫자만, 예: 1300)',
+    accept:['1358','1358.2','1,358.2','1,358'],
+    explain:'정답은 <b>1,358.2원</b>이야. 22.8원 내려 원화 강세로 마감했어.' },
+  { q:"18일 백악관 출입이 금지된 언론사 중 하나로, 뉴닉 원문엔 'MS나우'로 표기된 매체의 실제 이름은? (영문 약칭)",
+    accept:['msnbc'],
+    explain:'정답은 <b>MSNBC</b>야.' },
+  { q:'(어제 복습) 대미투자 협상에서 한국이 요구한 연간 송금 상한은 몇 억 달러일까? (숫자만)',
+    accept:['200','200억'],
+    explain:'정답은 <b>200억 달러</b>야.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
