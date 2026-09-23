@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.24</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.24 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'texas_deal', variants:[
+    { q:'대미투자 1호로 확정된 텍사스 사업의 정체는?',
+      opts:['AI 데이터센터에 전력을 공급할 6.3GW 규모 가스복합화력발전소',
+            '텍사스 서부에 짓는 태양광 발전 단지',
+            '텍사스 항만을 확장하는 물류 인프라 사업',
+            '텍사스에 세우는 반도체 위탁생산 공장'], answer:0,
+      explain:"텍사스 '엔시날' 가스복합화력발전소로, <b>223억 달러</b>를 들여 <b>6.3GW</b> 규모로 지어. 전기는 텍사스에 몰린 <b>AI 데이터센터</b>에 공급돼." },
+    { q:'텍사스 가스복합화력발전소 사업에 투입되는 금액은?',
+      opts:['223억 달러', '2,000억 달러', '450억 달러', '30억 달러'], answer:0,
+      explain:'<b>223억 달러</b>(약 30조 원)가 투입돼. 20년간 최대 <b>450억 달러</b>를 회수할 수 있다는 게 정부 계산이야.' },
+  ]},
+  { id:'commercial_rationale', variants:[
+    { q:"이번 텍사스 사업에서 정부가 말한 '상업적 합리성'이 확보됐다는 판단의 근거는?",
+      opts:['20년간 최대 450억 달러 수익이 예상돼 투입 금액 대비 회수가 가능하다는 계산',
+            '미국 정부가 투자금 전액을 보증해줬다는 점',
+            '사업 자체가 국내 기업에 위탁 운영된다는 점',
+            '텍사스 주정부가 세금을 전액 면제해줬다는 점'], answer:0,
+      explain:'223억 달러를 넣어 20년간 최대 <b>450억 달러</b>를 회수할 수 있다는 전망이 나오면서, 손해 보는 투자가 아니라는 게 확인된 거야.' },
+    { q:"'상업적 합리성'이 확인된 사업이 국회 절차상 갖는 의미는?",
+      opts:['국회 별도 승인 없이 보고만으로 진행이 정해진다',
+            '국회 재적 3분의 2 찬성을 반드시 받아야 한다',
+            '지방의회 동의를 추가로 받아야 한다',
+            '국민투표를 거쳐야 확정된다'], answer:0,
+      explain:'상업성이 확인된 사업은 국회에 <b>보고</b>만 하면 되고, 별도 승인 절차가 필요 없어.' },
+  ]},
+  { id:'texas_why', variants:[
+    { q:'텍사스 발전소가 상업적 합리성을 입증하기 수월했던 결정적 이유는?',
+      opts:['AI 데이터센터가 몰려 있어 전기를 팔 곳(수요)이 확실했기 때문',
+            '텍사스의 인건비가 미국에서 가장 저렴하기 때문',
+            '텍사스에 이미 한국 기업의 발전소가 있었기 때문',
+            '가스 가격이 텍사스에서 세계 최저이기 때문'], answer:0,
+      explain:'텍사스는 AI 데이터센터가 몰리면서 전력이 모자란 지역이라 <b>전기를 팔 곳이 확실</b>했어. 팔 곳이 분명하니 회수 전망 계산이 수월했던 거야.' },
+  ]},
+  { id:'nuclear_mix', variants:[
+    { q:'대미투자 후속 원전 사업에서 막판 조율된 원자로 구성은?',
+      opts:['미국형(AP1000) 6기 + 한국형(APR1400) 2기',
+            '미국형·한국형 각 4기씩 동일 배분',
+            '전량 한국형(APR1400) 8기',
+            '전량 미국형(AP1000) 8기'], answer:0,
+      explain:'미국 요구를 반영한 <b>AP1000 6기</b>와 한국 기술 참여를 확보한 <b>APR1400 2기</b>로 조율됐어.' },
+  ]},
+  { id:'trumpxi', variants:[
+    { q:'오늘(24일) 백악관에서 열리는 트럼프-시진핑 정상회담의 성격으로 가장 정확한 것은?',
+      opts:['시진핑 주석이 11년 만에 백악관을 찾아 관세휴전 연장·희토류·대만 등을 논의하는 자리',
+            '시진핑 주석의 생애 첫 해외 순방',
+            '무역 의제만 다루고 안보 이슈는 배제된 회담',
+            '트럼프 대통령이 베이징을 방문해 여는 회담'], answer:0,
+      explain:'시진핑 주석이 <b>11년 만에</b> 백악관을 방문하는 자리로, 관세휴전 연장·희토류·첨단기술 수출규제·대만 문제가 의제로 꼽혀.' },
+  ]},
+  { id:'adb', variants:[
+    { q:'ADB가 9월에 발표한 올해 한국 성장률 전망은?',
+      opts:['3.2% — 7월 전망(2.6%)보다 상향, 두 번 연속 상향 조정',
+            '2.6%로 7월 전망 그대로 유지',
+            '1.9%로 오히려 하향 조정',
+            '4.5%로 대폭 상향'], answer:0,
+      explain:'4월 1.9% → 7월 2.6% → 9월 <b>3.2%</b>로 <b>두 번 연속</b> 상향됐어. 반도체 수출 호조와 확장재정이 근거야.' },
+    { q:'ADB가 한국 성장률을 올려 잡은 핵심 근거로 꼽은 것은?',
+      opts:['AI발 반도체 수요 확대에 따른 수출 호조와 확장재정',
+            '원/달러 환율 급등에 따른 수출 경쟁력 개선',
+            '내수 부동산 시장의 급격한 회복',
+            '해외 관광객 급증에 따른 서비스업 호황'], answer:0,
+      explain:'제조업 지표 호조에 <b>AI 반도체 수요</b> 확대가 수출을 끌어올린 게 핵심 근거고, 확장재정과 기업 실적 개선도 반영됐어.' },
+  ]},
+  { id:'market', variants:[
+    { q:'22일(현지시간) 나스닥 지수 마감 상황으로 정확한 것은?',
+      opts:['27,244.28로 이틀 연속 사상 최고 종가를 경신했다',
+            '전일 대비 3% 넘게 급락했다',
+            '보합권에서 마감해 최고치 경신에는 실패했다',
+            '거래정지로 마감가가 집계되지 않았다'], answer:0,
+      explain:'<b>27,244.28</b>(+0.45%)로 21일에 이어 <b>이틀 연속</b> 사상 최고 종가를 새로 썼어. 다우·S&P500은 오히려 소폭 내렸어.' },
+    { q:'23일 국내 금융시장 마감을 가장 정확히 설명한 것은?',
+      opts:['코스피가 7,080.92로 올라 7,000선 위에 자리 잡았고, 환율은 1,358.4원으로 거의 제자리였다',
+            '코스피가 6,000선까지 급락했다',
+            '원/달러 환율이 1,500원을 넘어섰다',
+            '코스피가 사상 최고치를 새로 썼다'], answer:0,
+      explain:'코스피는 <b>7,080.92</b>(+0.90%)로 반도체·대형주가 견인했고, 원/달러는 <b>1,358.4원</b>으로 전날과 거의 같았어.' },
+  ]},
+  { id:'prosecution_acting', variants:[
+    { q:'23일 검찰총장 대행으로 지정된 인물은?',
+      opts:['이정현 지검장', '김승원', '김지용', '조지호'], answer:0,
+      explain:'<b>이정현</b> 지검장이 검찰총장 대행으로 지정됐어. 10월 2일 검찰청 폐지·공소청 출범을 앞둔 준비 인사야.' },
+    { q:'이정현 대행 지정으로 실제 풀린 문제는 무엇일까?',
+      opts:['공소청 출범 준비 업무 공백 — 법무부장관·검찰총장·중수청장 공백 자체는 그대로다',
+            '법무부장관 공석 문제가 완전히 해소됐다',
+            '중수청장 인선 갈등이 해소됐다',
+            '경찰청장 공백까지 함께 해소됐다'], answer:0,
+      explain:'이건 <b>공소청 출범 준비용 대행</b>일 뿐, 법무부장관·검찰총장·중수청장이 모두 공석인 근본 상황은 그대로야.' },
+  ]},
+  { id:'esim', variants:[
+    { q:'최근 해외여행객 사이에서 통신사 로밍 대신 뚜렷하게 늘고 있는 것은?',
+      opts:['eSIM — 요금 비교에서 로밍보다 평균 85% 이상 저렴하게 나타남',
+            '위성 인터넷 단말기',
+            '해외 통신사 현지 유심 매장 직접 방문',
+            '공항 와이파이 무제한 이용권'], answer:0,
+      explain:"'요즘 누가 로밍 써요'라는 말이 나올 정도로 <b>eSIM</b>으로 옮겨가는 흐름이야. 실제 요금 비교에서 로밍보다 <b>85% 이상</b> 저렴하게 나타났어." },
+  ]},
+  { id:'visitors', variants:[
+    { q:'올해 방한 외국인 관광객 전망(야놀자리서치)으로 정확한 것은?',
+      opts:['2,356만 7,000명 — 작년보다 24.5% 많은 역대 최대',
+            '1,000만 명 — 작년과 비슷한 수준',
+            '5,000만 명 — 국내 인구를 넘어서는 규모',
+            '작년보다 10% 감소한 1,700만 명'], answer:0,
+      explain:'<b>2,356만 7,000명</b>으로 작년(1,893만 7,000명)보다 <b>24.5%</b> 많은, 역대 최대 전망치야.' },
+    { q:'K-컬처를 방문 동기로 꼽은 여행객이 일반 여행객보다 더 쓰는 금액은?',
+      opts:['1인당 평균 435달러', '1인당 평균 50달러', '1인당 평균 4,350달러', '차이가 거의 없다'], answer:0,
+      explain:'K-컬처 목적 여행객은 일반 여행객보다 1인당 평균 <b>435달러</b>를 더 써 — 씀씀이가 큰 손님들이야.' },
+  ]},
+  { id:'airport_peak', variants:[
+    { q:'이번 추석 연휴에서 인천공항 "출국" 인원이 가장 몰리는 날은?',
+      opts:['오늘(24일) — 13만 1,154명 예상', '23일', '25일', '27일'], answer:0,
+      explain:'<b>오늘(24일)</b> 출국객이 13만 1,154명으로 최다야. 입국 피크는 <b>27일</b>(13만 8,658명)로 날짜가 달라.' },
+  ]},
+  { id:'review_0923', variants:[
+    { q:'(어제 복습) 위험자산에 있던 돈이 예·적금 같은 안전자산으로 되돌아가는 현상을 부르는 말은?',
+      opts:['역머니무브', '머니무브', '캐리트레이드', '디레버리징'], answer:0,
+      explain:'<b>역머니무브</b>야. 예금 → 주식 방향인 머니무브의 반대야.' },
+    { q:'(어제 복습) 예금이 쌓여도 연말 대출 문턱이 낮아지기 어려웠던 이유는?',
+      opts:['5대 은행 가계대출이 올해 연간 증가 목표치를 이미 넘겨 한도를 다 썼기 때문',
+            '예금을 대출 재원으로 못 쓰게 법이 바뀌었기 때문',
+            '대출 신청자가 급감했기 때문',
+            '한국은행이 대출을 전면 금지했기 때문'], answer:0,
+      explain:'가계대출 잔액이 연간 증가 목표치(약 7조 1,100억)를 <b>이미 초과</b>했어. 돈이 없어서가 아니라 <b>한도</b>를 다 써서 조이는 거야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'텍사스 가스복합화력발전소 사업에 투입되는 금액은? (숫자+단위, 예: 100억 달러)',
+    accept:['223억','223억달러','223억 달러'],
+    explain:'정답은 <b>223억 달러</b>야. 20년간 최대 450억 달러 회수가 목표야.' },
+  { q:'대미투자 1호 사업이 짓는 텍사스 발전소의 발전 용량은? (숫자+단위, 예: 1GW)',
+    accept:['6.3gw','6.3','6.3기가와트'],
+    explain:'정답은 <b>6.3GW</b>야. 텍사스 AI 데이터센터에 전력을 공급해.' },
+  { q:'대미투자 후속 원전 사업에서 미국형(AP1000)은 몇 기로 조율됐을까? (숫자만)',
+    accept:['6','6기'],
+    explain:'정답은 <b>6기</b>야. 한국형(APR1400)은 2기로 조율됐어.' },
+  { q:'ADB가 9월에 상향 발표한 올해 한국 성장률은 몇 %일까? (숫자만, 예: 2.5)',
+    accept:['3.2','3.2%'],
+    explain:'정답은 <b>3.2%</b>야. 7월 전망(2.6%)보다 0.6%p 올랐어.' },
+  { q:'22일(현지시간) 나스닥 지수가 이틀 연속 사상 최고를 찍은 마감가는? (숫자만)',
+    accept:['27244','27244.28','27,244.28','27,244'],
+    explain:'정답은 <b>27,244.28</b>이야.' },
+  { q:'23일 국내 코스피 지수 마감가는? (숫자만)',
+    accept:['7080','7080.92','7,080.92','7,080'],
+    explain:'정답은 <b>7,080.92</b>야. +0.90%로 7,000선 위에 자리 잡았어.' },
+  { q:'검찰총장 대행으로 지정된 인물의 이름은? (한 단어)',
+    accept:['이정현'],
+    explain:'정답은 <b>이정현</b> 지검장이야.' },
+  { q:'검찰청이 폐지되고 공소청·중수청이 출범하는 날짜는? (월.일 형식, 예: 10.2)',
+    accept:['10.2','10월2일','10월 2일'],
+    explain:'정답은 <b>10월 2일</b>이야. 오늘 기준 D-8이야.' },
+  { q:'해외여행객이 통신사 로밍 대신 주로 갈아타는 것은? (한 단어)',
+    accept:['esim','이심'],
+    explain:'정답은 <b>eSIM</b>이야. 로밍보다 평균 85% 이상 저렴하다는 비교가 나와.' },
+  { q:'야놀자리서치가 전망한 올해 방한 외국인 관광객 수는? (숫자+단위, 예: 2000만명)',
+    accept:['2356만7000명','2356만7천명','2,356만 7,000명','2356만'],
+    explain:'정답은 <b>2,356만 7,000명</b>이야. 작년보다 24.5% 많은 역대 최대 전망이야.' },
+  { q:'K-컬처 목적 여행객이 일반 여행객보다 1인당 평균 더 쓰는 금액은? (숫자+단위, 예: 100달러)',
+    accept:['435달러','435'],
+    explain:'정답은 <b>435달러</b>야.' },
+  { q:'이번 추석 연휴 인천공항 출국 인원이 가장 몰리는 날짜는? (일자만, 예: 27)',
+    accept:['24','24일','오늘'],
+    explain:'정답은 <b>24일(오늘)</b>이야. 입국 피크는 27일로 날짜가 달라.' },
+  { q:'(어제 복습) 위험자산 자금이 안전자산으로 되돌아가는 현상을 부르는 말은? (한 단어)',
+    accept:['역머니무브'],
+    explain:'정답은 <b>역머니무브</b>야.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
