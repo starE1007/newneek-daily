@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.25</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.25 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'xi_visit', variants:[
+    { q:'24일 시진핑 주석의 백악관 방문을 가장 정확히 설명한 것은?',
+      opts:['3년 만의 방미이자 개인적으로는 11년 만의 백악관 방문 — 3시간 22분 체류',
+            '취임 후 첫 해외 순방으로 미국을 택한 것',
+            '무역 의제만 다루기로 사전에 합의된 실무 방문',
+            '트럼프 대통령이 베이징을 답방하는 자리'], answer:0,
+      explain:'시 주석은 <b>3년 만에</b> 미국 땅을 밟았고, 백악관 방문은 개인적으로 <b>11년 만</b>이야. 트럼프가 공항까지 나가 맞았고 <b>3시간 22분</b> 체류했어.' },
+  ]},
+  { id:'truce_extend', variants:[
+    { q:'정상회담을 앞두고 미·중이 발표한 무역휴전 연장 내용은?',
+      opts:['11월 10일 만료 예정이던 부산합의를 내년 1월 10일까지 두 달 연장',
+            '무역휴전을 트럼프 잔여임기 전체로 영구 연장',
+            '무역휴전을 종료하고 관세를 즉시 재부과',
+            '휴전을 1주일만 임시 연장'], answer:0,
+      explain:'11/10 만료 예정이던 <b>부산합의</b>(무역휴전)를 내년 <b>1월 10일</b>까지 <b>두 달</b> 더 연장하기로 미리 합의해뒀어.' },
+    { q:"이번 무역휴전 연장이 '완전 타결'이 아니라 '임시 연장'에 그친 이유로 가장 정확한 것은?",
+      opts:['중국은 장기 협정을 원했지만 미국이 짧은 조건부 갱신을 고수했고, 희토류 신뢰도 안 쌓였기 때문',
+            '양국이 이미 모든 쟁점에 완전히 합의했지만 서명 절차만 남아서',
+            '미국 의회가 장기 합의를 법으로 금지해서',
+            '중국이 아예 휴전 자체를 원하지 않아서'], answer:0,
+      explain:'중국은 <b>잔여임기 전체</b>를 묶는 장기 합의를 원했지만 미국은 <b>3~6개월 단위 조건부 갱신</b>을 고수했어. 희토류 등에서 서로 신뢰가 안 쌓인 탓이야.' },
+  ]},
+  { id:'busan_deal', variants:[
+    { q:'2025년 10월 부산합의에서 맞바꾼 세 가지 조합으로 정확한 것은?',
+      opts:['미국의 관세 10%p 인하 + 중국의 희토류 통제 1년 유예 + 중국의 농산물 구매 확대',
+            '미국의 반도체 수출 전면 허용 + 중국의 관세 완전 철폐',
+            '미국의 대만 지원 중단 + 중국의 군축',
+            '양국 모두 관세를 동시에 2배 인상'], answer:0,
+      explain:'미국이 <b>관세 10%p 인하</b>, 중국이 <b>희토류 통제 1년 유예</b>와 <b>농산물 구매 확대</b>를 맞바꾼 게 부산합의야.' },
+  ]},
+  { id:'rare_earth', variants:[
+    { q:'8월 중국의 대미 희토류 영구자석 출하량 상황으로 정확한 것은?',
+      opts:['512톤 — 1년 전보다 오히려 13% 줄어듦',
+            '2,000톤으로 전년 대비 2배 급증',
+            '수출이 전면 중단돼 0톤',
+            '전년과 정확히 동일한 수준 유지'], answer:0,
+      explain:'8월 출하량은 <b>512톤</b>으로 1년 전보다 <b>13% 줄었어</b>. 미국은 중국이 여전히 희토류 수출을 엄격히 통제하고 있다고 봐.' },
+    { q:'중국의 부산합의 이행 상황을 가장 정확히 설명한 것은?',
+      opts:['대두 구매(연 2,500만 톤)는 이행 중이지만, 추가 농산물 170억弗 구매는 지연되고 있다',
+            '모든 약속을 100% 이행해 아무 문제가 없다',
+            '대두 구매마저 전면 중단했다',
+            '농산물 구매는 초과 이행했지만 대두는 중단했다'], answer:0,
+      explain:'연간 <b>대두 2,500만 톤</b> 구매 약속은 지키고 있지만, 추가로 약속한 <b>170억 달러</b> 규모 농산물 구매는 늦어지고 있어.' },
+  ]},
+  { id:'korea_impact', variants:[
+    { q:'미·중 희토류 갈등이 한국 산업에 주는 영향으로 가장 정확한 것은?',
+      opts:['영구자석 등 첨단소재의 중국 의존도가 높아 반도체·배터리·자동차 공급망이 함께 흔들릴 수 있다',
+            '한국은 희토류를 전량 자체 생산해 영향이 전혀 없다',
+            '반도체 산업에만 영향이 있고 배터리·자동차는 무관하다',
+            '희토류와 한국 산업은 아무 관련이 없다'], answer:0,
+      explain:'한국은 <b>영구자석</b> 등 첨단소재의 중국·일본 의존도가 높아, 반도체·배터리·전기차 공급망이 희토류 갈등의 영향권에 있어.' },
+  ]},
+  { id:'schedule_next', variants:[
+    { q:'이번에 연장된 무역휴전의 다음 만료(재협상) 시점은?',
+      opts:['2027년 1월 10일', '2026년 11월 10일', '2026년 12월 31일', '2027년 6월 30일'], answer:0,
+      explain:'원래 <b>11월 10일</b> 만료 예정이던 걸 <b>2027년 1월 10일</b>까지 연장한 거야 — 그날이 다음 확인 포인트야.' },
+  ]},
+  { id:'china_holiday_peak', variants:[
+    { q:'중국 국경절(10월 1일)과 맞물려 인천공항 외국인 입국이 정점을 찍는 시점과 규모는?',
+      opts:['10월 2일 하루 최대 6만 명 — 작년 최고치(4만 767명)보다 약 47% 많음',
+            '9월 24일 하루 6만 명',
+            '10월 2일 하루 1만 명 수준으로 작년과 비슷',
+            '연휴 내내 외국인 입국은 오히려 감소'], answer:0,
+      explain:'<b>10월 2일</b> 외국인 입국이 최대 <b>6만 명</b>까지 몰릴 전망이야 — 작년 국경절 최고치(4만 767명)보다 <b>약 47%</b> 많아.' },
+  ]},
+  { id:'review_0924', variants:[
+    { q:'(어제 복습) 대미투자 1호 텍사스 가스발전소 사업에서 상업적 합리성 판단의 핵심 기준이었던 것은?',
+      opts:['전기를 팔 곳(전력 수요)이 확실한가',
+            '건설 인건비가 얼마나 저렴한가',
+            '텍사스 주지사의 개인적 지지 여부',
+            '한국 기업 지분 참여 비율'], answer:0,
+      explain:'AI 데이터센터가 몰린 텍사스는 <b>전력을 팔 곳(수요)이 확실</b>했고, 그게 상업적 합리성 판단의 핵심 기준이었어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'시진핑 주석의 이번 백악관 방문은 개인적으로 몇 년 만일까? (숫자만)',
+    accept:['11','11년'],
+    explain:'정답은 <b>11년</b>이야. 국가 방문 자체는 3년 만이야.' },
+  { q:'이번에 연장된 미·중 무역휴전(부산합의)의 새 만료일은? (월.일 형식, 예: 1.10)',
+    accept:['1.10','1월10일','1월 10일','2027.1.10'],
+    explain:'정답은 <b>내년 1월 10일</b>이야. 원래는 11월 10일 만료 예정이었어.' },
+  { q:'부산합의에서 미국이 중국에 취한 관세 조치는? (숫자+단위, 예: 5%p)',
+    accept:['10%p','10%포인트','10퍼센트포인트','10%'],
+    explain:'정답은 <b>10%p 인하</b>야.' },
+  { q:'8월 중국의 대미 희토류 영구자석 출하량은? (숫자+단위, 예: 100톤)',
+    accept:['512톤','512'],
+    explain:'정답은 <b>512톤</b>이야. 1년 전보다 13% 줄었어.' },
+  { q:'중국이 추가로 구매를 약속했지만 지연되고 있는 미국산 농산물 구매 규모는? (숫자+단위, 예: 10억달러)',
+    accept:['170억달러','170억 달러','170억弗'],
+    explain:'정답은 <b>170억 달러</b>야.' },
+  { q:'중국 국경절 연휴 기간, 인천공항 외국인 입국이 정점을 찍는 날짜는? (월.일 형식, 예: 10.2)',
+    accept:['10.2','10월2일','10월 2일'],
+    explain:'정답은 <b>10월 2일</b>이야. 하루 최대 6만 명까지 몰릴 전망이야.' },
+  { q:'(어제 복습) 대미투자 1호 텍사스 사업에 투입되는 금액은? (숫자+단위, 예: 100억 달러)',
+    accept:['223억','223억달러','223억 달러'],
+    explain:'정답은 <b>223억 달러</b>야.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
