@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.26</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.26 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'trigger', variants:[
+    { q:'지난 24일 오라클 등 AI 관련주가 흔들린 직접적인 도화선은?',
+      opts:['로이터가 전한 오픈AI의 2026~2030년 누적 마이너스 현금흐름 2,780억弗 전망',
+            '오픈AI가 흑자 전환에 성공했다는 발표',
+            '엔비디아가 오픈AI 지분을 전량 매각했다는 소식',
+            '한국은행이 기준금리를 인상했다는 발표'], answer:0,
+      explain:'로이터 보도로 오픈AI의 <b>2026~2030년 누적 마이너스 현금흐름이 2,780억 달러</b>에 이를 거란 전망이 전해지면서 오라클(-4.64%) 등 AI 관련주가 동반 하락했어.' },
+  ]},
+  { id:'total_commit', variants:[
+    { q:'오픈AI가 7개 회사에 쓰기로 약속한 인프라 지출 총액과, 이를 현재 연매출과 비교한 것으로 정확한 것은?',
+      opts:['총 1조 4,000억弗 — 연매출(약 250억弗)의 50배가 넘는 규모',
+            '총 1조 4,000억弗 — 이미 연매출을 넘는 수준이라 문제없음',
+            '총 1,400억弗 — 연매출보다 적어 안전한 수준',
+            '총 1조 4,000억弗 — 전액 이미 현금으로 지급 완료'], answer:0,
+      explain:'브로드컴 3,500억+오라클 3,000억+MS 2,500억+엔비디아 1,000억+AMD 900억+AWS 380억+코어위브 220억弗를 합치면 <b>1조 4,000억弗</b>인데, 오픈AI 연매출은 아직 <b>250억弗</b> 안팎이야.' },
+  ]},
+  { id:'mechanism', variants:[
+    { q:"'순환금융' 구조를 가장 정확히 설명한 것은?",
+      opts:['엔비디아가 오픈AI에 돈을 대주면, 오픈AI는 그 돈으로 클라우드사에 선주문하고, 클라우드사는 그 계약으로 다시 엔비디아 칩을 사들여 매출이 한 바퀴 돌아옴',
+            '오픈AI가 외부 소비자에게만 직접 서비스를 팔아 번 돈으로 투자금을 갚는 구조',
+            '엔비디아·오라클·MS가 서로 전혀 거래 관계 없이 독립적으로 성장하는 구조',
+            '정부 보조금만으로 모든 데이터센터 비용을 충당하는 구조'], answer:0,
+      explain:'엔비디아 → 오픈AI → 클라우드사(오라클·MS 등) → 다시 엔비디아로 돈이 <b>한 바퀴 돌아오는</b> 구조라 "순환금융"이라 불려.' },
+    { q:'이 순환금융 구조가 위험하다고 지적받는 핵심 이유는?',
+      opts:["매출 성장의 상당 부분이 실제 소비자 수요가 아니라 회사들끼리의 상호 약정(계약)에 기대고 있어서",
+            '모든 계약이 이미 현금으로 완납돼 더 늘어날 매출이 없어서',
+            '이 구조에 참여한 회사가 한 곳도 없어서',
+            '정부가 이 거래를 전면 금지했기 때문에'], answer:0,
+      explain:'겉보기엔 매출이 느는 것 같지만, 그 상당 부분이 실수요가 아니라 <b>몇몇 회사끼리 주고받기로 한 약속</b>에서 나온다는 게 핵심 위험이야.' },
+  ]},
+  { id:'oracle_exposure', variants:[
+    { q:'오라클의 미결제 주문액(RPO)과 오픈AI 비중에 대한 설명으로 정확한 것은?',
+      opts:['RPO 6,380억弗 중 절반에 가까운 3,000억弗가 오픈AI 한 회사 몫(BofA 추정)',
+            'RPO 전액이 오픈AI와 무관한 여러 고객사에 고르게 분산돼 있음',
+            'RPO는 100억弗 수준으로 오픈AI 리스크와 무관함',
+            '오픈AI는 오라클의 RPO에 전혀 포함되지 않음'], answer:0,
+      explain:'오라클 RPO 6,380억弗 중 <b>3,000억弗 가까이가 오픈AI 한 곳</b>에서 나온 걸로 BofA는 추정해 — 오픈AI가 못 내면 오라클이 그 빚과 시설을 떠안아.' },
+  ]},
+  { id:'burry', variants:[
+    { q:'마이클 버리가 이 구조를 비판하며 취한 행동으로 정확한 것은?',
+      opts:['이 구조를 "엔론 같다"고 비판하며 오라클·엔비디아·팔란티어 등에 포트폴리오의 21% 넘게 공매도',
+            '오라클·엔비디아 주식을 대량 매수해 지지 의사를 밝힘',
+            'AI 산업에 대해 아무 의견도 내지 않음',
+            '오픈AI에 직접 투자해 이사회에 합류함'], answer:0,
+      explain:'마이클 버리는 이 순환금융 구조를 <b>"엔론 같다"</b>고 비판하며 오라클·엔비디아·팔란티어 등에 포트폴리오의 <b>21% 넘게 공매도</b>를 걸어놨어.' },
+  ]},
+  { id:'korea_impact', variants:[
+    { q:'이 AI 순환금융 구조가 한국에 주는 영향으로 가장 정확한 것은?',
+      opts:['코스피 사상 최고치를 이끈 삼성전자·SK하이닉스의 HBM 랠리가 엔비디아發 AI 투자 사이클에 올라탄 것이라, 고리가 흔들리면 한국 반도체 수출·코스피로 충격이 옮겨붙을 수 있음',
+            '한국 반도체 산업과는 완전히 무관한 미국 내부 문제일 뿐임',
+            'HBM은 엔비디아와 관련이 없는 별개의 메모리 규격임',
+            '코스피는 AI·반도체와 무관하게 움직여 온 시장임'], answer:0,
+      explain:'코스피 최고치의 배경엔 삼성전자·SK하이닉스의 <b>HBM 랠리</b>가 있는데, 이건 엔비디아發 AI 투자 사이클에 올라탄 결과라 <b>순환금융 고리가 흔들리면 한국까지 영향</b>을 받아.' },
+  ]},
+  { id:'review_0925', variants:[
+    { q:"(어제 복습) 어제 다룬 미·중 무역휴전 연장을 '완전 타결'이 아니라고 부른 이유와 재협상 시점으로 정확한 것은?",
+      opts:['희토류 갈등 등 근본 쟁점이 안 풀린 채 두 달만 연장됐고, 재협상 시점은 2027년 1월 10일',
+            '모든 쟁점이 완전히 해결돼 재협상 자체가 필요 없어짐',
+            '재협상 없이 영구 타결로 끝남',
+            '재협상 시점은 2026년 12월 31일'], answer:0,
+      explain:'희토류 등 근본 갈등이 그대로인 채 <b>두 달만 연장</b>됐고, 다음 재협상(만료) 시점은 <b>2027년 1월 10일</b>이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'오픈AI가 7개 회사에 쓰기로 약속한 인프라 지출 총액은? (숫자+단위, 예: 1000억달러)',
+    accept:['1조4000억달러','1조 4000억달러','1조4천억달러','1조 4천억 달러','1.4조달러','1조4000억弗'],
+    explain:'정답은 <b>1조 4,000억 달러</b>야. 오픈AI 연매출(약 250억弗)의 50배가 넘어.' },
+  { q:'오픈AI의 2026~2030년 누적 마이너스 현금흐름 전망치는? (숫자+단위, 예: 100억달러)',
+    accept:['2780억달러','2780억 달러','2,780억달러','2780억弗'],
+    explain:'정답은 <b>2,780억 달러</b>야. 로이터가 보도한 오픈AI 내부 전망이야.' },
+  { q:'오라클 RPO(미결제 주문액) 중 오픈AI 한 회사 몫으로 BofA가 추정한 금액은? (숫자+단위, 예: 100억달러)',
+    accept:['3000억달러','3000억 달러','3,000억달러','3000억弗'],
+    explain:'정답은 <b>3,000억 달러</b>야. 오라클 전체 RPO(6,380억弗)의 절반 가까이를 차지해.' },
+  { q:'9월 24일 오라클 주가는 몇 % 하락했을까? (숫자만, 소수점 포함 가능)',
+    accept:['4.64','-4.64','4.64%'],
+    explain:'정답은 <b>4.64%</b>야. 같은 날 Arm -3.85%, 델 -2.99%도 함께 떨어졌어.' },
+  { q:'이 AI 순환금융 구조를 "엔론 같다"고 비판하며 대규모 공매도를 건 유명 투자자는? (이름만)',
+    accept:['마이클 버리','버리','michael burry'],
+    explain:'정답은 <b>마이클 버리</b>야. 오라클·엔비디아·팔란티어 등에 포트폴리오의 21% 넘게 공매도를 걸었어.' },
+  { q:'(어제 복습) 어제 다룬 미·중 무역휴전의 새 만료(재협상) 시점은? (연도.월.일 형식, 예: 2027.1.10)',
+    accept:['2027.1.10','2027년1월10일','2027년 1월 10일','1.10'],
+    explain:'정답은 <b>2027년 1월 10일</b>이야. 원래 11월 10일 만료 예정이었어.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
