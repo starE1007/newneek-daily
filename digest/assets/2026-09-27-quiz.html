@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.27</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.27 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'iran_proposal', variants:[
+    { q:"이란이 아락치 외무장관을 통해 낸 '호르무즈 7일 개방안'의 조건으로 정확한 것은?",
+      opts:['미국이 이란 항구 해상 봉쇄 해제·원유 제재 철회·동결자산 해제·레바논 포함 7일간 적대행위 중단을 하면, 그 안에 호르무즈 통항을 재개하겠다는 로드맵',
+            '이란이 먼저 핵무기 개발을 전면 포기하면 미국이 모든 제재를 즉시 해제하겠다는 미국 측 제안',
+            '유엔이 중재해 호르무즈 해협을 국제 공동관리 구역으로 바꾸자는 제안',
+            '이란이 아무 조건 없이 호르무즈 해협을 즉시 재개방하겠다는 일방적 선언'], answer:0,
+      explain:'이란 제안은 <b>미국이 먼저</b> 봉쇄 해제·제재 철회·자산 동결 해제·중동 전역 적대행위 중단을 이행하면, 그 <b>7일 안에</b> 이란이 통항을 재개하겠다는 순서였어.' },
+  ]},
+  { id:'trump_response', variants:[
+    { q:'트럼프 대통령은 이란의 제안에 대해 어떻게 반응했어?',
+      opts:['백악관 앞에서 기자들에게 "내가 그 제안을 거절했다"고 직접 밝힘',
+            '즉각 제안을 수용하고 이행 절차에 들어감',
+            '별다른 언급 없이 침묵으로 일관함',
+            '이란에 오히려 더 유리한 역제안을 내놓음'], answer:0,
+      explain:'트럼프는 26일 백악관 앞에서 기자들에게 <b>"내가 그 제안을 거절했다"</b>고 직접 밝혔어.' },
+  ]},
+  { id:'why_reject', variants:[
+    { q:'미국이 이란의 제안을 거절한 배경으로 로이터 등이 전한 내용은?',
+      opts:['트럼프가 참모들에게 이란이 핵 프로그램 폐기라는 근본 요구를 받아들일지 회의적이라 말했고, 중간선거 후 폭격 재개 가능성도 저울질 중이라는 보도가 나옴',
+            '미국이 이미 호르무즈 봉쇄를 스스로 풀 계획을 확정해 협상 자체가 불필요해짐',
+            '이란이 핵 프로그램을 이미 전면 폐기해 더 논의할 쟁점이 없어짐',
+            '미국 의회가 이란과의 모든 협상을 금지하는 법을 통과시킴'], answer:0,
+      explain:'트럼프는 참모들에게 이란의 <b>핵 프로그램 폐기 수용 여부에 회의적</b>이라 말했고, <b>중간선거(11월) 이후 폭격 재개</b> 가능성도 저울질 중이라는 보도가 나왔어.' },
+  ]},
+  { id:'why_now', variants:[
+    { q:'이란이 하필 지금 이 제안을 던진 배경으로 가장 정확한 설명은?',
+      opts:['원유 우회로였던 사우디 동서 송유관이 이달 피격으로 끊기면서 물량이 다시 호르무즈로 몰렸고, 뱃삯이 사상 최고를 찍은 시점이라 "봉쇄를 풀 절호의 기회"로 판단',
+            '이란 경제가 완전히 회복돼 더 이상 협상할 이유가 사라졌기 때문',
+            '미국이 먼저 이란에 협상을 간청해왔기 때문',
+            '호르무즈 해협 통항량이 이미 전쟁 이전 수준으로 완전히 회복됐기 때문'], answer:0,
+      explain:'우회로였던 <b>사우디 동서 송유관</b>이 이달 피격으로 끊기면서 물량이 다시 호르무즈로 몰렸고, 뱃삯이 사상 최고를 찍은 시점이라 이란도 지금이 <b>협상 지렛대가 가장 세다</b>고 본 거야.' },
+  ]},
+  { id:'oil_impact', variants:[
+    { q:'이란의 제안 소식과 트럼프의 거부가 국제유가에 미친 영향으로 정확한 것은?',
+      opts:['제안 소식이 돌던 25일엔 유가가 잠깐 내렸다가, 거부가 확인되자 다시 튀어 올랐음',
+            '제안 소식에도 유가는 거의 움직이지 않고 그대로 유지됐음',
+            '제안 소식이 나오자마자 유가가 큰 폭으로 뛰어올랐음',
+            '거부가 확인된 뒤에도 유가는 오히려 계속 내려갔음'], answer:0,
+      explain:'25일 제안 소식에 유가가 <b>잠깐 내렸다가</b>, 26일 거부가 확인되자 <b>다시 튀어 올랐어</b> — 협상 기대가 꺼진 거야.' },
+  ]},
+  { id:'us_china', variants:[
+    { q:'시진핑 방미 후속으로 26일 베이징이 내놓은 미·중 합의 구체 항목으로 정확한 것은?',
+      opts:["'민감하지 않은' 품목 각 300억弗에 상호 관세 인하 적용 + 중국이 2027·2028년 미국산 석탄을 각 1,000만 톤씩 구매 + AI 정책 대화 채널·상설 무역협의체 신설",
+            '모든 품목에 대한 관세를 전면 철폐하기로 합의',
+            '중국이 미국산 반도체 수입 물량을 대폭 늘리기로 합의',
+            '이번 합의로 희토류 수출 통제 문제까지 함께 타결됨'], answer:0,
+      explain:"양국은 '민감하지 않은' 품목 각 <b>300억弗</b>에 관세 인하를 적용하고, 중국은 2027·2028년 미국산 석탄을 각 <b>1,000만 톤</b>씩 사기로 했어. 희토류 등 근본 쟁점은 그대로야." },
+  ]},
+  { id:'review_0926', variants:[
+    { q:"(어제 복습) 어제 다룬 '순환금융' 구조에서, 엔비디아가 오픈AI에 댄 돈이 결국 어디로 되돌아온다고 했지?",
+      opts:['클라우드사(오라클·MS 등)가 그 계약을 근거로 다시 엔비디아 칩을 사들이면서, 결국 엔비디아 매출로 되돌아옴',
+            '미국 정부 보조금 계좌로 전액 흡수됨',
+            '전액 오픈AI 창업자 개인 자산으로 귀속됨',
+            '한국 반도체 기업에 직접 재투자됨'], answer:0,
+      explain:'엔비디아 → 오픈AI → 클라우드사 → 다시 <b>엔비디아 매출</b>로 도는 구조라 "순환금융"이라 불렀어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'호르무즈 해협이 봉쇄된 지 몇 개월째야? (숫자만)',
+    accept:['7개월','7 개월','7달','7'],
+    explain:'정답은 <b>7개월</b>이야. 2월 말 전쟁 이후 사실상 계속 닫혀 있어.' },
+  { q:"이란 제안에서, 미국이 조건을 이행하면 이란이 통항을 재개하겠다고 한 기간은? (숫자+단위, 예: 3일)",
+    accept:['7일','7 일','7'],
+    explain:'정답은 <b>7일</b>이야. 그래서 "7일 개방안"이라 불려.' },
+  { q:'미·중이 관세를 낮추기로 한 품목 규모는? (숫자+단위, 예: 100억달러)',
+    accept:['300억달러','300억 달러','300억弗'],
+    explain:'정답은 <b>300억 달러</b>야. 양국이 "민감하지 않은" 품목에 상호 적용하기로 했어.' },
+  { q:'중국이 2027·2028년 각각 사기로 한 미국산 석탄량은? (숫자+단위, 예: 100만톤)',
+    accept:['1000만톤','1000만 톤','1,000만톤','1,000만 톤'],
+    explain:'정답은 <b>1,000만 톤</b>이야. 2027년과 2028년 각각이라 총 2,000만 톤 규모야.' },
+  { q:'트럼프가 폭격 재개 가능성을 저울질한다고 보도된 시점의 기준이 된 미국 국내 일정은? (한 단어)',
+    accept:['중간선거','중간 선거','미국 중간선거','midterm'],
+    explain:'정답은 <b>중간선거</b>(11월)야. 그 이후 폭격 작전 재개 가능성이 보도됐어.' },
+  { q:'(어제 복습) 오픈AI가 7개 회사에 쓰기로 약속한 인프라 지출 총액은? (숫자+단위, 예: 1000억달러)',
+    accept:['1조4000억달러','1조 4000억달러','1조4천억달러','1조 4천억 달러','1.4조달러','1조4000억弗'],
+    explain:'정답은 <b>1조 4,000억 달러</b>야. 오픈AI 연매출(약 250억弗)의 50배가 넘어.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
