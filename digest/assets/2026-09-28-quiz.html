@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.09.28</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.28 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. MC는 concept당 여러 버전, 정답 index는 원본 옵션 배열 기준(셔플 전).
+const MC_BANK = [
+  { id:'trump_turn', variants:[
+    { q:"트럼프가 26일 이란의 '호르무즈 7일 개방' 제안을 거절한 지 하루 만인 27일, 악시오스와의 인터뷰에서 한 말로 정확한 것은?",
+      opts:['"이번 주 이란과 협상을 더 할 것으로 예상한다"며 재협상을 예고함',
+            '"이란과의 모든 협상 채널을 영구히 끊겠다"고 선언함',
+            '"이란의 제안을 다시 검토해 조건 없이 수용하겠다"고 밝힘',
+            '호르무즈 문제에 대해 더 이상 언급하지 않겠다고 함'], answer:0,
+      explain:'트럼프는 27일(현지시간) 악시오스에 <b>"이번 주 이란과 협상을 더 할 것"</b>이라 말하며 거부 하루 만에 재협상을 예고했어.' },
+  ]},
+  { id:'qatar_role', variants:[
+    { q:'카타르 중재자들의 최근 움직임으로 정확한 것은?',
+      opts:['미국·이란 양측을 오가며 간극을 좁히려 하고 있고, 이르면 월요일 양측과 각각 회동할 예정',
+            '중재를 완전히 포기하고 손을 뗌',
+            '이란 편에 서서 미국에 제재 해제를 공개 요구함',
+            '유엔에 중재 권한을 넘기고 물러남'], answer:0,
+      explain:'카타르 중재자들은 물밑에서 <b>미국·이란 양측을 오가며</b> 간극을 좁히려 하고 있고, 이르면 <b>월요일</b> 양측과 각각 만날 예정이라고 전해졌어.' },
+  ]},
+  { id:'agenda_gap', variants:[
+    { q:'이란과 미국이 재협상을 앞두고도 여전히 안 맞는 지점은?',
+      opts:['이란은 호르무즈 재개방·해군 봉쇄 해제만 논의하고 싶어하는데, 미국은 그 전에 이란의 핵 프로그램 양보부터 받아내려 함',
+            '양측 모두 이미 모든 조건에 합의해 실무 서명만 남음',
+            '이란이 오히려 미국보다 더 강경한 군사 조치를 요구함',
+            '미국이 먼저 호르무즈 봉쇄를 스스로 해제하겠다고 선언함'], answer:0,
+      explain:'이란은 <b>호르무즈·해군 봉쇄</b>만 논의하고 싶어하는데, 미국은 그 전에 이란의 <b>핵 프로그램 양보</b>부터 받아내겠다는 입장이라 의제 자체가 안 맞아.' },
+  ]},
+  { id:'trump_quote', variants:[
+    { q:"트럼프가 이란의 제안에 대해 남긴 발언의 취지로 가장 정확한 것은?",
+      opts:['"1년 전이라면 합의했을 내용인데 저쪽이 패를 너무 세게 밀어붙였다"며 핵심 요구는 안 굽히는 최대압박 기조를 유지함',
+            '이란의 요구를 전부 수용하며 즉각 타결을 선언함',
+            '협상 자체가 무의미하다며 대화를 완전히 중단함',
+            '이란의 제안이 오히려 미국에 불리하지 않다고 인정함'], answer:0,
+      explain:'트럼프는 "그들은 합의를 원하지만 내가 원하는 합의는 아니다. <b>1년 전이라면 합의했을 내용</b>인데, 저쪽이 패를 너무 세게 밀어붙였다"고 말해 <b>최대압박 기조</b>를 이어갔어.' },
+  ]},
+  { id:'justice_vacancy', variants:[
+    { q:'10월 2일 공소청·중수청 출범을 앞둔 인선 상황으로 정확한 것은?',
+      opts:['법무부장관 후보자는 자진사퇴 후 후임을 못 찾았고, 중수청장도 절차상 10/2 임명이 사실상 불가능하며, 공소청장 인선 자체가 출범 이후에나 시작됨',
+            '지휘탑 네 자리 모두 이미 인선이 완료돼 정상 출범이 확정됨',
+            '법무부장관만 공석이고 나머지 세 자리는 이미 채워짐',
+            '공소청장 후보 추천이 이미 끝나 이달 안에 임명이 확정됨'], answer:0,
+      explain:'법무부장관 후보자는 후임을 못 찾았고, 중수청장은 인사청문 절차상 <b>10/2 임명이 사실상 불가능</b>, 공소청장은 변협 추천 마감(10/6)이 출범 이후라 인선이 <b>출범 후에나 시작</b>돼.' },
+  ]},
+  { id:'review_0927', variants:[
+    { q:"(어제 복습) 이란이 낸 '호르무즈 7일 개방' 제안에서, 미국이 먼저 이행해야 할 조건 중 '해상 봉쇄 해제·원유 제재 철회·동결자산 해제' 말고 하나는?",
+      opts:['중동 전역(레바논 포함)에서 7일간 적대행위 중단',
+            '이란에 대한 무기 수출 전면 허용',
+            '유엔 안보리 상임이사국 지위 부여',
+            '이란 중앙은행 자산의 미국 이전'], answer:0,
+      explain:'이란 제안에는 <b>중동 전역(레바논 포함) 7일간 적대행위 중단</b>이 조건 중 하나로 포함돼 있었어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'카타르 중재자들이 이르면 언제 미국·이란 양측과 각각 회동할 예정이라고 전해졌어? (요일)',
+    accept:['월요일','월','monday'],
+    explain:'정답은 <b>월요일</b>이야. 카타르 중재자들이 이르면 월요일 양측과 따로 만날 예정이라고 전해졌어.' },
+  { q:'미국이 재협상에서 이란에게 먼저 받아내려는 핵심 요구는? (한 단어)',
+    accept:['핵프로그램','핵 프로그램','핵','핵양보','핵 양보'],
+    explain:'정답은 <b>핵 프로그램(양보)</b>이야. 미국은 호르무즈 논의보다 이란의 핵 프로그램 양보를 우선시해.' },
+  { q:'공소청장 후보에 대한 변협의 추천 마감일은? (날짜, 예: 10월 1일)',
+    accept:['10월6일','10월 6일','10/6'],
+    explain:'정답은 <b>10월 6일</b>이야. 공소청(10/2 출범) 이후로 잡혀 있어 인선이 출범 후에나 시작돼.' },
+  { q:'서울환대주간 기간 중 명동에서 K-POP 공연·럭키드로우가 열리는 날짜는? (예: 10월1일~10월5일)',
+    accept:['10월1일~10월8일','10/1~10/8','10월 1일~10월 8일','10월1일-10월8일'],
+    explain:'정답은 <b>10월 1일~10월 8일</b>이야. 명동에서 이 기간 K-POP 공연·관광안내·럭키드로우가 진행돼.' },
+  { q:'(어제 복습) 호르무즈 해협이 봉쇄된 지 몇 개월째야? (숫자만)',
+    accept:['7개월','7 개월','7달','7'],
+    explain:'정답은 <b>7개월</b>이야. 2월 말 전쟁 이후 사실상 계속 닫혀 있어.' },
+  { q:'트럼프가 이란 제안 거부 후 재고할 수도 있다고 저울질한다는 군사 조치 재개 시점의 기준은? (한 단어)',
+    accept:['중간선거','중간 선거','미국 중간선거','midterm'],
+    explain:'정답은 <b>중간선거</b>(11월)야. 그 이후 폭격 작전 재개 가능성이 보도됐어.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
