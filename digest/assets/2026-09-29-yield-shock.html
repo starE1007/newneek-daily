@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미국 금리가 오르면 왜 코스피가 빠질까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--red-soft);border-color:#F5CFCB}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.a{background:var(--orange-soft);color:#B06426}
+  .badge.b{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.29 데일리 뉴스 · 시각자료</div>
+  <h1>📉 미국 금리가 오르면 왜 코스피가 빠질까</h1>
+  <div class="sub">연휴 사이 벌어진 일이 어제 코스피 -2.7%로 이어진 경로를 한 장으로 보기</div>
+
+  <div class="section-title">국채금리 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>국채</b><span>나라가 발행하는 차용증 — 가장 안전한 투자</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box"><b>국채금리</b><span>그 안전한 투자가 주는 이자율</span></div>
+    <div class="tax-op">=</div>
+    <div class="tax-box result"><b>모든 자산의 기준선</b><span>10년물 <b>5.21%</b> · 30년물 <b>5.48%</b> (20년 만의 높이)</span></div>
+  </div>
+  <div class="tax-note">기준선이 오르면 "위험한 주식은 그보다 훨씬 더 벌어야 본전"이 돼서, 주식의 몸값이 깎여.</div>
+
+  <div class="section-title">충격이 코스피까지 오는 길</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>유가 100달러 언저리 + 금리 인상 기대</b><span class="mdesc">이란 갈등 → 물가 걱정 → 10/28 FOMC 25bp 인상 확률 약 70%</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>미국 장기금리 급등</b><span class="mdesc">채권 이자가 연 5%대 — 굳이 위험한 주식에 돈을 둘 이유가 줄어듦</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>성장주 가치 하락 (할인율 효과)</b><span class="mdesc">이익이 먼 미래에 몰린 반도체·AI 주식일수록 "지금 가치"가 더 크게 깎임</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>AI 데이터센터 차질 소식이 방아쇠</b><span class="mdesc">오라클 불가항력 통보 → AI 서버 투자 지연 우려 → 메모리 수요 시점이 뒤로</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>외국인 3.3조 순매도 → 삼성전자 -5.4%, 하이닉스 -5.1%</b><span class="mdesc">반도체 비중이 큰 코스피가 -2.70%로 6,889.74 마감</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 한국 악재가 아닌데 한국이 크게 빠지는 이유</b>코스피는 반도체 비중이 크고 외국인 지분이 커서, 미국 금리 충격이 오면 가장 먼저·크게 던져지는 시장이야.</div>
+  </div>
+
+  <div class="section-title">개인은 사고 외국인은 판 날</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge a">외국인</span>
+      <h3>순매도 약 3조 3,400억 원</h3>
+      <p>삼성전자·SK하이닉스에서만 <b>3조 원 넘게</b>. 금리·환율·AI 변수에 민감하게 반응해 먼저 비중을 줄임.</p>
+    </div>
+    <div class="vs">
+      <span class="badge b">개인</span>
+      <h3>순매수 약 2조 6,100억 원</h3>
+      <p>"급락은 기회"로 받아냄. 다만 금리가 더 오르면 <b>받은 물량이 더 눌릴</b> 위험도 같이 커짐.</p>
+    </div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">이번 주</div><div class="what">미·이란 재협상 — 유가가 꺾이면 물가·금리 기대도 누그러짐</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">10월 28일</div><div class="what"><b>FOMC</b> — 인상 확률 약 70%가 현실이 되는지</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.09.29 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
