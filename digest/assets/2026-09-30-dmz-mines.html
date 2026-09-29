@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>휴전선 남쪽 10m, 북한 지뢰 4발 — 한눈에 보는 지도</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:700px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed #7D7A75}
+  .band-sample{display:inline-block;width:26px;height:12px;background:#FBEBDE;border:1px solid #D5803B;border-radius:2px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  /* 단면도 */
+  .cut{border:1px solid var(--border);border-radius:12px;padding:18px 18px 14px;background:var(--canvas)}
+  .cut-bar{display:flex;align-items:stretch;border-radius:8px;overflow:hidden;font-size:12.5px;font-weight:600;text-align:center}
+  .cut-bar div{padding:16px 6px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+  .cut-bar small{font-weight:500;font-size:11.5px;opacity:.9}
+  .nk{flex:1.1 1 0;background:var(--surface2);color:var(--text2)}
+  .nz{flex:2 1 0;background:var(--orange-soft);color:#9A5620}
+  .mdl{flex:0 0 6px;background:#7D7A75}
+  .sz{flex:2 1 0;background:var(--orange-soft);color:#9A5620}
+  .sk{flex:1.1 1 0;background:var(--blue-soft);color:#1B6BB8}
+  .cut-mark{position:relative;height:56px;margin-top:6px}
+  .cut-mark .pin{position:absolute;left:50%;transform:translateX(-50%);text-align:center;font-size:12.5px;color:#C6493E;font-weight:700;line-height:1.35}
+  .cut-mark .pin .stick{display:block;width:2px;height:14px;background:#E56458;margin:0 auto 4px}
+  .cut-note{margin-top:8px;font-size:13px;color:var(--text2)}
+  .cut-note b{color:var(--text)}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 170px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--red-soft);border-color:#F3CFCA}
+  .t-item.next .when{color:#C6493E}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 흐름도 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1,.step.s2{background:var(--surface2);color:var(--text2)}
+  .step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .step.s5{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.09.30 데일리 뉴스 · 시각자료</div>
+  <h1>🗺️ 휴전선 남쪽 10m에서 터졌다</h1>
+  <div class="sub">DMZ·휴전선(MDL)이 뭔지, 폭발이 어디서 일어났는지, 왜 '정전협정 위반'이라는 말이 나오는지 한 장으로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="한반도 중부 개략 지도: DMZ 띠와 파주 폭발 지점">
+      <rect x="0" y="0" width="900" height="430" fill="#F0EFED"/>
+
+      <!-- 서해 -->
+      <path d="M0,150 Q70,175 110,215 Q140,248 130,300 Q120,360 60,400 L0,430 Z" fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5"/>
+      <!-- 동해 -->
+      <path d="M840,60 L900,50 L900,300 L860,250 Q835,180 840,60 Z" fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5"/>
+
+      <!-- DMZ 띠 (남북 각 2km, 총 4km) -->
+      <path d="M118,268 C300,238 560,196 856,152" fill="none" stroke="#D5803B" stroke-width="30" stroke-opacity="0.22"/>
+      <path d="M118,268 C300,238 560,196 856,152" fill="none" stroke="#D5803B" stroke-width="30" stroke-opacity="0" />
+      <!-- MDL (휴전선) -->
+      <path d="M118,268 C300,238 560,196 856,152" fill="none" stroke="#7D7A75" stroke-width="2.5" stroke-dasharray="9 6"/>
+
+      <!-- 임진강 -->
+      <path d="M150,262 C176,300 196,330 190,372" fill="none" stroke="#B9D4EC" stroke-width="7" stroke-linecap="round"/>
+
+      <!-- 라벨: 북한 / 남한 -->
+      <g text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="5" font-family="inherit">
+        <text x="470" y="80" font-size="19" font-weight="700" fill="#7D7A75">북  한</text>
+        <text x="500" y="362" font-size="19" font-weight="700" fill="#7D7A75">대한민국</text>
+        <text x="300" y="398" font-size="14" font-weight="600" fill="#7D7A75">서울</text>
+        <text x="60" y="330" font-size="13" font-style="italic" fill="#5B87B5" stroke="none">서해</text>
+        <text x="876" y="230" font-size="13" font-style="italic" fill="#5B87B5" stroke="none">동해</text>
+      </g>
+      <circle cx="300" cy="384" r="5" fill="#7D7A75"/>
+
+      <!-- DMZ 띠 라벨 -->
+      <g font-family="inherit">
+        <text x="640" y="160" font-size="13.5" font-weight="700" fill="#9A5620" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">DMZ (비무장지대) · 폭 4km · 길이 약 250km</text>
+        <text x="640" y="180" font-size="12.5" fill="#7D7A75" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">점선 = 휴전선(MDL) · 말뚝 1,292개로 표시</text>
+      </g>
+
+      <!-- 사고 지점 마커 (파주, 서부전선) -->
+      <g>
+        <circle cx="196" cy="256" r="26" fill="#E56458" opacity="0.15"/>
+        <circle cx="196" cy="256" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="189" y1="263" x2="203" y2="249" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g font-family="inherit">
+        <line x1="196" y1="282" x2="216" y2="322" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="112" y="322" width="250" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="237" y="341" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">경기 파주 · 서부전선</text>
+        <text x="237" y="359" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">9/21 지뢰 폭발 · 장병 3명 부상</text>
+      </g>
+
+      <!-- 판문점 참고 -->
+      <g font-family="inherit">
+        <circle cx="258" cy="246" r="4.5" fill="#2C2C2B"/>
+        <text x="272" y="238" font-size="12.5" fill="#2C2C2B" font-weight="600" paint-order="stroke" stroke="#F0EFED" stroke-width="4">판문점(JSA)</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 폭발 지점</span>
+      <span class="item"><span class="band-sample"></span> DMZ (군대·무기 못 두는 완충지대)</span>
+      <span class="item"><span class="dash-sample"></span> 휴전선(MDL) — 남북 군사 경계선</span>
+    </div>
+  </div>
+
+  <div class="section-title">확대해서 보면 — 어디가 '남쪽 10m'야?</div>
+  <div class="cut">
+    <div class="cut-bar">
+      <div class="nk">북한<small>국경 요새화 중</small></div>
+      <div class="nz">북측 DMZ<small>MDL에서 2km</small></div>
+      <div class="mdl"></div>
+      <div class="sz">남측 DMZ<small>MDL에서 2km</small></div>
+      <div class="sk">대한민국<small>민통선·후방</small></div>
+    </div>
+    <div class="cut-mark">
+      <div class="pin"><span class="stick"></span>⊘ 폭발 지점<br>MDL 남쪽 약 10m · 지뢰 최소 4발</div>
+    </div>
+    <div class="cut-note">1953년 휴전 때 남북은 MDL에서 <b>각각 2km씩</b> 물러나 군대를 두지 않기로 했어. 그 4km 띠가 DMZ야. 이번 폭발은 MDL 바로 남쪽, <b>우리 쪽 완충지대 안</b>에서 일어났고, 지름 4m 안에 지뢰가 여러 발 몰려 있었어 — 그래서 군은 "흘린 게 아니라 <b>묻은 것</b>"으로 보고 있어.</div>
+  </div>
+
+  <div class="section-title">사고 이후 9일, 시간 순서</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">9/21</div><div class="what">수색로 개척 중 <b>2발 폭발</b> — 중상 2명·경상 1명</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/27</div><div class="what">군·유엔사 현장 조사 시작, 그러나 <b>사고 지점 도달 실패</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/28</div><div class="what">합참 중간결과 — "<b>북한군 지뢰 가능성 매우 높다</b>"</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9/29~30</div><div class="what">추가 1발 발견 → 현장 지뢰 <b>최소 4발</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">최종 판정 뒤</div><div class="what">고의 매설로 확정되면 <b>상응 조치</b> (대북확성기 재개 등 검토)</div></div>
+  </div>
+
+  <div class="section-title">군이 '북한 지뢰'로 본 근거 4가지</div>
+  <div class="flow">
+    <div class="step s1">① 국과수 감정<small>TNT + 갈색 이물질 검출</small></div>
+    <div class="step s1">② 병사 목격<small>플라스틱 상자 모양 지뢰</small></div>
+    <div class="step s3">③ 위치<small>작년 9월 위성으로 잡힌 북한 매설 흔적에서 10m 거리</small></div>
+    <div class="step s3">④ 기록<small>우리 군의 해당 지역 매설 기록 없음</small></div>
+  </div>
+
+  <div class="section-title">여기서 나한테 오는 길</div>
+  <div class="flow">
+    <div class="step s2">북한 '남부국경선'<small>2024년 10월부터 요새화</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">MDL 인근 지뢰 매설</div>
+    <div class="arrow">→</div>
+    <div class="step s4">우리 병사 부상<small>정전협정 위반 소지</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">상응 조치 ↔ 북 반발<small>확성기 → 오물풍선 전례</small></div>
+    <div class="arrow">→</div>
+    <div class="step s5">지정학 리스크 가격화<small>환율·외국인 수급에 얹힘</small></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(위치·축척 부정확) · 2026.09.30 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
