@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>반도체가 벌어준 63조, 어디로 흘러가나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--green-soft);color:#2F7A52}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  /* 갈래 */
+  .split{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .br{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .br .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.fund{background:var(--blue-soft);color:#1B6BB8}
+  .badge.policy{background:var(--green-soft);color:#2F7A52}
+  .badge.bond{background:var(--orange-soft);color:#B06426}
+  .br h3{font-size:15.5px;margin-bottom:6px}
+  .br p{font-size:13.5px;color:var(--text2)}
+  .br p b{color:var(--text)}
+
+  /* 지방 몫 계산 */
+  .calc{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .cbox{flex:1 1 170px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .cbox b{display:block;font-size:14.5px;margin-bottom:2px}
+  .cbox span{font-size:13px;color:var(--text2)}
+  .cop{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .cbox.result{background:var(--red-soft);border-color:#F5CFCA}
+  .cbox.result b{color:#B23F34}
+  .calc-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .split{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.01 데일리 뉴스 · 시각자료</div>
+  <h1>💰 반도체가 벌어준 63조, 어디로 흘러가나</h1>
+  <div class="sub">돈이 생긴 경로 → 정부가 쓰려는 곳 → 지방이 화난 이유까지 한 장으로</div>
+
+  <div class="section-title">① 이 돈이 어디서 생겼나</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>AI 데이터센터 투자 → 반도체 호황</b>
+        <span class="mdesc">HBM·고용량 D램 주문이 삼성전자·SK하이닉스로 쏟아졌어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>기업 이익이 급증</b>
+        <span class="mdesc">9월 1~20일 반도체 수출만 341억 달러(+259.4%), 총수출의 47.8%</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>이익에 매기는 법인세가 크게 늘어</b>
+        <span class="mdesc">소득세도 함께 증가 — 세금은 실적을 한 박자 늦게 따라와</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>올해 국세수입 478조 6,000억 원으로 재추계</b>
+        <span class="mdesc">추경 기준보다 <b>63조 2,000억 원</b> 더 걷힘 — 초과세수 역대 최대</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">② 정부가 쓰겠다는 세 갈래</div>
+  <div class="split">
+    <div class="br">
+      <span class="badge fund">기금 적립</span>
+      <h3>미래대응기금</h3>
+      <p>내년 예산안 반영분이 <b>162조 3,000억 원</b>. 초과세수를 다 넣으면 <b>225조 원</b> 수준까지 커질 수 있어.</p>
+    </div>
+    <div class="br">
+      <span class="badge policy">3대 정책</span>
+      <h3>주거 · 일자리 · 서민금융</h3>
+      <p>대통령이 국무회의에서 밝힌 방향. 청년 주거지원 등에 투입한다는 구상이야.</p>
+    </div>
+    <div class="br">
+      <span class="badge bond">빚 관리</span>
+      <h3>국채 발행 축소</h3>
+      <p>국채금리가 과하게 오르면 초과세수 일부로 <b>발행 물량을 줄여</b> 금리를 누르겠다는 카드.</p>
+    </div>
+  </div>
+
+  <div class="section-title">③ 지방이 화난 이유 — 원래 자동으로 내려갈 돈이었다</div>
+  <div class="calc">
+    <div class="cbox"><b>내국세 증가분</b><span>초과세수 중 내국세로 잡히는 몫</span></div>
+    <div class="cop">×</div>
+    <div class="cbox"><b>19.24%</b><span>법으로 정해진 지방교부세 연동 비율</span></div>
+    <div class="cop">=</div>
+    <div class="cbox result"><b>약 10조 8,000억 원</b><span>지방에 정산될 몫 (보통교부세 약 10조 5,000억)</span></div>
+  </div>
+  <div class="calc-note">※ 지방교부세는 <b>내국세에 비율로 묶여</b> 자동 배분되는 돈이야. 그래서 세금이 더 걷히면 지방 몫도 같이 늘어나는 게 원칙.</div>
+
+  <div class="paradox">
+    <b>⚠️ 쟁점은 '순서'야</b>
+    초과세수를 먼저 미래대응기금으로 넣어버리면, 내국세에 연동돼 지방으로 내려갈 몫이 그만큼 줄거나 늦어져. 지자체가 반발하는 지점이 바로 여기야.
+  </div>
+
+  <div class="foot">※ 재정경제부 2026.09.30 세수 재추계 발표 기준 · 기금 편입 규모는 아직 확정되지 않았고 관계 부처 협의 중</div>
+</div>
+</body>
+</html>
