@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>검찰청이 쪼개진 날 — 내 사건은 어떻게 흘러가나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .section-title small{font-weight:500;font-size:13.5px;color:var(--text2);margin-left:6px}
+
+  /* 전 → 후 비교 */
+  .ba{display:grid;grid-template-columns:1fr 36px 1fr;gap:12px;align-items:stretch}
+  .ba .col{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .ba .col.after{background:var(--blue-soft);border-color:#CBE6F9}
+  .ba .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+  .badge.before{background:var(--surface2);color:#6B6865}
+  .badge.after{background:#FFFFFF;color:#1B6BB8}
+  .ba h3{font-size:15.5px;margin-bottom:8px}
+  .ba ul{list-style:none;font-size:13.5px;color:var(--text2)}
+  .ba li{padding:5px 0 5px 16px;position:relative}
+  .ba li::before{content:"·";position:absolute;left:4px;color:#B9B6B1;font-weight:700}
+  .ba li b{color:var(--text)}
+  .ba .mid{align-self:center;text-align:center;font-size:22px;font-weight:700;color:#B9B6B1}
+
+  /* 핑퐁 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.loop .mnum{background:var(--orange-soft);color:#B06426}
+  .mstep.hot .mnum{background:var(--red-soft);color:#B23F34}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .loopnote{margin-top:14px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:13.5px;color:#9A5620}
+  .loopnote b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 빈자리 */
+  .seats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .seat{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft);text-align:center}
+  .seat .num{font-size:21px;font-weight:700;margin-bottom:2px}
+  .seat .lb{font-size:13px;color:var(--text2);line-height:1.4}
+  .seat.filled .num{color:#2F7A52}
+  .seat.part .num{color:#B06426}
+  .seat.empty{background:var(--red-soft);border-color:#F5CFCA}
+  .seat.empty .num{color:#B23F34}
+
+  .case{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:14px 16px;font-size:14px;color:#B23F34}
+  .case b{display:block;margin-bottom:3px;font-size:14.5px}
+
+  .foot{margin-top:22px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .ba{grid-template-columns:1fr;gap:8px}
+    .ba .mid{transform:rotate(90deg);font-size:18px}
+    .seats{grid-template-columns:repeat(2,1fr)}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.02 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 검찰청이 쪼개진 날, 내 사건은 어떻게 흘러가나</h1>
+  <div class="sub">누가 뭘 하게 됐나 → 왜 '핑퐁'이 생기나 → 지금 비어 있는 자리까지 한 장으로</div>
+
+  <div class="section-title">① 누가 뭘 하나 <small>검찰청 하나가 세 군데로 갈라졌다</small></div>
+  <div class="ba">
+    <div class="col">
+      <span class="badge before">10월 1일까지</span>
+      <h3>검찰청 한 곳이 다 했다</h3>
+      <ul>
+        <li><b>직접 수사</b> — 검사가 스스로 사건을 캤다</li>
+        <li><b>직접 보완수사</b> — 증거가 부족하면 검사가 더 캤다</li>
+        <li><b>기소</b> — 재판에 넘길지 결정했다</li>
+        <li>수사하는 손과 재판에 넘기는 손이 <b>같은 기관</b></li>
+      </ul>
+    </div>
+    <div class="mid">→</div>
+    <div class="col after">
+      <span class="badge after">10월 2일부터</span>
+      <h3>수사와 기소가 갈라졌다</h3>
+      <ul>
+        <li><b>경찰</b> — 고소·고발 등 일반 범죄 수사를 도맡는다</li>
+        <li><b>중수청</b>(행정안전부) — 부패·경제·마약 등 중대범죄 수사</li>
+        <li><b>공소청</b>(법무부) — 기소·공소 유지, 영장 청구, 보완수사 <b>요구</b></li>
+        <li>검사는 더 캐고 싶어도 <b>"해 주세요"라고 요구만</b> 할 수 있다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">② 그래서 '핑퐁'이 왜 생겨? <small>사건 하나가 걷는 길</small></div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>내가 고소장을 넣는다</b>
+        <span class="mdesc">접수는 경찰. 중대범죄면 중수청이 맡는다.</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>경찰·중수청이 수사해 공소청으로 보낸다</b>
+        <span class="mdesc">여기까지는 전과 비슷하다.</span></div>
+    </div>
+    <div class="mstep loop">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>검사가 보니 증거가 부족하다</b>
+        <span class="mdesc">예전: 검사가 직접 더 캔다 → 끝. 지금: 직접 캘 권한이 없다.</span></div>
+    </div>
+    <div class="mstep loop">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>"보완수사 해 주세요"라고 요구만 한다</b>
+        <span class="mdesc">사건이 수사기관으로 되돌아간다. 왕복 1회당 시간이 붙는다.</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>다시 올라온 결과가 또 부족하면 → 3번으로</b>
+        <span class="mdesc">기관 사이를 왕복하는 구간이 생긴다. 이게 '핑퐁'이다.</span></div>
+    </div>
+  </div>
+  <div class="loopnote">
+    <b>핑퐁이 길어지는 두 번째 이유</b>
+    큰 사건은 경찰과 중수청이 서로 맡으려 하고, 주목도 낮은 사건은 서로 떠넘길 수 있다. 내 사건이 '주인 없는 사건'이 되면 왕복이 더 늘어난다.
+  </div>
+
+  <div class="section-title">③ 문은 열었는데, 지금 비어 있는 자리 <small>2026.10.02 기준</small></div>
+  <div class="seats">
+    <div class="seat part">
+      <div class="num">68.3%</div>
+      <div class="lb">중수청 인력<br>(총정원 2,874명 중)</div>
+    </div>
+    <div class="seat part">
+      <div class="num">80~85%</div>
+      <div class="lb">공소청 검사<br>(법정 정원 대비)</div>
+    </div>
+    <div class="seat empty">
+      <div class="num">3자리</div>
+      <div class="lb">법무부 장관 · 공소청장<br>· 중수청장 모두 공석</div>
+    </div>
+    <div class="seat empty">
+      <div class="num">2년</div>
+      <div class="lb">경찰청장 공백<br>(대행 체제)</div>
+    </div>
+  </div>
+
+  <div class="case">
+    <b>이게 추상적인 얘기가 아닌 이유 — 장윤기 사건</b>
+    경찰은 '단순 살인'으로 사건을 넘겼지만, 검사가 <b>직접 보완수사</b>로 성범죄 목적 정황을 찾아내 죄명이 '강간 등 살인'으로 바뀌어 기소됐다. 1심은 무기징역. 오늘부터 그 '직접 보완수사' 칸이 없어졌다.
+  </div>
+
+  <div class="foot">자료: 뉴닉 데일리 주간 에디터 픽(2026.10.02), 중수청·공소청 출범 보도 종합. 인력 수치는 출범 시점 기준.</div>
+</div>
+</body>
+</html>
