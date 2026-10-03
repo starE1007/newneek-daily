@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고용 쇼크가 금리 인상을 흔든다 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .brow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .brow:last-child{margin-bottom:0}
+  .blabel{flex:0 0 150px;font-size:13.5px;font-weight:600}
+  .btrack{flex:1;background:var(--surface2);border-radius:6px;height:26px;position:relative;overflow:hidden}
+  .bfill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:13px;font-weight:700;color:#fff}
+  .bfill.before{background:var(--orange)}
+  .bfill.after{background:var(--blue)}
+  .bfill.exp{background:#B9B6B1}
+  .note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .blabel{flex-basis:96px;font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.04 데일리 뉴스 · 시각자료</div>
+  <h1>📉 고용 쇼크가 금리 인상 기대를 꺾었다</h1>
+  <div class="sub">일자리 +2.9만이 왜 금리·주가·채권을 한꺼번에 움직였는지 한 장으로 보기</div>
+
+  <div class="section-title">숫자로 보는 충격</div>
+  <div class="bars">
+    <div class="brow"><div class="blabel">9월 일자리 증가(만 개)</div><div class="btrack"><div class="bfill exp" style="width:100%">시장 전망 8~9</div></div></div>
+    <div class="brow"><div class="blabel"></div><div class="btrack"><div class="bfill before" style="width:34%">실제 2.9</div></div></div>
+    <div class="brow"><div class="blabel">10월 인상 확률</div><div class="btrack"><div class="bfill before" style="width:64%">일주일 전 60%대</div></div></div>
+    <div class="brow"><div class="blabel"></div><div class="btrack"><div class="bfill after" style="width:24%">발표 후 20%대</div></div></div>
+    <div class="note">실업률 4.1% → 4.2% · 민간 +4.6만, 공공 −1.7만 · 앞선 두 달치도 약 6만 개 하향 수정 (막대 길이는 개략 비교)</div>
+  </div>
+
+  <div class="section-title">충격이 번지는 경로</div>
+  <div class="mech">
+    <div class="mstep hot">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>일자리 +2.9만, 실업률 4.2%</b><span class="mdesc">전망치의 3분의 1 아래, 이전 달도 하향</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>연준의 인상 명분 약화</b><span class="mdesc">금리를 올리면 고용을 더 누를 수 있어 부담이 커짐</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>국채금리 급락 (채권값은 상승)</b><span class="mdesc">채권값과 금리는 시소 — 덜 오를 거라 보면 채권을 사자가 늘어남</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>주가 상승 (특히 기술주)</b><span class="mdesc">금리=할인율이 낮아지면 미래 이익이 덜 깎임</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 단, 반대쪽 힘이 남아 있어</b>브렌트유 100달러대의 물가 압력은 그대로라서, 고용이 나빠도 연준이 곧바로 방향을 틀기는 어려워. 다음 판가름은 CPI.</div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">10/2</div><div class="what">9월 고용 발표 — 인상 확률 급락</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">10/14</div><div class="what"><b>미국 CPI</b> — 물가가 아직 높은지 확인</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">10/28</div><div class="what"><b>FOMC</b> — 인상·동결 결정</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.04 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
