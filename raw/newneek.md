@@ -1,7 +1,7 @@
-<!-- scraped_at_kst: 2026-10-04 08:14 -->
-<!-- date_kst: 2026-10-04 (Sun) -->
+<!-- scraped_at_kst: 2026-10-05 08:25 -->
+<!-- date_kst: 2026-10-05 (Mon) -->
 
-## 뉴닉 데일리 — 2026-10-04
+## 뉴닉 데일리 — 2026-10-05
 원문: https://stibee.com/api/v1.0/emails/share/BsJDzOaxKPAMxesks_CLDIxxv_z_ZAs
 
 뉴닉 데일리: 10월 첫째 주 주간 결산
