@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.05</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.05 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제.
+const MC_BANK = [
+  { id:'chain', variants:[
+    { q:'대법관 임명이 대법원장과 대통령 사이의 갈등으로 쉽게 멈출 수 있는 구조적 이유로 가장 알맞은 것은?',
+      opts:['후보를 정식 추천하는 권한(제청)과 최종 임명 권한이 서로 다른 사람 손에 있어, 사전 협의가 깨지면 어느 쪽도 혼자 자리를 채울 수 없기 때문',
+            '대법관은 임명 없이 국회가 직접 선출하는데 여야 합의가 어렵기 때문',
+            '대통령이 대법원장을 겸직하고 있어 두 권한이 충돌하기 때문',
+            '대법관의 임기가 법으로 정해져 있지 않아 교체 시점을 아무도 모르기 때문'], answer:0,
+      explain:'대법관은 <b>대법원장 제청 → 국회 동의 → 대통령 임명</b> 순서야. 시작과 끝을 서로 다른 사람이 쥐고 있어서 합의가 깨지면 빈자리가 길어져.' },
+    { q:'"제청"의 뜻과 역할로 가장 알맞은 것은?',
+      opts:['임명권자에게 적임자를 정식으로 추천하는 행위로, 최종 임명 전의 한 단계다',
+            '국회가 후보를 표결로 부결시키는 행위다',
+            '대통령이 후보를 최종 확정하는 행위다',
+            '후보가 스스로 지원서를 내는 행위다'], answer:0,
+      explain:'제청은 추천 단계고, 최종 <b>임명은 대통령</b>이 해. 그래서 이 사태에선 추천(대법원)과 임명(청와대)이 서로 다른 말을 하는 거야.' },
+  ]},
+  { id:'mirror', variants:[
+    { q:'청와대의 재제청 요구와 대법원장의 거부, 두 입장에 대한 설명으로 가장 알맞은 것은?',
+      opts:['양쪽 모두 상대 때문에 자기 권한이 사실상 사라질 수 있다고 걱정하는, 서로 거울 같은 논리다',
+            '청와대는 대법원장 권한이 너무 작다고 보고, 대법원장은 대통령 권한이 너무 작다고 본다',
+            '양쪽 모두 후보의 자질이 부족하다는 데에는 이견이 없고 절차만 다툰다',
+            '대법원장은 헌법 개정이 먼저라 임명할 수 없다는 입장이다'], answer:0,
+      explain:'청와대는 "거부하면 <b>임명권</b>이 무력화", 대법원은 "되풀이 요구를 받아주면 <b>제청권</b>이 무력화"라는 걱정이야. 둘 다 권한 보호 논리라 타협점 찾기가 어려워.' },
+  ]},
+  { id:'audit', variants:[
+    { q:'국정감사에서 증인이 불출석했을 때 국회가 취할 수 있는 수단과 그 성격으로 가장 알맞은 것은?',
+      opts:['동행명령(강제로 데려오게 하는 명령)이나 고발 같은 압박 수단이 있고, 그래서 불출석이 정치적 충돌로 번지기 쉽다',
+            '출석을 아예 강제할 수 없어서 불출석은 아무 결과도 낳지 않는다',
+            '불출석하면 해당 기관의 예산이 자동으로 삭감된다',
+            '국정감사는 법원에는 적용되지 않아 증인을 부를 수 없다'], answer:0,
+      explain:'위원회는 출석을 요구하고, 정당한 이유 없이 불응하면 <b>동행명령·고발</b>을 검토할 수 있어. 대법원장 측은 "삼권분립·사법권 독립에 반한다"며 맞서는 거고.' },
+    { q:'대법원장이 국감 출석을 거부하며 내세운 논리의 핵심으로 가장 알맞은 것은?',
+      opts:['대법원장이 입법부의 증인으로 불려 나가는 것이 사법권 독립과 삼권분립 취지에 맞지 않는다는 것',
+            '대법관 인선은 국회 소관이 아니라는 것',
+            '국정감사 자체가 위헌이라는 것',
+            '일정이 겹쳐 물리적으로 참석이 불가능하다는 것'], answer:0,
+      explain:'불출석 사유서의 논리는 <b>사법권 독립 · 삼권분립</b>이야. 반대로 여당은 "안 나오려면 사퇴하라"고 맞서.' },
+  ]},
+  { id:'effect', variants:[
+    { q:'대법관 자리가 오래 비는 것의 우려로 가장 알맞은 것은?',
+      opts:['마지막 재판(3심)을 맡는 재판부 구성이 빠듯해져 심리가 늦어질 수 있고, 국민의 재판받을 권리 침해 지적이 나온다',
+            '하급심 판결이 전부 효력을 잃는다',
+            '대법원이 모든 사건을 자동으로 기각한다',
+            '헌법재판소가 대법원 역할을 대신 맡는다'], answer:0,
+      explain:'자리가 비면 상고심 심리가 늦어질 수 있어. 그래서 "<b>재판받을 권리</b>를 침해한다"는 비판이 나와.' },
+  ]},
+  { id:'review_1004', variants:[
+    { q:'(어제 복습) 고용 쇼크 뒤 미 국채금리가 급락한 흐름으로 가장 알맞은 것은?',
+      opts:['인상 기대가 꺾여 국채를 사자는 수요가 늘고, 채권값이 오르면서 금리(수익률)가 내려간다',
+            '채권값이 떨어지면서 금리가 내려간다',
+            '정부가 금리를 직접 낮춘다',
+            '고용 지표는 국채와 상관없다'], answer:0,
+      explain:'채권값과 금리는 <b>시소</b>야. 사자가 몰려 값이 오르면 수익률은 내려가.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'대법원장이 대법관 후보를 임명권자에게 정식으로 추천하는 행위를 뭐라고 해? (두 글자)',
+    accept:['제청'],
+    explain:'정답은 <b>제청</b>이야. 최종 임명은 대통령이 해.' },
+  { q:'국감에서 출석에 불응하는 증인을 위원회가 강제로 데려오게 하는 명령을 뭐라고 해? (네 글자)',
+    accept:['동행명령'],
+    explain:'정답은 <b>동행명령</b>이야. 불응하면 고발도 거론돼.' },
+  { q:'입법·행정·사법이 서로 견제하도록 권력을 나누는 원리를 뭐라고 해? (네 글자)',
+    accept:['삼권분립'],
+    explain:'정답은 <b>삼권분립</b>이야. 대법원장은 이를 근거로 국감 출석을 거부했고, 반대쪽은 국회의 감시 권한을 내세워.' },
+  { q:'(어제 복습) 채권값이 오르면 금리(수익률)는 어떻게 될까? 한 단어로.',
+    accept:['내려','내린다','하락','내림','내려간다'],
+    explain:'정답은 <b>내려간다</b>야. 시소 관계거든.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

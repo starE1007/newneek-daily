@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7개월 빈 대법관 자리 — 누가 뭘 쥐고 있나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .section-title small{font-weight:500;font-size:13.5px;color:var(--text2);margin-left:6px}
+
+  /* 전 → 후 비교 */
+  .ba{display:grid;grid-template-columns:1fr 36px 1fr;gap:12px;align-items:stretch}
+  .ba .col{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .ba .col.after{background:var(--blue-soft);border-color:#CBE6F9}
+  .ba .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+  .badge.before{background:var(--surface2);color:#6B6865}
+  .badge.after{background:#FFFFFF;color:#1B6BB8}
+  .ba h3{font-size:15.5px;margin-bottom:8px}
+  .ba ul{list-style:none;font-size:13.5px;color:var(--text2)}
+  .ba li{padding:5px 0 5px 16px;position:relative}
+  .ba li::before{content:"·";position:absolute;left:4px;color:#B9B6B1;font-weight:700}
+  .ba li b{color:var(--text)}
+  .ba .mid{align-self:center;text-align:center;font-size:22px;font-weight:700;color:#B9B6B1}
+
+  /* 핑퐁 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.loop .mnum{background:var(--orange-soft);color:#B06426}
+  .mstep.hot .mnum{background:var(--red-soft);color:#B23F34}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .loopnote{margin-top:14px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:13.5px;color:#9A5620}
+  .loopnote b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 빈자리 */
+  .seats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .seat{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft);text-align:center}
+  .seat .num{font-size:21px;font-weight:700;margin-bottom:2px}
+  .seat .lb{font-size:13px;color:var(--text2);line-height:1.4}
+  .seat.filled .num{color:#2F7A52}
+  .seat.part .num{color:#B06426}
+  .seat.empty{background:var(--red-soft);border-color:#F5CFCA}
+  .seat.empty .num{color:#B23F34}
+
+  .case{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:14px 16px;font-size:14px;color:#B23F34}
+  .case b{display:block;margin-bottom:3px;font-size:14.5px}
+
+  .foot{margin-top:22px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .ba{grid-template-columns:1fr;gap:8px}
+    .ba .mid{transform:rotate(90deg);font-size:18px}
+    .seats{grid-template-columns:repeat(2,1fr)}
+    h1{font-size:21px}
+  }
+
+  .tl{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.hot{background:var(--red-soft);border-color:#F5CFCA}
+  .t-item.hot .when{color:#B23F34}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.a{background:var(--blue-soft);color:#1B6BB8}
+  .badge.b{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 130px;min-width:120px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--blue-soft);color:#1B6BB8}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.stop{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  @media (max-width:640px){.vs-grid{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.05 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 7개월 빈 대법관 자리, 누가 뭘 쥐고 있나</h1>
+  <div class="sub">임명 절차 → 양쪽 논리 → 지금까지의 시간표를 한 장으로</div>
+
+  <div class="section-title">① 대법관이 임명되는 길 <small>두 사람이 각자 한 칸씩 쥔다</small></div>
+  <div class="flow">
+    <div class="step">대법원장<small>후보를 <b>제청</b>(정식 추천)</small></div>
+    <div class="arrow">→</div>
+    <div class="step">국회<small>임명 <b>동의</b></small></div>
+    <div class="arrow">→</div>
+    <div class="step">대통령<small>최종 <b>임명</b></small></div>
+    <div class="arrow">→</div>
+    <div class="step">새 대법관 취임</div>
+  </div>
+  <div class="case" style="background:var(--orange-soft);color:#9A5620"><b>그래서 어디서 막히나</b>첫 칸(제청)과 마지막 칸(임명)을 서로 다른 사람이 쥐고 있어서, 관행상 사전 협의로 후보를 맞춰 왔어. 그 협의가 깨지면 어느 칸에서든 멈춰.</div>
+
+  <div class="section-title">② 양쪽 논리는 거울이야 <small>둘 다 "내 권한이 사라진다"가 걱정</small></div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge a">청와대</span>
+      <h3>"다시 추천해 달라"</h3>
+      <p>협의 없이 올라온 후보에 <b>재제청을 요구</b>. 거부당하면 <b>대통령 임명권이 무력화</b>된다는 입장.</p>
+    </div>
+    <div class="vs">
+      <span class="badge b">대법원장</span>
+      <h3>"그럴 근거가 없다"</h3>
+      <p>재제청 요구엔 <b>구체적 사유도 헌법상 근거도 없다</b>. 한 번 받아주면 원하는 사람이 나올 때까지 되풀이돼 <b>제청권이 무력화</b>된다는 입장.</p>
+    </div>
+  </div>
+
+  <div class="section-title">③ 지금까지의 시간표</div>
+  <div class="tl">
+    <div class="t-item"><div class="when">1월 말</div><div class="what">청와대·대법원장 협의 틀어짐, 자리 공백 시작</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">8/18</div><div class="what">손봉기·김성수 동시 제청</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot"><div class="when">9/22</div><div class="what">재제청 요구 거부 선언</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item hot"><div class="when">10/4</div><div class="what">국감 증인 불출석 사유서 제출</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">10/6</div><div class="what">대법원 국감 — 불출석 시 동행명령·고발 거론</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.05 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
