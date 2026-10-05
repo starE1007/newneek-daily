@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>호르무즈 협상 — 누가 먼저 움직이나</title>
+<style>
+  :root{--text:#2C2C2B;--text2:#7D7A75;--canvas:#FFFFFF;--soft:#F9F8F7;--border:#E6E5E3;--blue:#2783DE;--blue-soft:#E5F2FC;--orange:#D5803B;--orange-soft:#FBEBDE;--red:#E56458;--red-soft:#FCE9E7}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .tl{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.now{background:var(--red-soft);border-color:#F5CBC6}
+  .t-item.now .when{color:#C6493E}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .box{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .b1{background:var(--red-soft);color:#C6493E}.b2{background:var(--blue-soft);color:#1B6BB8}
+  .box h3{font-size:15.5px;margin-bottom:6px}
+  .box p{font-size:13.5px;color:var(--text2)}.box p b{color:var(--text)}
+  .dead{margin-top:14px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .dead b{display:block;margin-bottom:2px}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;background:var(--orange-soft);color:#9A5620}
+  .step.f{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}.vs{grid-template-columns:1fr}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.06 데일리 뉴스 · 시각자료</div>
+  <h1>🕰️ 호르무즈, 합의 방향보다 '순서'가 문제</h1>
+  <div class="sub">서로 상대가 먼저 움직이라고 버티는 구조 — 그래서 해협이 안 열린다</div>
+
+  <div class="section-title">지금까지 흐름</div>
+  <div class="tl">
+    <div class="t-item"><div class="when">UN 총회 즈음</div><div class="what">이란, 미국에 '7일 신뢰구축안' 제시</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">그 뒤</div><div class="what">카타르 등 중재국 통해 미국이 답변 전달</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item now"><div class="when">10/4</div><div class="what">이란 갈리바프 의장 "7개 조건 충족 전엔 재개방 없다"</div></div>
+  </div>
+
+  <div class="section-title">두 입장이 맞서는 지점</div>
+  <div class="vs">
+    <div class="box"><span class="badge b1">이란</span><h3>"조건 먼저, 해협은 그다음"</h3>
+      <p>이슬라마바드 양해각서(MOU)에 근거한 <b>7개 조건</b>이 이행돼야 해협을 연다. "시간 끌며 일방 요구하던 시대는 끝났다"는 입장.</p></div>
+    <div class="box"><span class="badge b2">미국</span><h3>"개방 먼저, 논의는 병행"</h3>
+      <p>답변은 보냈지만 <b>이행 순서</b>에서 이견. 해협 개방이 늦어질수록 유가·물가 부담이 커진다는 압박을 받는 쪽.</p></div>
+  </div>
+  <div class="dead"><b>⚠️ 순서의 함정</b>먼저 양보한 쪽은 지렛대를 잃고 약해 보여. 그래서 합의 방향이 비슷해도 서로 "너 먼저"를 외치며 멈춰 서.</div>
+
+  <div class="section-title">안 열리면 나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step f">해협 개방 지연</div><div class="arrow">→</div>
+    <div class="step">원유 공급 불안</div><div class="arrow">→</div>
+    <div class="step">유가 100달러 안팎 유지</div><div class="arrow">→</div>
+    <div class="step">수입물가·운송비↑</div><div class="arrow">→</div>
+    <div class="step f">생활물가·금리 부담</div>
+  </div>
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.06 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
