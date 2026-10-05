@@ -14,6 +14,14 @@
   .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
   .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
   .section-title:first-of-type{margin-top:0}
+.card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:700px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .geo{margin-top:10px;font-size:13px;color:var(--text2)}
+  .geo a{color:var(--blue);text-decoration:none;font-weight:600}
   .tl{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
   .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
   .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
@@ -42,6 +50,77 @@
   <div class="eyebrow">2026.10.06 데일리 뉴스 · 시각자료</div>
   <h1>🕰️ 호르무즈, 합의 방향보다 '순서'가 문제</h1>
   <div class="sub">서로 상대가 먼저 움직이라고 버티는 구조 — 그래서 해협이 안 열린다</div>
+
+  <div class="section-title">🗺️ 어디가 막혀 있나</div>
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="호르무즈 해협 개략 지도: 페르시아만과 아라비아해를 잇는 좁은 길목">
+      <defs>
+        <marker id="ah2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+
+      <rect x="0" y="0" width="900" height="470" fill="#F0EFED"/>
+
+      <!-- water: Persian Gulf -> Hormuz neck -> Gulf of Oman / Arabian Sea -->
+      <path d="M60,170 C90,145 180,112 250,112 C340,112 430,138 545,185
+               C565,192 595,206 612,215
+               C660,185 750,160 850,148 L900,142 L900,340
+               C840,332 740,342 665,330 C640,322 612,292 566,246
+               C480,250 380,268 260,268 C180,266 100,238 60,170 Z"
+            fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- oil route -->
+      <path d="M170,196 C320,214 470,224 560,232 C680,244 790,262 884,300"
+            fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" opacity="0.9" marker-end="url(#ah2)"/>
+
+      <!-- sea labels -->
+      <g font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle" font-family="inherit">
+        <text transform="translate(300,170)">페르시아만</text>
+        <text transform="translate(790,218)">아라비아해 · 오만만</text>
+      </g>
+
+      <!-- country labels -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="420" y="62" font-size="17">이  란</text>
+        <text x="250" y="358" font-size="16">사우디아라비아</text>
+        <text x="500" y="316" font-size="13">UAE</text>
+        <text x="700" y="412" font-size="14">오  만</text>
+      </g>
+
+      <!-- chokepoint marker -->
+      <g>
+        <circle cx="589" cy="229" r="25" fill="#E56458" opacity="0.15"/>
+        <circle cx="589" cy="229" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="582" y1="236" x2="596" y2="222" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <!-- chip -->
+      <g font-family="inherit">
+        <line x1="648" y1="118" x2="596" y2="206" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="540" y="62" width="230" height="56" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="655" y="83" font-size="14.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">⊘ 호르무즈 해협</text>
+        <text x="655" y="102" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle">닫힌 채 교착 — 7개 조건 선결 요구</text>
+      </g>
+
+      <!-- route label -->
+      <g font-family="inherit">
+        <text x="830" y="348" font-size="13" font-weight="700" fill="#B06426" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">→ 한국·아시아행 원유</text>
+      </g>
+
+      <!-- note inside -->
+      <g font-family="inherit">
+        <text x="250" y="436" font-size="13" fill="#7D7A75" text-anchor="middle">걸프 산유국 원유가 바다로 나가는 사실상 하나뿐인 출구</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 닫혀 있는 병목 지점</span>
+      <span class="item"><span class="dash-sample"></span> 주요 원유 항로</span>
+    </div>
+  </div>
+  <div class="geo">📍 실제 위치: <a href="https://www.google.com/maps/search/?api=1&amp;query=Strait+of+Hormuz">호르무즈 해협</a> — 이란과 아라비아반도 사이, 페르시아만↔인도양을 잇는 길목.</div>
 
   <div class="section-title">지금까지 흐름</div>
   <div class="tl">

@@ -10,7 +10,7 @@ date: 2026-10-06
 ## 무슨 일이야?
 4일 이란 의회 의장이자 전 수석협상대표인 갈리바프가 "이란이 내건 **7개 조건**이 충족되기 전에는 호르무즈 해협을 다시 열지 않는다"고 못 박았어. 미국이 중재국을 통해 새 제안을 보냈다는 건 인정했지만, "시간을 끌며 일방적으로 요구하던 시대는 끝났다"고 선을 그었지. 이란은 앞서 UN 총회 즈음에 미국에 **'7일 신뢰구축안'**(작은 약속을 번갈아 이행하며 믿음을 쌓는 계획)을 내놨고, 미국도 답을 줬어. 그런데 둘이 **이행 순서**를 두고 의견이 달라.
 
-▤ https://cdn.jsdelivr.net/gh/starE1007/newneek-daily@main/digest/assets/2026-10-06-hormuz-order.html 1000
+▤ https://cdn.jsdelivr.net/gh/starE1007/newneek-daily@main/digest/assets/2026-10-06-hormuz-order.html 1500
 
 지도로 위치를 보고 싶다면 [호르무즈 해협](https://www.google.com/maps/search/?api=1&query=Strait+of+Hormuz) — 이란과 아라비아반도 사이, 페르시아만↔인도양을 잇는 길목.
 
