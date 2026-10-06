@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>형벌의 사다리 — 사형·무기징역·가석방 없는 무기징역</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .ladder{display:flex;flex-direction:column;gap:10px}
+  .rung{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft);display:flex;gap:14px;align-items:flex-start}
+  .rung .badge{flex:0 0 auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
+  .rung h3{font-size:15.5px;margin-bottom:2px}
+  .rung p{font-size:13.5px;color:var(--text2)}
+  .rung p b{color:var(--text)}
+  .rung.top .badge{background:var(--red-soft);color:#C6493E}
+  .rung.new{background:var(--blue-soft);border-color:#CBE3F8;border-style:dashed}
+  .rung.new .badge{background:#fff;color:#1B6BB8}
+  .rung.mid .badge{background:var(--orange-soft);color:#B06426}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--orange-soft);color:#9A5620}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.end{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}h1{font-size:21px}.rung{flex-direction:column;gap:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.07 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 형벌의 사다리, 어디에 칸을 끼우자는 걸까</h1>
+  <div class="sub">사형은 법에만 있고 집행은 30년 가까이 없는 상태 — '가석방 없는 무기징역' 논쟁을 한 장으로</div>
+
+  <div class="section-title">지금의 사다리 + 제안된 새 칸</div>
+  <div class="ladder">
+    <div class="rung top"><span class="badge">맨 위</span><div><h3>사형</h3><p>법에는 있지만 <b>1997년 12월 이후 집행 없음</b> → '실질적 사형 폐지국'</p></div></div>
+    <div class="rung new"><span class="badge">제안</span><div><h3>가석방 없는 무기징역 (새 칸)</h3><p>평생 가석방 불가. 2023년 법무부 형법 개정안이 제출됐지만 <b>논란 끝에 폐기</b></p></div></div>
+    <div class="rung mid"><span class="badge">현재</span><div><h3>무기징역 (가석방 가능)</h3><p>가석방 최저 복역 기간 <b>10년 → 20년</b>으로 상향</p></div></div>
+  </div>
+
+  <div class="section-title">왜 이런 논쟁이 생겼나</div>
+  <div class="flow">
+    <div class="step">흉악 범죄에<br>사형 구형</div><div class="arrow">→</div>
+    <div class="step">법원은 사형 대신<br>무기징역<small>30년 미집행·국제 흐름</small></div><div class="arrow">→</div>
+    <div class="step">"가석방이라도<br>막아 달라"<small>유족·여론</small></div><div class="arrow">→</div>
+    <div class="step end">가석방 없는<br>무기징역 도입 논쟁</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.07 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>

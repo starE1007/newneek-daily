@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.07</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.07 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제.
+const MC_BANK = [
+  { id:'defacto', variants:[
+    { q:'우리나라를 "실질적 사형 폐지국"이라고 부르는 근거로 가장 알맞은 것은?',
+      opts:['법에 사형은 남아 있지만 10년 넘게 집행하지 않은 상태가 이어지고 있다',
+            '형법에서 사형 조항이 이미 삭제됐다',
+            '법원이 사형을 선고하는 것을 헌법이 금지했다',
+            '사형은 선고되지만 집행 권한이 유엔으로 넘어갔다'], answer:0,
+      explain:'<b>법에는 있지만 집행이 없는</b> 상태를 말해. 1997년 12월 이후 집행이 없었어.' },
+    { q:'사형이 법에 남아 있어도 "실질적 폐지국"으로 분류되는 기준은?',
+      opts:['오랫동안(10년 이상) 집행이 없었다는 사실',
+            '사형 선고가 연간 1건 미만이라는 사실',
+            '국회가 폐지 법안을 한 번 발의했다는 사실',
+            '정부가 사형 집행을 공식 선언했다는 사실'], answer:0,
+      explain:'기준은 <b>집행 공백 기간</b>이야. 선고 건수나 법안 발의가 아니라 실제 집행 여부를 봐.' },
+  ]},
+  { id:'parole', variants:[
+    { q:'무기징역의 가석방 최저 복역 기간이 10년에서 20년으로 늘어난 취지로 가장 알맞은 것은?',
+      opts:['사형을 집행하지 않는 현실에서, 사형 다음 형벌의 실질적 무게를 키우려는 것',
+            '무기징역자를 더 빨리 사회에 복귀시키려는 것',
+            '사형 선고를 의무화하려는 것',
+            '가석방 심사 자체를 없애려는 것'], answer:0,
+      explain:'사형을 못 쓰는 만큼 <b>그 아래 형벌을 무겁게</b> 하려는 장치야.' },
+  ]},
+  { id:'newrung', variants:[
+    { q:'"가석방 없는 무기징역"을 도입하자는 주장의 논리로 가장 알맞은 것은?',
+      opts:['사형을 안 쓰는 현실에서도, 극악 범죄자를 평생 사회에서 격리할 수단을 법으로 확실히 하자는 것',
+            '모든 무기징역자의 형기를 줄여 주자는 것',
+            '사형 집행을 즉시 재개하자는 것',
+            '재판 없이 구금하자는 것'], answer:0,
+      explain:'핵심은 <b>영구 격리의 법적 보장</b>이야. 사형의 대안이지 사형의 부활이 아니야.' },
+    { q:'가석방 없는 무기징역에 신중론이 나오는 이유로 가장 알맞은 것은?',
+      opts:['한 번 선고하면 되돌릴 여지가 거의 없어, 오판이나 교정 가능성을 완전히 닫아 버린다는 우려',
+            '무기징역은 이미 폐지된 형벌이라서',
+            '사형보다 반드시 가벼운 형벌이라서',
+            '법원이 형을 선택할 수 없게 되어서'], answer:0,
+      explain:'<b>되돌릴 수 없음</b>이 사형 반대 논리와 닿아 있어서, 대안도 같은 비판을 받아.' },
+  ]},
+  { id:'intl', variants:[
+    { q:'한국이 유엔의 사형 집행 모라토리움 결의안에 찬성하는 것이 의미하는 바로 가장 알맞은 것은?',
+      opts:['사형 집행을 점차 줄이자는 국제적 흐름에 동참하되, 완전 폐지는 별도로 신중히 검토한다는 입장',
+            '사형제를 즉시 폐지했다는 선언',
+            '국내법을 유엔이 대신 개정한다는 뜻',
+            '사형을 모든 범죄에 적용하겠다는 뜻'], answer:0,
+      explain:'<b>집행을 멈추자</b>는 것과 <b>제도를 폐지</b>하는 것은 달라. 한국은 앞의 흐름에만 동참했어.' },
+  ]},
+  { id:'review_1006', variants:[
+    { q:'(어제 복습) 호르무즈 협상이 교착인 핵심 이유로 가장 알맞은 것은?',
+      opts:['합의 방향보다 누가 먼저 움직이느냐, 즉 이행 순서에서 서로 먼저 양보하지 않으려 해서',
+            '양쪽 모두 해협 개방 자체에 반대해서',
+            '중재국이 군사적으로 개입해서',
+            '유가가 이미 충분히 올라서'], answer:0,
+      explain:'먼저 열거나 먼저 들어주면 <b>지렛대를 잃거나 굴복으로 읽혀서</b> 순서에서 막히는 거야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'법에는 사형이 있지만 10년 이상 집행하지 않은 나라를 뭐라고 불러? (일곱 글자)',
+    accept:['실질적사형폐지국','실질적 사형 폐지국'],
+    explain:'정답은 <b>실질적 사형 폐지국</b>이야.' },
+  { q:'무기징역 수감자를 형기가 끝나기 전에 조건부로 내보내는 제도는? (세 글자)',
+    accept:['가석방'],
+    explain:'정답은 <b>가석방</b>이야. 이 제도가 없는 무기징역이 새로 제안된 거야.' },
+  { q:'(어제 복습) 호르무즈 협상이 합의 내용이 아니라 무엇 때문에 막혀 있다고 했지? (네 글자)',
+    accept:['이행순서','이행 순서'],
+    explain:'정답은 <b>이행 순서</b>야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
