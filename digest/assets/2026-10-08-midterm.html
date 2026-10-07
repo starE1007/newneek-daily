@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미국 중간선거, 뭘 뽑고 왜 트럼프가 불리한가</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 뭘 뽑나 */
+  .seat-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .seat{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--soft)}
+  .seat .who{font-size:14.5px;font-weight:700;margin-bottom:4px}
+  .seat .num{font-size:22px;font-weight:700;color:#1B6BB8;margin-bottom:2px}
+  .seat .note{font-size:12.5px;color:var(--text2)}
+  .seat.all{background:var(--blue-soft);border-color:#CBE3F8}
+  .seat-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 메커니즘 2경로 */
+  .paths{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .path{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--canvas)}
+  .path .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+  .badge.war{background:var(--red-soft);color:#C6493E}
+  .badge.tariff{background:var(--orange-soft);color:#B06426}
+  .path h3{font-size:15.5px;margin-bottom:10px}
+  .mstep{display:flex;gap:12px;align-items:flex-start;position:relative;padding-bottom:14px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:3px;font-size:14px}
+  .mtxt b{font-size:14.5px}
+  .mtxt .mdesc{display:block;font-size:13px;color:var(--text2);margin-top:2px}
+  .verdict{margin-top:12px;background:var(--surface2);border-radius:9px;padding:10px 13px;font-size:13.5px;color:var(--text2)}
+  .verdict b{color:var(--text)}
+
+  /* 지지율 */
+  .rating{display:flex;align-items:center;gap:14px;border:1px solid var(--border);border-radius:12px;padding:14px 18px;background:var(--red-soft);flex-wrap:wrap}
+  .rating .big{font-size:34px;font-weight:700;color:#C6493E;line-height:1}
+  .rating .txt{font-size:14px;color:#B23F34}
+  .rating .txt b{display:block;font-size:15px;margin-bottom:2px}
+
+  /* 한국으로 오는 길 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 160px;min-width:150px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .paths{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.08 데일리 뉴스 · 시각자료</div>
+  <h1>🇺🇸 미국 중간선거 — 뭘 뽑고, 왜 트럼프가 불리한가</h1>
+  <div class="sub">11월 3일 투표 · 지지율이 역대 최저까지 내려간 두 경로와, 그 결과가 한국 지갑으로 오는 길</div>
+
+  <div class="section-title">① 11월 3일, 뭘 뽑는 선거야</div>
+  <div class="seat-row">
+    <div class="seat all">
+      <div class="who">하원 (임기 2년)</div>
+      <div class="num">435석</div>
+      <div class="note">전체 의석을 <b>한 번에 전부</b> 다시 뽑아 — 그래서 민심이 가장 세게 반영돼</div>
+    </div>
+    <div class="seat">
+      <div class="who">상원 (임기 6년)</div>
+      <div class="num">35석</div>
+      <div class="note">전체 100석 중 <b>3분의 1</b>만 교체 — 임기가 길어 2년마다 조금씩 돌아가</div>
+    </div>
+    <div class="seat">
+      <div class="who">주지사</div>
+      <div class="num">36개 주</div>
+      <div class="note">주 단위 행정을 맡는 자리 — 연방의회와 별개로 같은 날 투표</div>
+    </div>
+  </div>
+  <div class="seat-note">'중간'선거라는 이름은 <b>대통령 임기 4년의 딱 절반</b>인 2년 차에 치러져서 붙었어. 한국 총선과 비슷한 자리인데, 대통령이 일을 잘하는지 묻는 <b>중간 성적표</b>로 읽히는 게 차이야.</div>
+
+  <div class="section-title">② 지지율, 역대 최저까지 내려왔어</div>
+  <div class="rating">
+    <div class="big">32%</div>
+    <div class="txt">
+      <b>트럼프 대통령 지지율 (9/30~10/5 조사)</b>
+      역대 최저치. 여당이 중간선거에서 이기는 경우가 원래 드문데, 지지율까지 바닥이라 공화당이 불리하다는 분석이 나와.
+    </div>
+  </div>
+
+  <div class="section-title">③ 왜 이렇게 떨어졌어 — 결국 둘 다 '물가'로 모여</div>
+  <div class="paths">
+    <div class="path">
+      <span class="badge war">경로 A · 전쟁</span>
+      <h3>끝이 안 보이는 미국·이란 전쟁</h3>
+      <div class="mstep">
+        <div class="mnum">1</div>
+        <div class="mtxt"><b>2월 말 전쟁 시작</b><span class="mdesc">"4~6주면 끝난다"고 했지만 7개월이 넘도록 계속</span></div>
+      </div>
+      <div class="mstep">
+        <div class="mnum">2</div>
+        <div class="mtxt"><b>중동 석유 수출에 제동</b><span class="mdesc">원유가 빠져나가는 길이 좁아짐</span></div>
+      </div>
+      <div class="mstep">
+        <div class="mnum">3</div>
+        <div class="mtxt"><b>기름값 상승</b><span class="mdesc">주유소·물류비부터 바로 올라</span></div>
+      </div>
+      <div class="mstep hot">
+        <div class="mnum">4</div>
+        <div class="mtxt"><b>체감물가 상승</b><span class="mdesc">소비자신뢰지수 81.9 (8월) — 2014년 4월 이후 최저</span></div>
+      </div>
+      <div class="verdict"><b>소비자신뢰지수</b>는 사람들이 살림살이를 얼마나 괜찮게 느끼는지 재는 지표야. 낮을수록 "지금 돈 쓰기 겁난다"는 뜻.</div>
+    </div>
+
+    <div class="path">
+      <span class="badge tariff">경로 B · 관세</span>
+      <h3>관세 정책의 부메랑</h3>
+      <div class="mstep">
+        <div class="mnum">1</div>
+        <div class="mtxt"><b>수입품에 관세 부과</b><span class="mdesc">트럼프의 대표 경제 정책</span></div>
+      </div>
+      <div class="mstep">
+        <div class="mnum">2</div>
+        <div class="mtxt"><b>"부담은 외국 기업이 진다"</b><span class="mdesc">정부가 내세운 설명</span></div>
+      </div>
+      <div class="mstep">
+        <div class="mnum">3</div>
+        <div class="mtxt"><b>실제론 약 90%를 미국이 부담</b><span class="mdesc">미국 기업·소비자가 떠안았다는 연구 결과</span></div>
+      </div>
+      <div class="mstep hot">
+        <div class="mnum">4</div>
+        <div class="mtxt"><b>공화당 텃밭까지 흔들림</b><span class="mdesc">텍사스·캔자스·노스캐롤라이나에서도 후보 입지 불안</span></div>
+      </div>
+      <div class="verdict">관세는 수입업자가 먼저 내고 <b>가격에 얹어 소비자에게 넘긴다</b> — 그래서 '외국에 매기는 세금'처럼 보여도 체감은 내 물가로 돌아와.</div>
+    </div>
+  </div>
+
+  <div class="section-title">④ 선거 결과가 한국 지갑으로 오는 길</div>
+  <div class="flow">
+    <div class="step s1">하원 민주당 우세<br>상원은 접전<small>현재 여론조사 기준</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">공화당이 양원 과반 실패<small>법안·예산이 막히기 시작</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">트럼프 '레임덕' 위기<small>약속을 밀어붙일 힘이 약해짐</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">한국 대미 투자·관세 조건이<br>재조정 변수로<small>2,000억 달러 패키지가 걸려 있어</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.08 딥다이브(뉴닉 데일리 2026.10.08) 내용 기반</div>
+</div>
+</body>
+</html>
