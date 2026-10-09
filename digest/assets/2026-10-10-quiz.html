@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.10</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.10 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제.
+const MC_BANK = [
+  { id:'fab_tradeoff', variants:[
+    { q:'AI용 HBM 생산이 늘수록 스마트폰용 메모리가 모자라지는 이유로 가장 알맞은 것은?',
+      opts:['스마트폰용 메모리는 원료가 AI용과 전혀 달라 구하기 어려워서',
+            '메모리 생산 능력은 한정돼 있어서, 마진이 큰 AI용에 라인을 돌리면 다른 용도 배정이 줄어서',
+            '스마트폰 회사들이 AI용 메모리를 대신 사들여서',
+            'AI용 메모리를 만들면 일반 메모리는 자동으로 못 만들게 법으로 정해져서'],
+      answer:1,
+      explain:'공장은 한정돼 있어서 <b>자리 다툼</b>이 벌어져. 더 남는 장사(HBM·서버용)에 라인을 몰면 스마트폰용 몫이 줄어.' },
+    { q:'메모리 업체가 일반 D램보다 HBM 쪽에 생산을 몰아주는 판단의 핵심 근거는?',
+      opts:['HBM이 일반 D램보다 같은 설비에서 더 남는 장사여서',
+            '일반 D램은 기술이 사라져 만들 수 없어서',
+            '정부가 HBM 생산을 의무화해서',
+            'HBM은 팔지 않고 보관만 하면 되어서'],
+      answer:0,
+      explain:'기업은 <b>마진</b>이 큰 쪽에 설비를 써. 그 결과 덜 남는 용도는 공급이 줄어.' },
+  ]},
+  { id:'two_responses', variants:[
+    { q:'메모리 값이 오른 스마트폰 제조사가 택할 수 있는 대응을 맞게 짝지은 것은?',
+      opts:['값을 내려서 판매량을 줄이기 / 메모리를 더 많이 넣기',
+            '값을 올려 원가를 소비자에게 넘기기 / 값은 두고 메모리 탑재량을 줄이기',
+            '메모리 없이 폰을 출시하기 / 폰 출시를 영구 중단하기',
+            '부품값은 제조사가 아닌 통신사가 낸다고 정하기'],
+      answer:1,
+      explain:'<b>값 인상</b>과 <b>칩 다이어트</b> 두 갈래야. 둘 다 부족분의 부담을 누군가에게 넘기는 방식이야.' },
+    { q:"'칩 다이어트'가 소비자에게 의미하는 바로 가장 알맞은 것은?",
+      opts:['같은 값에 받는 메모리 용량이 줄어드는 사실상의 가격 인상일 수 있다',
+            '폰이 반드시 더 빨라진다',
+            '폰 가격이 자동으로 내려간다',
+            '메모리를 빼서 배터리가 반드시 커진다'],
+      answer:0,
+      explain:'겉가격은 같아도 <b>용량이 줄면 같은 돈에 덜 받는 것</b>이니 사실상 인상일 수 있어.' },
+  ]},
+  { id:'self_correcting', variants:[
+    { q:'메모리 값이 너무 오르면 이 호황을 스스로 식힐 수 있는 이유로 가장 알맞은 것은?',
+      opts:['공급 업체가 모두 폐업하기 때문',
+            '정부가 폰 판매를 금지하기 때문',
+            '폰 값이 오르면 소비자가 구매를 미루거나 줄여, 메모리 수요 한 축이 약해질 수 있기 때문',
+            '메모리는 값이 오를수록 원가가 자동으로 내려가기 때문'],
+      answer:2,
+      explain:'비싸지면 <b>수요가 줄 수 있어</b>. 그래서 급등이 영원히 간다고 단정하면 안 돼.' },
+    { q:'"공급난이 2027년까지 간다"는 전망이 소비자에게 시사하는 것으로 가장 알맞은 것은?',
+      opts:['내일부터 폰 값이 반드시 내려간다',
+            '메모리 값은 오르기만 할 수 있고 내릴 수는 없다',
+            '기다려도 단기간에 싸질 신호는 약하니, 구매 시점을 값 하락만 기대하며 미루기 어렵다',
+            '폰은 2027년까지 판매되지 않는다'],
+      answer:2,
+      explain:'전망일 뿐이라 <b>단정은 금물</b>이지만, 적어도 가까운 시일의 하락을 기대할 근거는 약해.' },
+  ]},
+  { id:'tax_link', variants:[
+    { q:'AI·메모리 호황이 한국의 나라 살림(세수)으로 이어지는 경로로 가장 알맞은 것은?',
+      opts:['삼성전자·SK하이닉스 이익 증가 → 법인세 증가 → 초과세수',
+            '폰 값 인상 → 근로소득세 감면 → 세수 감소',
+            '메모리 가격 하락 → 관세 인하 → 세수 증가',
+            '호황이 길수록 세금이 자동으로 면제된다'],
+      answer:0,
+      explain:'기업이 크게 벌면 <b>법인세</b>가 늘어. 10/1에 본 초과세수 63조 원도 같은 줄기야.' },
+  ]},
+  { id:'review_1009', variants:[
+    { q:'(어제 복습) 기준금리와 10년물 국채금리의 차이로 가장 알맞은 것은?',
+      opts:['기준금리는 시장이 정하고, 10년물은 연준이 정한다',
+            '둘 다 연준이 정하는 단기금리다',
+            '기준금리는 연준이 정하는 지금의 돈값, 10년물은 시장이 매기는 앞으로 10년의 평균 예상치다',
+            '기준금리는 장기금리, 10년물은 단기금리다'],
+      answer:2,
+      explain:'기준금리는 <b>지금</b>, 10년물은 <b>앞으로 10년의 평균 예상</b>이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'AI 데이터센터에 쓰이는, 여러 겹을 쌓아 속도를 높인 메모리를 영문 약자로 뭐라고 해? (세 글자)',
+    accept:['HBM','hbm'],
+    explain:'정답은 <b>HBM</b>(고대역폭메모리)야.' },
+  { q:'값은 그대로 두고 폰에 넣는 메모리 용량을 줄이는 대응을 뭐라고 부를까? (○○ 다이어트, 두 글자)',
+    accept:['칩','칩 다이어트'],
+    explain:'정답은 <b>칩</b> 다이어트야.' },
+  { q:'메모리 반도체 부족과 가격 폭등을 가리키는 말로, RAM과 아마겟돈을 합친 신조어는? (한글로)',
+    accept:['램마겟돈','RAMmageddon'],
+    explain:'정답은 <b>램마겟돈</b>이야.' },
+  { q:'(어제 복습) 시장이 매기는 "앞으로 10년 돈값의 평균 예상치"인 세계 장기금리의 기준점은 어느 나라 국채의 금리일까? (두 글자)',
+    accept:['미국','미'],
+    explain:'정답은 <b>미국</b> 10년물 국채야.' },
+];
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

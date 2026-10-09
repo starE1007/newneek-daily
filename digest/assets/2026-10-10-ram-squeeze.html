@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI가 메모리를 먹으면 스마트폰 값이 오른다</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .fab{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch}
+  .box{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .box h3{font-size:15.5px;margin-bottom:6px}
+  .box p{font-size:13.5px;color:var(--text2)}
+  .box p b{color:var(--text)}
+  .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.hot{background:var(--blue-soft);color:#1B6BB8}
+  .badge.cold{background:var(--red-soft);color:#C6493E}
+  .mid{align-self:center;text-align:center;font-size:13px;font-weight:700;color:var(--text2)}
+  .mid .big{display:block;font-size:22px;color:#B9B6B1}
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13.5px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 120px;color:var(--text2)}
+  .bar{height:22px;border-radius:6px}
+  .bar.ai{background:var(--blue);width:78%}
+  .bar.phone{background:#F0B7B1;width:22%}
+  .bar-note{font-size:12.5px;color:var(--text2);margin-top:10px}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .fab,.two{grid-template-columns:1fr}
+    .mid .big{transform:rotate(90deg)}
+    .bar-label{flex-basis:96px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.10 데일리 뉴스 · 시각자료</div>
+  <h1>📱 AI가 메모리를 먹으면 스마트폰 값이 오른다</h1>
+  <div class="sub">같은 메모리 공장에서 '누가 먼저 가져가느냐'가 내 폰 가격을 정하는 구조</div>
+
+  <div class="section-title">메모리 공장은 하나, 주문은 둘</div>
+  <div class="fab">
+    <div class="box">
+      <span class="badge hot">우선순위 ↑</span>
+      <h3>AI 데이터센터</h3>
+      <p><b>HBM·서버용 D램</b> — 마진이 커서 업체가 생산을 몰아줘.</p>
+    </div>
+    <div class="mid"><span class="big">⇄</span>같은 생산 능력</div>
+    <div class="box">
+      <span class="badge cold">우선순위 ↓</span>
+      <h3>스마트폰·PC</h3>
+      <p><b>일반 D램·낸드</b> — 배정 물량이 줄어 모자라고 비싸져.</p>
+    </div>
+  </div>
+
+  <div class="bars" style="margin-top:14px">
+    <div class="bar-row"><span class="bar-label">AI용으로 쏠림</span><span class="bar ai"></span></div>
+    <div class="bar-row"><span class="bar-label">스마트폰용 몫</span><span class="bar phone"></span></div>
+    <div class="bar-note">※ 막대는 '쏠림의 방향'을 보여주는 개념도야. 실제 비율이 아니야.</div>
+  </div>
+
+  <div class="section-title">내 폰값까지 오는 경로</div>
+  <div class="flow">
+    <div class="step s1">AI 서버 수요 폭발</div>
+    <div class="arrow">→</div>
+    <div class="step s2">생산이 HBM으로 이동<small>스마트폰용 물량 감소</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">메모리 값 급등<small>업계 "2027년까지"</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">폰 값 인상<small>또는 탑재량 축소</small></div>
+  </div>
+
+  <div class="section-title">제조사의 두 가지 선택</div>
+  <div class="two">
+    <div class="box">
+      <span class="badge cold">① 값을 올린다</span>
+      <h3>원가를 소비자에게 넘기기</h3>
+      <p>애플 <b>최대 25%</b> 인상, 구글 픽셀11 <b>899→999유로</b> 전망, 삼성 S26 인상.</p>
+    </div>
+    <div class="box">
+      <span class="badge hot">② 칩 다이어트</span>
+      <h3>값은 두고 메모리를 덜 넣기</h3>
+      <p>겉가격은 지키지만 <b>탑재량이 줄어</b> 같은 값에 덜 받는 셈이야.</p>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.10 오늘의 딥다이브 내용 기반(가격 수치는 7월 보도 기준)</div>
+</div>
+</body>
+</html>
