@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI가 해킹을 자동화하면 뭐가 달라지나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 유출 현황 */
+  .hit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .hit{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .hit .where{font-size:13.5px;font-weight:700;margin-bottom:2px}
+  .hit .num{font-size:19px;font-weight:700;color:#C6493E}
+  .hit .num small{font-size:12.5px;font-weight:600;color:var(--text2)}
+  .hit .memo{font-size:12.5px;color:var(--text2);margin-top:2px}
+
+  /* 공격 루프 */
+  .loop{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .lrow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+  .lstep{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--blue-soft);color:#1B6BB8}
+  .lstep small{font-weight:500;font-size:12px;opacity:.85}
+  .lstep.hot{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .loopback{margin-top:10px;font-size:13px;font-weight:700;color:#B06426;background:var(--orange-soft);border-radius:8px;padding:10px 14px}
+
+  /* 전·후 비교 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.before{background:var(--surface2);color:var(--text2)}
+  .badge.after{background:var(--red-soft);color:#C6493E}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 내 대응 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--green-soft);color:#2F7A52;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid,.hit-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.12 데일리 뉴스 · 시각자료</div>
+  <h1>🔓 AI가 해킹을 자동화하면 뭐가 달라지나</h1>
+  <div class="sub">9월 말~10월 연쇄 유출의 규모, AI 공격이 반복되는 구조, 내가 지금 걸 수 있는 자물쇠까지 한 장으로</div>
+
+  <div class="section-title">어디가 얼마나 털렸나</div>
+  <div class="hit-grid">
+    <div class="hit"><div class="where">신한은행</div><div class="num">약 2만 5천<small> 명</small></div><div class="memo">이름·주민번호·전화번호 등</div></div>
+    <div class="hit"><div class="where">KB국민은행</div><div class="num">119<small> 명</small></div><div class="memo">같은 해커 소행 추정</div></div>
+    <div class="hit"><div class="where">하나은행</div><div class="num">89<small> 명</small></div><div class="memo">부산은행도 유출 확인</div></div>
+    <div class="hit"><div class="where">한국전력</div><div class="num">약 2만 4천<small> 명</small></div><div class="memo">직원 정보가 외부 웹에 노출</div></div>
+    <div class="hit"><div class="where">대형 교회 2곳</div><div class="num">최대 100만<small> 명</small></div><div class="memo">교인 정보 유출 가능성</div></div>
+    <div class="hit"><div class="where">교육 플랫폼 1곳</div><div class="num">약 4만 5천<small> 명</small></div><div class="memo">기아 노조원·교육부 유관기관</div></div>
+  </div>
+
+  <div class="section-title">AI 공격은 '한 번'이 아니라 '루프'로 온다</div>
+  <div class="loop">
+    <div class="lrow">
+      <div class="lstep">① 계획 AI<small>어디를 어떻게 찔러볼지 정함</small></div>
+      <div class="arrow">→</div>
+      <div class="lstep">② 실행 AI<small>실제로 침입 시도</small></div>
+      <div class="arrow">→</div>
+      <div class="lstep">③ 결과 분석<small>뭐가 막혔고 뭐가 통했나</small></div>
+      <div class="arrow">→</div>
+      <div class="lstep hot">④ 계획 수정 후 재시도<small>①로 되돌아감</small></div>
+    </div>
+    <div class="loopback">↩ 사람이 자지 않고 해야 했던 '찔러보기'를 AI가 쉬지 않고 돌린다 — 그래서 한 곳이 아니라 은행·공공기관·대학·교회가 동시에 털렸다.</div>
+  </div>
+
+  <div class="section-title">그래서 뭐가 달라졌나</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge before">예전 해킹</span>
+      <h3>숙련된 사람의 수작업</h3>
+      <p>취약점을 찾는 데 <b>사람의 시간과 실력</b>이 들었다. 그래서 공격 대상은 값나가는 몇 곳으로 좁혀졌다.</p>
+    </div>
+    <div class="vs">
+      <span class="badge after">AI 활용 해킹</span>
+      <h3>오픈소스 도구로 자동 반복</h3>
+      <p>중국산 자율 침투 도구 <b>아르텍스(ARTEX)</b> 흔적이 은행 6곳 로그에서 나왔다. 도구가 공개돼 있어 <b>진입장벽이 낮아지고</b>, 대상은 넓어졌다.</p>
+    </div>
+  </div>
+
+  <div class="section-title">내가 지금 걸 수 있는 자물쇠</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>여신거래 안심차단</b><span class="mdesc">내 이름으로 새 대출·카드 발급이 아예 안 되게 미리 잠근다. 거래 은행 앱이나 영업점에서 신청.</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>개인정보노출자 등록</b><span class="mdesc">금감원 '파인'(fine.fss.or.kr)에 등록하면 전 금융사에 공유돼 본인 확인 절차가 강화된다.</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>비밀번호 재사용 끊기</b><span class="mdesc">한 곳에서 새어 나간 조합을 다른 사이트에 자동으로 넣어보는 공격이 가장 싸고 빠르다.</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 핵심은 '사후'가 아니라 '사전'</b>주민등록번호는 한 번 새면 바꿀 수 없다 — 유출 사실을 알게 된 다음에 막는 게 아니라, 털리기 전에 잠가 두는 쪽만 유효하다.</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 유출 규모는 2026.10.12 기준 발표·보도치 · 금융당국은 "사람 개입 없는 AI 단독 공격은 아니다"로 판단</div>
+</div>
+</body>
+</html>
