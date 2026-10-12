@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기름값을 양쪽에서 당기는 두 힘 — 사우디·예멘 지도와 유가 구도</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:700px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:30px;height:0;border-top:3px dashed var(--red)}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+
+  /* 타임라인 */
+  .tl{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .tstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:16px}
+  .tstep:last-of-type{padding-bottom:0}
+  .tstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .tstep:last-of-type::before{display:none}
+  .tdot{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--surface2);color:var(--text2);font-weight:700;font-size:11.5px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .tstep.calm .tdot{background:var(--green-soft);color:#2F7A52}
+  .tstep.hot .tdot{background:var(--red-soft);color:#C6493E}
+  .ttxt{padding-top:5px;font-size:14.5px}
+  .ttxt b{font-size:15px}
+  .ttxt .tdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  /* 두 힘 */
+  .forces{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .force{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .force .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.up{background:var(--red-soft);color:#C6493E}
+  .badge.down{background:var(--green-soft);color:#2F7A52}
+  .force h3{font-size:15.5px;margin-bottom:6px}
+  .force p{font-size:13.5px;color:var(--text2)}
+  .force p b{color:var(--text)}
+  .force p + p{margin-top:7px}
+
+  .result{margin-top:16px;border-radius:10px;padding:14px 16px;background:var(--orange-soft);font-size:14px;color:#8E4F1C}
+  .result b{display:block;font-size:14.5px;margin-bottom:3px;color:#7A4315}
+
+  /* 흐름도 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 145px;min-width:135px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:3px;background:var(--orange-soft);color:#9A5620}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.a{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .forces{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.13 데일리 뉴스 · 시각자료</div>
+  <h1>⛽ 기름값을 양쪽에서 당기는 두 힘</h1>
+  <div class="sub">어디서 싸우는지(지도) · 왜 이렇게까지 왔는지(타임라인) · 그래서 유가가 왜 104달러에 멈춰 있는지</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="아라비아반도 개략 지도: 리야드 공항 피격 지점과 예멘 사나, 바브엘만데브 해협 위치">
+      <defs>
+        <marker id="arrUp" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#E56458"/></marker>
+        <marker id="arrDown" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/></marker>
+      </defs>
+
+      <!-- 육지 바탕 -->
+      <rect width="900" height="580" fill="#F0EFED"/>
+
+      <!-- 홍해 (왼쪽 위에서 남동으로) -->
+      <path d="M96,40 C130,130 170,240 215,330 C255,410 310,470 372,512" fill="none" stroke="#B9D4EC" stroke-width="46" stroke-linecap="round"/>
+      <path d="M96,40 C130,130 170,240 215,330 C255,410 310,470 372,512" fill="none" stroke="#D8E9F7" stroke-width="42" stroke-linecap="round"/>
+
+      <!-- 페르시아만·오만만·아라비아해 -->
+      <path d="M612,56 L900,56 L900,560 L520,560 L430,520 L372,512
+               L470,486 L600,450 L700,400 L790,316 L830,258
+               L786,214 L730,176 L690,196 L640,206 L612,170 Z"
+            fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 예멘 (후티 지배 지역 표시) -->
+      <path d="M374,504 L470,478 L548,452 L530,392 L440,392 L378,436 Z" fill="#E56458" fill-opacity="0.14" stroke="#E56458" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+      <!-- 바다 이름 -->
+      <g font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle">
+        <text transform="translate(206,300) rotate(58)">홍  해</text>
+        <text transform="translate(728,106) rotate(16)">페르시아만</text>
+        <text transform="translate(690,520)">아라비아해</text>
+        <text transform="translate(452,536)">아덴만</text>
+      </g>
+
+      <!-- 나라 이름 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">
+        <text x="400" y="230" font-size="17">사우디아라비아</text>
+        <text x="760" y="36" font-size="14">이란 ↗</text>
+        <text x="120" y="330" font-size="13">아프리카</text>
+        <text x="806" y="280" font-size="13">오만</text>
+      </g>
+      <g text-anchor="middle">
+        <text x="452" y="430" font-size="14" font-weight="700" fill="#C6493E">예  멘</text>
+        <text x="452" y="447" font-size="11.5" fill="#C6493E">북부 = 후티 지배 지역</text>
+      </g>
+
+      <!-- 후티 → 리야드 공격 화살표 -->
+      <path d="M470,404 C492,350 508,300 524,252" fill="none" stroke="#E56458" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#arrUp)"/>
+      <!-- 사우디 연합군 → 사나 포격 화살표 -->
+      <path d="M470,268 C444,320 420,364 404,408" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#arrDown)"/>
+
+      <!-- 피격 지점 ① 리야드 킹칼리드 공항 -->
+      <g>
+        <circle cx="528" cy="240" r="23" fill="#E56458" opacity="0.15"/>
+        <circle cx="528" cy="240" r="12.5" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="521" y1="247" x2="535" y2="233" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g>
+        <line x1="604" y1="196" x2="540" y2="232" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="596" y="158" width="268" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="730" y="178" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 킹칼리드 공항 · 리야드</text>
+        <text x="730" y="196" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">10·11일 이틀 연속 피격</text>
+      </g>
+
+      <!-- 피격 지점 ② 사나 -->
+      <g>
+        <circle cx="398" cy="420" r="23" fill="#D5803B" opacity="0.15"/>
+        <circle cx="398" cy="420" r="12.5" fill="#D5803B" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="391" y1="427" x2="405" y2="413" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g>
+        <line x1="268" y1="452" x2="386" y2="424" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="36" y="428" width="236" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="154" y="448" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 사나 (예멘 수도)</text>
+        <text x="154" y="466" font-size="12.5" font-weight="700" fill="#D5803B" text-anchor="middle">사우디 연합군이 집중 포격</text>
+      </g>
+
+      <!-- 바브엘만데브 -->
+      <g>
+        <circle cx="372" cy="512" r="10" fill="none" stroke="#2783DE" stroke-width="3"/>
+        <line x1="372" y1="512" x2="372" y2="556" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="232" y="556" width="280" height="22" rx="6" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="372" y="571" font-size="12" font-weight="600" fill="#2783DE" text-anchor="middle">바브엘만데브 — 후티가 쥔 해상 길목</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 후티 → 사우디 공격 지점</span>
+      <span class="item"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#D5803B"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 사우디 연합군 → 예멘 포격 지점</span>
+      <span class="item"><span class="dash-sample"></span> 공격 방향</span>
+    </div>
+  </div>
+
+  <div class="section-title">왜 여기까지 왔어? — 4년 휴전이 깨진 순서</div>
+  <div class="tl">
+    <div class="tstep">
+      <div class="tdot">90s</div>
+      <div class="ttxt"><b>후티, 예멘 북부에서 등장</b><span class="tdesc">2004년 예멘 당국이 지도자를 사살한 뒤 본격 무장 조직이 됐고, 이란의 지원으로 군사력을 키웠어</span></div>
+    </div>
+    <div class="tstep">
+      <div class="tdot">2014</div>
+      <div class="ttxt"><b>예멘 내전 — 후티가 수도 사나를 장악</b><span class="tdesc">예멘 정부는 망명 정부 형태로 맞서고, 사우디가 그 정부를 군사·재정으로 지원 → 사우디 vs 후티 구도가 생김</span></div>
+    </div>
+    <div class="tstep calm">
+      <div class="tdot">2022</div>
+      <div class="ttxt"><b>유엔 중재로 휴전 (4월)</b><span class="tdesc">10월에 공식 기간이 끝난 뒤에도 대규모 충돌은 서로 자제 — 약 4년간 조용했던 구간</span></div>
+    </div>
+    <div class="tstep hot">
+      <div class="tdot">26.2</div>
+      <div class="ttxt"><b>미국·이란 전쟁 시작</b><span class="tdesc">이란이 친미 국가인 사우디를 때리면서, 이란이 지원하는 후티도 같은 편에서 움직이게 됨</span></div>
+    </div>
+    <div class="tstep hot">
+      <div class="tdot">26.7</div>
+      <div class="ttxt"><b>4년 휴전이 깨짐</b><span class="tdesc">사우디와 후티가 다시 직접 무력 충돌 — 여기서부터 민간 피해를 주고받는 단계로 번졌어</span></div>
+    </div>
+    <div class="tstep hot">
+      <div class="tdot">26.10</div>
+      <div class="ttxt"><b>리야드 공항 피격 · 미국 개입 검토</b><span class="tdesc">10일 13명 사망·309명 부상(미국인 1명 포함), 11일에도 공격. 트럼프는 "동참 검토", 튀르키예·파키스탄은 사우디에 파병 결정</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">그래서 기름값은? — 서로 반대로 당기는 두 힘</div>
+  <div class="forces">
+    <div class="force">
+      <span class="badge up">↑ 올리는 힘</span>
+      <h3>산유국 본토가 맞고 있다</h3>
+      <p>사우디는 세계 최대 원유 수출국이야. 생산 설비가 직접 끊기지 않아도, <b>'끊길 수 있다'</b>는 가능성만으로 값이 먼저 올라 — 이걸 위험 프리미엄이라고 해.</p>
+      <p>후티는 <b>바브엘만데브</b> 해상 길목도 쥐고 있어서, 배로 나가는 길까지 위협할 수 있어.</p>
+    </div>
+    <div class="force">
+      <span class="badge down">↓ 내리는 힘</span>
+      <h3>미국이 러시아 기름을 시장에 풀고 있다</h3>
+      <p>트럼프는 9일 푸틴과 <b>러시아산 경유</b>를 미국·세계 시장에 공급하기로 했다고 밝혔고, 11일에는 러·우 <b>'에너지 휴전'</b>까지 발표했어.</p>
+      <p>휴전이 지켜지면 러시아 정유시설 공격이 멈춰서 <b>공급이 돌아온다</b>는 기대가 생겨 — 값을 누르는 쪽이야.</p>
+    </div>
+  </div>
+  <div class="result">
+    <b>두 힘이 부딪힌 결과 = 브렌트유 104달러대</b>
+    장중에 105달러를 넘었다가 러시아산 경유 공급 기대에 오른 만큼을 되돌려줬어. 값이 조용해 보이는 게 '위험이 사라져서'가 아니라, <strong>반대 방향 두 힘이 맞물려 있어서</strong>라는 게 핵심이야.
+  </div>
+
+  <div class="section-title">여기서 내 지갑까지 오는 길</div>
+  <div class="flow">
+    <div class="step a">중동 확전 위험</div>
+    <div class="arrow">→</div>
+    <div class="step">유가·해상 보험료</div>
+    <div class="arrow">→</div>
+    <div class="step">수입 물가·운송비</div>
+    <div class="arrow">→</div>
+    <div class="step">연준 "더 올릴 수도"<small>10/14 미 9월 CPI</small></div>
+    <div class="arrow">→</div>
+    <div class="step a">대출금리·환율<small>10/22 금통위 · 10/28 FOMC</small></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도로, 위치·국경·거리가 정밀하지 않음 · 2026.10.13 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
