@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.13</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.13 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+
+// 문제은행 — concept별 변형 문제.
+const MC_BANK = [
+  { id:'overcap', variants:[
+    { q:'"구조적 과잉생산"이 일시적 재고 과잉과 다르다고 보는 이유로 가장 알맞은 것은?',
+      opts:['수요가 잠깐 줄어든 탓이라 경기가 회복되면 저절로 해소되기 때문',
+            '생산 능력 자체가 세계 수요를 넘도록 커져 있어, 시간이 지나도 공급과잉이 반복되기 때문',
+            '재고를 쌓아 두는 창고가 부족해서 생기는 물류 문제이기 때문',
+            '정부가 수출을 막아 물량이 국내에 쌓이는 현상이기 때문'],
+      answer:1,
+      explain:'핵심은 <b>공장(생산 능력)</b>이야. 수요가 잠깐 꺾인 게 아니라 설비가 수요보다 크니, 값이 내려가도 해소가 안 돼.' },
+    { q:'어느 나라의 과잉생산이 "세계 경제를 흔든다"고 말하는 논리로 가장 알맞은 것은?',
+      opts:['남는 물량이 국내에서 다 소화돼 그 나라 물가만 흔들리기 때문',
+            '남는 물량이 해외로 싼값에 쏟아져, 다른 나라 공장이 가격 경쟁에서 밀리기 때문',
+            '남는 물량을 수출하면 그 나라 통화가치가 자동으로 내려가기 때문',
+            '과잉생산국이 원자재를 사들여 원자재 값만 오르기 때문'],
+      answer:1,
+      explain:'안에서 못 팔면 <b>밖으로 밀어낸다</b>. 싼 수입품이 들어온 나라는 소비자는 좋아도 자국 제조업이 흔들려.' },
+  ]},
+  { id:'scope', variants:[
+    { q:'성명이 지목한 분야가 전기차·배터리·범용반도체처럼 "이미 많이 만들어진 제품군"에 몰린 이유로 가장 알맞은 것은?',
+      opts:['이 분야들은 기술이 단순해 신규 진입이 불가능해서',
+            '대규모 설비 투자로 생산 능력을 한꺼번에 키우기 쉬워, 수요를 앞질러 공급이 늘기 쉬운 분야라서',
+            '모든 나라가 해당 제품의 수입을 이미 금지했기 때문',
+            '이 제품들은 가격이 아니라 브랜드로만 경쟁하기 때문'],
+      answer:1,
+      explain:'공장을 크게 지어 규모로 값을 낮추는 산업이라, 한 번 증설이 쏠리면 <b>공급이 수요를 앞지르기</b> 쉬워.' },
+  ]},
+  { id:'joint', variants:[
+    { q:'15개국이 개별 대응 대신 "공동 장관성명"을 낸 이유로 가장 알맞은 것은?',
+      opts:['한 나라씩 관세를 올리면 대상국이 나라별로 대응해 효과가 약하고, 함께 문제를 규정하면 압박의 무게가 커지기 때문',
+            '공동성명은 법적 구속력이 있어 위반국을 즉시 처벌할 수 있기 때문',
+            '15개국이 모두 같은 산업 구조를 가져 같은 피해를 보기 때문',
+            '성명을 내면 해당 제품의 세계 가격이 자동으로 고정되기 때문'],
+      answer:0,
+      explain:'성명 자체는 구속력이 없지만, <b>같이 문제를 규정</b>하면 이후 관세·보조금 대응에 명분과 무게가 실려.' },
+  ]},
+  { id:'korea', variants:[
+    { q:'과잉생산 문제가 한국에 "양면"이라고 보는 설명으로 가장 알맞은 것은?',
+      opts:['한국은 이 분야를 전혀 만들지 않아 영향이 없다',
+            '싼 수입품은 소비자 물가에 도움이 되지만, 겹치는 국내 업종은 가격 경쟁에 밀릴 수 있다',
+            '한국은 과잉생산국이라 성명의 직접 피해국이 된다',
+            '수입품이 싸지면 한국 수출도 반드시 늘어난다'],
+      answer:1,
+      explain:'소비자엔 <b>싼 물건</b>, 겹치는 제조업엔 <b>가격 압박</b> — 입장에 따라 득실이 갈려.' },
+  ]},
+  { id:'asia', variants:[
+    { q:'어제 복습한 AI 해킹 뉴스의 핵심 논리로 가장 알맞은 것은?',
+      opts:['AI가 새로운 해킹 기술을 발명해 방어가 불가능해졌다',
+            '찔러보기의 반복 단가가 거의 0이 돼 표적이 약한 곳 전부로 넓어졌다',
+            '해킹 대상이 값나가는 몇 곳으로 더 좁혀졌다',
+            '사람의 개입 없이 AI가 독자적으로 공격한 것으로 확인됐다'],
+      answer:1,
+      explain:'기술이 아니라 <b>반복 단가</b>가 바뀐 거야. 그래서 은행과 교회가 같은 주에 털렸어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'(어제 복습) 공격이 싸지면서 표적이 "중요한 몇 곳"에서 "방어가 ○○ 곳 전부"로 넓어졌다. ○○에 들어갈 두 글자는?',
+    accept:['약한'],
+    explain:'정답은 <b>약한</b>. 반복 단가가 거의 0이 되니 방어가 약한 곳이 전부 표적이 돼.' },
+  { q:'OECD 본부에서 15개국이 낸 성명의 이름에 들어간 문제 개념, "구조적 ○○○○ 대응"의 ○○○○는?',
+    accept:['과잉생산'],
+    explain:'정답은 <b>과잉생산</b>. 수요보다 생산 능력이 구조적으로 큰 상태를 말해.' },
+  { q:'OECD 본부가 있는 나라(도시)는 어디일까? (프랑스의 ○○)',
+    accept:['파리'],
+    explain:'정답은 <b>파리</b>. 이번 공동 장관성명이 발표된 곳이야.' },
+];
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

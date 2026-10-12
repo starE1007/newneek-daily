@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과잉생산, 왜 남의 문제가 되나 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.good{background:var(--green-soft);color:#2F7A52}
+  .badge.bad{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tag{border:1px solid var(--border);background:var(--soft);border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}.vs-grid{grid-template-columns:1fr}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.13 데일리 뉴스 · 시각자료</div>
+  <h1>🏭 과잉생산, 왜 남의 나라 문제가 될까</h1>
+  <div class="sub">공장이 수요보다 크면 어떤 일이 벌어지는지, 그리고 15개국이 왜 한목소리를 냈는지</div>
+
+  <div class="section-title">성명이 지목한 5개 분야 중 알려진 것</div>
+  <div class="tags"><span class="tag">🔋 배터리</span><span class="tag">🚗 전기차</span><span class="tag">💾 범용반도체</span><span class="tag">…외 2개 분야</span></div>
+
+  <div class="section-title">과잉생산이 '수출 밀어내기'로 번지는 경로</div>
+  <div class="mech">
+    <div class="mstep"><div class="mnum">1</div><div class="mtxt"><b>정부 지원·투자로 공장을 크게 지음</b><span class="mdesc">수요보다 생산 능력이 앞서감</span></div></div>
+    <div class="mstep"><div class="mnum">2</div><div class="mtxt"><b>안에서 다 못 팔고 재고가 쌓임</b><span class="mdesc">값을 내려도 설비 자체가 커서 해소가 안 됨</span></div></div>
+    <div class="mstep"><div class="mnum">3</div><div class="mtxt"><b>남는 물량을 싼값에 해외로 밀어냄</b><span class="mdesc">공장을 놀리느니 손해를 줄이며 팔기</span></div></div>
+    <div class="mstep hot"><div class="mnum">4</div><div class="mtxt"><b>수입국 공장이 가격 경쟁에서 밀림</b><span class="mdesc">소비자는 싸서 좋지만, 자국 제조업·일자리는 흔들림 → 관세·공동 대응 요구</span></div></div>
+  </div>
+
+  <div class="section-title">한국에게는 양면</div>
+  <div class="vs-grid">
+    <div class="vs"><span class="badge good">소비자·원가 쪽</span><h3>싼 수입품·부품은 이득</h3><p>물가 부담을 덜고, 부품을 쓰는 업종은 원가가 낮아져.</p></div>
+    <div class="vs"><span class="badge bad">생산자 쪽</span><h3>겹치는 업종은 가격 압박</h3><p>배터리·범용반도체처럼 겹치는 분야는 값 경쟁에 밀릴 수 있어.</p></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.13 딥다이브 내용 기반 (성명 세부 분야는 확인된 범위만 표기)</div>
+</div>
+</body>
+</html>
