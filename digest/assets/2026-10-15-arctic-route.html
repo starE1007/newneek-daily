@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>북극항로, 10일 짧은 길 — 한눈에 보는 지도</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:760px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .line-arctic{display:inline-block;width:34px;height:0;border-top:3px solid var(--blue)}
+  .line-suez{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cmp .box{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .cmp .box .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.short{background:var(--blue-soft);color:#1B6BB8}
+  .badge.long{background:var(--orange-soft);color:#B06426}
+  .cmp h3{font-size:16px;margin-bottom:8px}
+  .kv{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;border-bottom:1px dashed var(--border)}
+  .kv:last-child{border-bottom:none}
+  .kv b{font-variant-numeric:tabular-nums}
+
+  .bar-wrap{margin-top:6px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
+  .bar-row .lab{flex:0 0 108px;color:var(--text2)}
+  .bar-track{flex:1;background:var(--surface2);border-radius:99px;height:22px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:99px;display:flex;align-items:center;justify-content:flex-end;padding-right:9px;font-size:12px;font-weight:700;color:#fff}
+  .bar-fill.blue{background:var(--blue)}
+  .bar-fill.orange{background:var(--orange)}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:142px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3,.step.s4{background:var(--orange-soft);color:#9A5620}
+  .step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .note{margin-top:14px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 8px 8px 0;padding:13px 15px;font-size:14px}
+  .note b{color:#1B6BB8}
+  .warn{margin-top:12px;border-left:3px solid var(--red);background:var(--red-soft);border-radius:0 8px 8px 0;padding:13px 15px;font-size:14px}
+  .warn b{color:#B23F34}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .cmp{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-row .lab{flex:0 0 84px;font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.15 데일리 뉴스 · 시각자료</div>
+  <h1>🧭 북극 뱃길, 10일 짧은데 왜 아직 안 쓸까</h1>
+  <div class="sub">팬스타 아크로호가 50일 왕복을 마쳤어 — 어디를 지나갔고, 짧아진 10일이 왜 돈으로는 안 남는지 지도와 도식으로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="북극항로 지도: 부산에서 베링해협과 빌키츠키해협을 지나 로테르담까지 가는 길, 그리고 수에즈 항로 비교">
+      <defs>
+        <marker id="arcA" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#2783DE"/>
+        </marker>
+        <marker id="arcS" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+
+      <!-- ocean base -->
+      <rect x="0" y="0" width="900" height="600" fill="#D8E9F7"/>
+
+      <!-- Arctic ice cap (top) -->
+      <path d="M0,0 L900,0 L900,96 C760,120 600,104 440,118 C300,130 150,112 0,124 Z"
+            fill="#EFF6FC" stroke="#C9DEF0" stroke-width="1.5"/>
+      <text x="452" y="40" font-size="14" font-style="italic" fill="#7FA6C6" text-anchor="middle" font-family="inherit">북 극 해 (여름에만 열린다)</text>
+
+      <!-- Russia landmass -->
+      <path d="M118,150 C210,132 300,146 392,138 C500,129 600,142 700,134 C756,130 800,140 836,152
+               L852,232 C800,250 700,246 600,254 C500,262 400,256 300,262 C220,268 160,260 112,250 Z"
+            fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5" stroke-linejoin="round"/>
+      <text x="470" y="206" font-size="19" font-weight="600" fill="#8D8A85" text-anchor="middle"
+            paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">러 시 아</text>
+
+      <!-- Europe (left) -->
+      <path d="M0,150 L118,150 L112,250 C96,286 70,300 40,318 L0,330 Z"
+            fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5"/>
+      <text x="44" y="212" font-size="14" font-weight="600" fill="#8D8A85" text-anchor="middle"
+            paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">유럽</text>
+
+      <!-- Alaska (right) -->
+      <path d="M868,138 L900,132 L900,250 L858,244 C846,210 852,170 868,138 Z"
+            fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5"/>
+      <text x="880" y="196" font-size="11.5" font-weight="600" fill="#8D8A85" text-anchor="middle"
+            paint-order="stroke" stroke="#F0EFED" stroke-width="3.5" font-family="inherit">알래</text>
+      <text x="880" y="210" font-size="11.5" font-weight="600" fill="#8D8A85" text-anchor="middle"
+            paint-order="stroke" stroke="#F0EFED" stroke-width="3.5" font-family="inherit">스카</text>
+
+      <!-- Asia landmass (bottom center/right) -->
+      <path d="M300,262 C400,256 500,262 600,254 C690,247 780,250 852,232 L860,300
+               C800,330 720,348 650,366 C560,390 470,392 400,386 C340,380 300,360 286,330 Z"
+            fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5" stroke-linejoin="round"/>
+      <text x="520" y="318" font-size="14" font-weight="600" fill="#8D8A85" text-anchor="middle"
+            paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">중국·몽골</text>
+
+      <!-- Korea peninsula -->
+      <path d="M676,352 C690,362 694,382 690,400 C686,416 676,426 666,428 C656,424 650,408 652,390 C654,372 664,358 676,352 Z"
+            fill="#E8F1EC" stroke="#46A171" stroke-width="1.8"/>
+      <text x="706" y="392" font-size="12.5" font-weight="700" fill="#2E7B53" font-family="inherit"
+            paint-order="stroke" stroke="#D8E9F7" stroke-width="3.5">한국</text>
+
+      <!-- Japan -->
+      <path d="M736,346 C756,360 772,384 782,406 C772,412 758,402 744,386 C732,372 728,356 736,346 Z"
+            fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5"/>
+
+      <!-- sea labels -->
+      <g font-style="italic" fill="#5B87B5" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text transform="translate(176,286)">바렌츠해</text>
+        <text transform="translate(60,352)">북해</text>
+        <text transform="translate(806,286)">베링해</text>
+        <text transform="translate(792,460)">태평양</text>
+      </g>
+
+      <!-- ARCTIC ROUTE: Busan -> Bering -> Arctic -> Barents -> Rotterdam -->
+      <path d="M672,436 C724,442 780,420 816,380 C846,344 852,300 844,266
+               C836,238 816,222 800,208
+               C740,186 640,176 520,170 C400,164 290,166 206,178
+               C168,192 150,228 146,262
+               C140,292 120,312 92,324 C72,332 56,330 44,326"
+            fill="none" stroke="#2783DE" stroke-width="3.4" stroke-linecap="round" marker-end="url(#arcA)"/>
+
+      <!-- SUEZ ROUTE (comparison, schematic along the bottom) -->
+      <path d="M664,448 C600,490 500,520 390,536 C280,552 170,546 96,520
+               C58,500 40,450 42,392 C43,362 44,344 44,336"
+            fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="8 6" stroke-linecap="round" marker-end="url(#arcS)"/>
+      <text x="382" y="572" font-size="13" font-weight="600" fill="#B06426" text-anchor="middle" font-family="inherit"
+            paint-order="stroke" stroke="#D8E9F7" stroke-width="4">수에즈 항로 — 약 22,000km · 30~34일 (인도양·수에즈 운하 경유)</text>
+
+      <!-- Busan pin -->
+      <g>
+        <circle cx="672" cy="436" r="17" fill="#46A171" opacity="0.18"/>
+        <circle cx="672" cy="436" r="8" fill="#46A171" stroke="#FFFFFF" stroke-width="2.6"/>
+      </g>
+      <text x="672" y="470" font-size="13" font-weight="700" fill="#2E7B53" text-anchor="middle" font-family="inherit"
+            paint-order="stroke" stroke="#D8E9F7" stroke-width="4">부산신항 · 출발</text>
+
+      <!-- Rotterdam pin -->
+      <g>
+        <circle cx="44" cy="326" r="17" fill="#2783DE" opacity="0.18"/>
+        <circle cx="44" cy="326" r="8" fill="#2783DE" stroke="#FFFFFF" stroke-width="2.6"/>
+      </g>
+      <text x="60" y="360" font-size="13" font-weight="700" fill="#1B6BB8" text-anchor="start" font-family="inherit"
+            paint-order="stroke" stroke="#D8E9F7" stroke-width="4">로테르담 · 도착</text>
+
+      <!-- Bering Strait chokepoint -->
+      <g>
+        <circle cx="844" cy="266" r="21" fill="#D5803B" opacity="0.16"/>
+        <circle cx="844" cy="266" r="11" fill="#D5803B" stroke="#FFFFFF" stroke-width="2.8"/>
+        <text x="844" y="270" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="inherit">1</text>
+      </g>
+      <text x="828" y="306" font-size="12.5" font-weight="700" fill="#9A5620" text-anchor="middle" font-family="inherit"
+            paint-order="stroke" stroke="#D8E9F7" stroke-width="4">베링 해협</text>
+
+      <!-- Vilkitsky Strait chokepoint (hardest) -->
+      <g>
+        <circle cx="400" cy="165" r="23" fill="#E56458" opacity="0.16"/>
+        <circle cx="400" cy="165" r="12" fill="#E56458" stroke="#FFFFFF" stroke-width="2.8"/>
+        <text x="400" y="169.5" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="inherit">2</text>
+      </g>
+      <text x="400" y="134" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle" font-family="inherit"
+            paint-order="stroke" stroke="#EFF6FC" stroke-width="4">빌키츠키 해협 · 최대 난코스</text>
+
+      <!-- arctic route label -->
+      <text x="560" y="206" font-size="0" font-family="inherit"></text>
+      <g font-family="inherit">
+        <text x="300" y="232" font-size="13" font-weight="700" fill="#1B6BB8" text-anchor="middle"
+              paint-order="stroke" stroke="#F0EFED" stroke-width="4">북극항로 — 약 15,000km · 편도 22일</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <div class="item"><span class="line-arctic"></span> 북극항로(아크로호가 간 길)</div>
+      <div class="item"><span class="line-suez"></span> 기존 수에즈 항로</div>
+      <div class="item">① ② 좁은 길목 — 얼음·허가가 걸리는 자리</div>
+      <div class="item">지도는 길의 순서를 보는 개략도야 — 실제 모양·축척은 아니야</div>
+    </div>
+  </div>
+
+  <div class="section-title">📏 거리는 32% 짧다 — 여기까지는 좋은 소식</div>
+  <div class="cmp">
+    <div class="box">
+      <span class="badge short">북극항로</span>
+      <h3>부산 → 로테르담</h3>
+      <div class="kv"><span>거리</span><b>약 15,000km</b></div>
+      <div class="kv"><span>편도 기간</span><b>22일</b></div>
+      <div class="kv"><span>지나는 길목</span><b>베링·빌키츠키 해협</b></div>
+      <div class="kv"><span>열리는 때</span><b>여름 중심</b></div>
+    </div>
+    <div class="box">
+      <span class="badge long">수에즈 항로</span>
+      <h3>부산 → 로테르담</h3>
+      <div class="kv"><span>거리</span><b>약 22,000km</b></div>
+      <div class="kv"><span>편도 기간</span><b>30~34일</b></div>
+      <div class="kv"><span>지나는 길목</span><b>말라카·수에즈 운하</b></div>
+      <div class="kv"><span>열리는 때</span><b>1년 내내</b></div>
+    </div>
+  </div>
+
+  <div class="bar-wrap" style="margin-top:16px">
+    <div class="bar-row">
+      <span class="lab">북극항로</span>
+      <span class="bar-track"><span class="bar-fill blue" style="width:68%">15,000km · 22일</span></span>
+    </div>
+    <div class="bar-row">
+      <span class="lab">수에즈 항로</span>
+      <span class="bar-track"><span class="bar-fill orange" style="width:100%">22,000km · 30~34일</span></span>
+    </div>
+  </div>
+
+  <div class="section-title">💸 그런데 아낀 10일이 돈으로는 왜 안 남을까</div>
+  <div class="flow">
+    <div class="step s1">거리 32%↓<small>10일 단축 = 기름·용선료 절약</small></div>
+    <span class="arrow">→</span>
+    <div class="step s2">쇄빙선 수수료<small>길을 쓰려면 내는 통행료</small></div>
+    <span class="arrow">+</span>
+    <div class="step s3">보험료 할증<small>얼음 바다는 사고 위험이 커</small></div>
+    <span class="arrow">+</span>
+    <div class="step s4">결빙 연료 페널티<small>얼음을 밀며 가면 기름이 더 들어</small></div>
+    <span class="arrow">=</span>
+    <div class="step s5">비용 우위 확률<small>여름 16.6% · 겨울 1.4%</small></div>
+  </div>
+
+  <div class="note">
+    <b>핵심.</b> 짧다고 싼 게 아니야. 거리에서 아낀 돈을 <b>쇄빙선 수수료·보험료·얼음 연료</b>가 되가져가서,
+    목포해양대 시뮬레이션에서 북극항로가 수에즈보다 실제로 더 싸게 끝날 확률은 <b>여름에도 16.6%</b>, 겨울엔 <b>1.4%</b>였어.
+    그래서 지금은 '매일 쓰는 길'이 아니라 <b>경험을 쌓는 단계</b>고, 정부 목표도 정기 상업 운항은 <b>2030년</b>이야.
+  </div>
+
+  <div class="warn">
+    <b>진짜 변수는 얼음이 아니라 러시아야.</b> 상업 운항이 가능한 이 길은 러시아 연안을 지나서 <b>러시아 허가</b>가 필요하고,
+    쇄빙선도 대부분 러시아가 운영해(2030년까지 원자력 쇄빙선 17척 확대 계획). 대러 제재와도 겹치는 자리라,
+    이 대통령이 3대 원칙의 첫 줄로 <b>'국제규범·제재 준수'</b>를 꺼낸 이유가 여기 있어.
+  </div>
+
+  <div class="foot">
+    아크로호 실적: 8월 22일 부산신항 출항 → 9월 5일 빌키츠키 해협 통과(러시아 쇄빙선 호위 없이) → 9월 12일 영국 펠릭스토우, 9월 13일 로테르담 → 10월 11일 부산 귀항(왕복 50일, 북극해 약 6,400km 통과).
+    수치는 보도·연구 기준이라 얼음 상태·기상에 따라 달라져.
+  </div>
+</div>
+</body>
+</html>
