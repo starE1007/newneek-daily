@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>폭락의 고리와 16일 반등 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.a{background:var(--orange-soft);color:#9A5620}
+  .step.b{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .loopback{margin-top:8px;font-size:13px;color:#B23F34;background:var(--red-soft);border-radius:8px;padding:8px 12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .chk{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:6px}
+  .badge.ok{background:var(--green-soft);color:#2F7A52}
+  .badge.warn{background:var(--orange-soft);color:#B06426}
+  .chk h3{font-size:15px;margin-bottom:4px}
+  .chk p{font-size:13.5px;color:var(--text2)}
+  .chk p b{color:var(--text)}
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13.5px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 130px;color:var(--text2)}
+  .bar-track{flex:1;height:22px;background:var(--surface2);border-radius:6px;overflow:hidden}
+  .bar{height:100%;border-radius:6px}
+  .bar.drop{background:var(--red)}
+  .bar.intra{background:#B9D4EC}
+  .bar.close{background:var(--blue)}
+  .bar-val{flex:0 0 120px;font-weight:700;font-size:13px}
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-label{flex-basis:90px}
+    .bar-val{flex-basis:90px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.17 데일리 뉴스 · 시각자료</div>
+  <h1>📉 폭락은 어떤 고리로 번졌고, 반등은 어느 칸을 끊었나</h1>
+  <div class="sub">7거래일 -20.7% 뒤 16일 +2.05% — 반등이 '바닥'인지 보려면 고리의 칸별로 확인해야 해</div>
+
+  <div class="section-title">폭락 고리</div>
+  <div class="flow">
+    <div class="step a">미국 물가·금리 불안<br>AI 수익성 의문</div>
+    <div class="arrow">→</div>
+    <div class="step a">외국인 현·선물 매도<small>환차손 피하려는 매도 포함</small></div>
+    <div class="arrow">→</div>
+    <div class="step b">지수 급락</div>
+    <div class="arrow">→</div>
+    <div class="step b">빚투 계좌 담보 부족<small>반대매매(강제 매도)</small></div>
+  </div>
+  <div class="loopback">↻ 반대매매 물량이 다시 지수를 눌러 → 또 다른 계좌가 담보 부족에 걸려</div>
+
+  <div class="section-title">16일, 어느 칸이 멈췄나</div>
+  <div class="grid">
+    <div class="chk">
+      <span class="badge ok">멈춤</span>
+      <h3>외국인 현물 매도</h3>
+      <p>8거래일 만에 <b>순매수 전환</b>(3천억 원대).</p>
+    </div>
+    <div class="chk">
+      <span class="badge ok">완화</span>
+      <h3>환율 부담</h3>
+      <p><b>1,331.4원</b>, 2년여 만의 최저. 환차손 피하려는 매도 유인이 줄어.</p>
+    </div>
+    <div class="chk">
+      <span class="badge warn">계속</span>
+      <h3>외국인 선물 매도</h3>
+      <p>현물은 샀지만 선물은 <b>1조 원 넘게 순매도</b>.</p>
+    </div>
+    <div class="chk">
+      <span class="badge warn">확인 필요</span>
+      <h3>장중 힘 빠짐</h3>
+      <p>장중 <b>+4.6%</b>까지 갔다가 종가 <b>+2.05%</b>로 식었어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">빠진 만큼 되찾았나</div>
+  <div class="bars">
+    <div class="bar-row"><div class="bar-label">7거래일 낙폭</div><div class="bar-track"><div class="bar drop" style="width:100%"></div></div><div class="bar-val">-1,449.52p</div></div>
+    <div class="bar-row"><div class="bar-label">장중 최대 반등</div><div class="bar-track"><div class="bar intra" style="width:17%"></div></div><div class="bar-val">+255.7p (+4.6%)</div></div>
+    <div class="bar-row"><div class="bar-label">종가 기준 반등</div><div class="bar-track"><div class="bar close" style="width:7.9%"></div></div><div class="bar-val">+113.83p (+2.05%)</div></div>
+  </div>
+  <div class="foot">낙폭 대비 종가 반등은 약 8%. 막대 길이는 -1,449.52p를 100%로 한 비율이야.</div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">다음 거래일(월)</div><div class="what">외국인 현물 매수가 이어지나 + 선물 매도가 줄어드나</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/22</div><div class="what">한국은행 금융통화위원회(금통위)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/27~28</div><div class="what">미국 FOMC(연준 금리 회의)</div></div>
+  </div>
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.15~16 보도 기반</div>
+</div>
+</body>
+</html>
