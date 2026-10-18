@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>브렌트 110달러 — 같은 주에 막힌 세 곳과 금통위로 가는 길</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:700px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:30px;height:0;border-top:3px dashed var(--red)}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+
+  /* 막힌 세 곳 */
+  .spots{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .spot{border:1px solid var(--border);border-radius:12px;padding:15px 16px;background:var(--soft)}
+  .spot .badge{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;margin-bottom:8px;background:var(--red-soft);color:#C6493E}
+  .spot h3{font-size:15px;margin-bottom:5px}
+  .spot p{font-size:13.5px;color:var(--text2)}
+  .spot p b{color:var(--text)}
+  .spot p + p{margin-top:6px}
+
+  /* 두 힘 */
+  .forces{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .force{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .force .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.up{background:var(--red-soft);color:#C6493E}
+  .badge.down{background:var(--green-soft);color:#2F7A52}
+  .force h3{font-size:15.5px;margin-bottom:6px}
+  .force p{font-size:13.5px;color:var(--text2)}
+  .force p b{color:var(--text)}
+  .force p + p{margin-top:7px}
+  .speed{margin-top:10px;font-size:12.5px;font-weight:700;padding:7px 10px;border-radius:8px;text-align:center}
+  .speed.now{background:#FCE9E7;color:#B23F34}
+  .speed.later{background:var(--surface2);color:var(--text2)}
+
+  .result{margin-top:16px;border-radius:10px;padding:14px 16px;background:var(--orange-soft);font-size:14px;color:#8E4F1C}
+  .result b{display:block;font-size:14.5px;margin-bottom:3px;color:#7A4315}
+
+  /* 흐름도 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:3px;background:var(--orange-soft);color:#9A5620}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.a{background:var(--red-soft);color:#B23F34}
+  .step.z{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .forces{grid-template-columns:1fr}
+    .spots{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.19 데일리 뉴스 · 시각자료</div>
+  <h1>⛽ 브렌트 110달러 — 같은 주에 세 곳이 막혔다</h1>
+  <div class="sub">어디가 막혔는지(지도) · 왜 '상쇄'가 깨졌는지(두 힘의 속도) · 그게 10/22 금통위까지 어떻게 오는지</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="아라비아반도 개략 지도: 호르무즈 해협과 사우디 얀부 항의 위치">
+      <defs>
+        <marker id="arrUp" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#E56458"/></marker>
+        <marker id="arrOut" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/></marker>
+      </defs>
+
+      <!-- 육지 바탕 -->
+      <rect width="900" height="580" fill="#F0EFED"/>
+
+      <!-- 홍해 -->
+      <path d="M96,40 C130,130 170,240 215,330 C255,410 310,470 372,512" fill="none" stroke="#B9D4EC" stroke-width="46" stroke-linecap="round"/>
+      <path d="M96,40 C130,130 170,240 215,330 C255,410 310,470 372,512" fill="none" stroke="#D8E9F7" stroke-width="42" stroke-linecap="round"/>
+
+      <!-- 페르시아만·오만만·아라비아해 -->
+      <path d="M612,56 L900,56 L900,560 L520,560 L430,520 L372,512
+               L470,486 L600,450 L700,400 L790,316 L830,258
+               L786,214 L730,176 L690,196 L640,206 L612,170 Z"
+            fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- 바다 이름 -->
+      <g font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle">
+        <text transform="translate(206,300) rotate(58)">홍  해</text>
+        <text transform="translate(706,104) rotate(16)">페르시아만</text>
+        <text transform="translate(700,520)">아라비아해</text>
+        <text transform="translate(452,536)">아덴만</text>
+      </g>
+
+      <!-- 나라 이름 -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">
+        <text x="420" y="260" font-size="17">사우디아라비아</text>
+        <text x="782" y="38" font-size="15">이  란</text>
+        <text x="120" y="330" font-size="13">아프리카</text>
+        <text x="812" y="290" font-size="13">오만</text>
+        <text x="452" y="438" font-size="13">예멘</text>
+      </g>
+
+      <!-- 수에즈·유럽 방향 (얀부에서 북서로 나가는 길) -->
+      <path d="M186,214 C160,170 132,110 108,56" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#arrOut)"/>
+      <text x="122" y="104" font-size="11.5" font-weight="700" fill="#B06426" text-anchor="start" paint-order="stroke" stroke="#F0EFED" stroke-width="4">→ 수에즈 · 유럽</text>
+
+      <!-- 호르무즈 통과 항로 (페르시아만에서 아라비아해로) -->
+      <path d="M660,120 C700,142 730,160 756,186 C790,222 812,268 826,320" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#arrOut)"/>
+      <text x="856" y="360" font-size="11.5" font-weight="700" fill="#B06426" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4">→ 아시아</text>
+
+      <!-- 막힌 지점 ① 호르무즈 해협 -->
+      <g>
+        <circle cx="758" cy="188" r="24" fill="#E56458" opacity="0.15"/>
+        <circle cx="758" cy="188" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="750" y1="196" x2="766" y2="180" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g>
+        <line x1="640" y1="256" x2="746" y2="200" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="372" y="228" width="272" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="508" y="248" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 호르무즈 해협</text>
+        <text x="508" y="266" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">통과 통제 강화 · 선박 9척 피격</text>
+      </g>
+
+      <!-- 막힌 지점 ② 얀부 -->
+      <g>
+        <circle cx="196" cy="232" r="24" fill="#E56458" opacity="0.15"/>
+        <circle cx="196" cy="232" r="13" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="188" y1="240" x2="204" y2="224" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g>
+        <line x1="252" y1="330" x2="206" y2="246" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="248" y="330" width="258" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="377" y="350" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 얀부 — 사우디 수출 항구</text>
+        <text x="377" y="368" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">날아온 미사일을 요격</text>
+      </g>
+
+      <!-- 세 번째 지점은 지도 밖(미국) 표시 -->
+      <g>
+        <rect x="596" y="430" width="286" height="62" rx="10" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="739" y="452" font-size="13.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">③ 멕시코만 — 지도 밖, 미국 남부</text>
+        <text x="739" y="470" font-size="12.5" fill="#7D7A75" text-anchor="middle">허리케인 이사야스로 해상 생산 차질</text>
+        <text x="739" y="486" font-size="12.5" font-weight="700" fill="#E56458" text-anchor="middle">미국 원유 재고 800만 배럴 이상 감소</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 이번 주 공급이 막힌 지점</span>
+      <span class="item"><span class="dash-sample" style="border-color:#D5803B"></span> 기름이 나가는 길(항로)</span>
+      <span class="item">⊘ 표시는 대략적인 위치야 — 정확한 좌표가 아니라 '어디쯤'을 보는 용도</span>
+    </div>
+  </div>
+
+  <div class="section-title">같은 주에 세 곳 — 전부 '오늘 줄어드는' 배럴이야</div>
+  <div class="spots">
+    <div class="spot">
+      <span class="badge">① 길목</span>
+      <h3>호르무즈 해협</h3>
+      <p>이란이 해협을 지나는 원유 수출 통제를 강화했고, <b>11일 이후 선박 최소 9척</b>이 공격을 받았어.</p>
+      <p>배가 못 지나가면 유전이 멀쩡해도 기름은 시장에 도착하지 못해.</p>
+    </div>
+    <div class="spot">
+      <span class="badge">② 출구</span>
+      <h3>얀부 (사우디)</h3>
+      <p>사우디 동부 유전의 기름을 홍해로 빼내는 <b>수출 거점</b>이야. 이쪽으로 날아온 미사일을 요격했어.</p>
+      <p>맞지 않았어도 '맞을 수 있다'는 사실만으로 값에 <b>위험 프리미엄</b>이 붙어.</p>
+    </div>
+    <div class="spot">
+      <span class="badge">③ 생산</span>
+      <h3>멕시코만 (미국)</h3>
+      <p>허리케인 <b>이사야스</b>로 해상 생산이 멈춰, 미국 상업용 원유 재고가 <b>800만 배럴</b> 넘게 줄었어.</p>
+      <p>중동과 무관한 사고인데 같은 주에 겹쳤다는 게 문제야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">왜 지난주엔 멈춰 있었고 지금은 튀었어? — 두 힘의 '도착 속도'</div>
+  <div class="forces">
+    <div class="force">
+      <span class="badge up">↑ 올리는 힘</span>
+      <h3>배럴이 실제로 줄어든다</h3>
+      <p>길목(호르무즈)·출구(얀부)·생산(멕시코만)이 동시에 막혔어. 재고 <b>800만 배럴</b> 감소처럼 숫자로 바로 나타나는 변화야.</p>
+      <div class="speed now">도착 속도 : 오늘 · 이번 주</div>
+    </div>
+    <div class="force">
+      <span class="badge down">↓ 내리는 힘</span>
+      <h3>러시아 제재가 풀렸다 — 서류상</h3>
+      <p>트럼프가 <b>그레이엄법</b>의 대러 제재를 면제하는 행정명령에 서명해, 18일 시행 예정이던 제재가 멈췄어.</p>
+      <p>그런데 유조선·보험·장기 계약이 다시 붙는 데는 <b>몇 달</b>이 걸려. 제재 문서가 바뀐 날 배럴이 늘지는 않아.</p>
+      <div class="speed later">도착 속도 : 몇 달 뒤</div>
+    </div>
+  </div>
+  <div class="result">
+    <b>그래서 '상쇄'가 깨졌어</b>
+    같은 크기의 힘이라도 한쪽은 오늘 도착하고 한쪽은 몇 달 뒤에 도착하면, 값은 <b>빠른 쪽</b>으로 먼저 움직여. 104달러에서 멈춰 보였던 건 두 힘이 같은 속도일 때 얘기였던 거야.
+  </div>
+
+  <div class="section-title">그게 나한테 오는 길 — 10/22 금통위까지</div>
+  <div class="flow">
+    <div class="step a">유가 110달러<small>브렌트 109.86달러</small></div>
+    <div class="arrow">→</div>
+    <div class="step">수입물가·항공유 ↑<small>원유를 사 와야 하는 나라</small></div>
+    <div class="arrow">→</div>
+    <div class="step">소비자물가 압력<small>9월 2.9% 위에 시차를 두고 얹힘</small></div>
+    <div class="arrow">→</div>
+    <div class="step">금통위의 딜레마<small>공급 충격은 금리로 못 고침 + 주가는 -20%</small></div>
+    <div class="arrow">→</div>
+    <div class="step z">동결하되 인상 카드<small>10/22 전원 동결 전망 · 11월 인상 다수</small></div>
+  </div>
+
+  <div class="foot">
+    수치 기준: 브렌트 12월물 109.86달러·WTI 101.41달러(10/16 현지 정산), 미국 상업용 원유 재고 800만 배럴 이상 감소, 금통위 전망은 채권시장 전문가 설문(10/18 보도). 지도는 위치 감각을 위한 개략도야.
+  </div>
+</div>
+</body>
+</html>
