@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.19</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.19 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'pause', variants:[
+    { q:'금리를 두 번 올린 한국은행이 이번에 동결해도 "인상 사이클이 끝났다"고 단정하기 어려운 이유로 가장 알맞은 것은?',
+      opts:['동결은 직전 인상의 효과를 지켜보려는 속도 조절일 수 있고, 물가·금융불균형이 풀리지 않으면 다음에 다시 올릴 수 있어서',
+            '기준금리는 한 번 동결하면 법에 따라 1년간 바꿀 수 없어서',
+            '동결은 금리를 내리기 전에 반드시 거치는 정해진 절차여서',
+            '금통위는 동결할 때마다 소수의견 없이 만장일치여야 해서'],
+      answer:0,
+      explain:'동결은 <b>멈춤</b>이지 <b>방향 전환</b>이 아니야. 앞선 인상이 대출·소비에 퍼지는 데 시간이 걸려서, 그 효과를 보며 속도만 늦추는 경우가 많아.' },
+    { q:'시장이 "동결하되 매파적(금리 올리자는 쪽) 신호를 낼 것"이라고 보는 상황을 가장 알맞게 설명한 것은?',
+      opts:['이번 회의에선 금리를 그대로 두되, 총재 발언 등으로 다음 회의 인상 가능성을 열어 두는 것',
+            '이번 회의에서 금리를 크게 올리고 다음 회의에서 곧바로 내리는 것',
+            '기준금리 대신 시중은행의 대출 금리를 한국은행이 직접 정해 발표하는 것',
+            '금리 결정을 정부 부처가 대신 하도록 위임하는 것'],
+      answer:0,
+      explain:'중앙은행은 <b>금리 숫자</b>뿐 아니라 <b>말</b>로도 시장을 움직여. 동결+매파 신호는 "아직 안 끝났다"는 예고야.' },
+  ]},
+  { id:'transmit', variants:[
+    { q:'기준금리 인상이 물가를 누르는 경로를 순서대로 가장 알맞게 나열한 것은?',
+      opts:['기준금리↑ → 대출·예금 금리↑ → 이자 부담에 소비·투자 위축 → 수요 둔화 → 물가 상승 압력 완화',
+            '기준금리↑ → 기업 생산 설비 확대 → 공급 증가 → 물가 하락',
+            '기준금리↑ → 정부 재정지출 확대 → 소비 촉진 → 물가 안정',
+            '기준금리↑ → 환율 고정 → 수입 물가 변동 차단 → 물가 하락'],
+      answer:0,
+      explain:'금리는 <b>돈의 값</b>이야. 빌리는 값이 비싸지면 쓰는 돈이 줄고, 수요가 식으면서 물가가 눌려.' },
+    { q:'기준금리를 올렸는데도 가계의 이자 부담이 곧바로 같은 폭으로 늘지 않는 경우가 있는 이유로 가장 알맞은 것은?',
+      opts:['고정금리 대출은 약정 기간 동안 금리가 유지되고, 변동금리도 반영 주기가 정해져 있어 시차가 생겨서',
+            '기준금리는 예금에만 적용되고 대출에는 영향을 주지 않아서',
+            '한국은행이 올린 금리만큼 시중은행이 의무적으로 손실을 부담해서',
+            '대출 금리는 물가 지표가 아니라 주가 지수에 연동돼서'],
+      answer:0,
+      explain:'금리 효과는 <b>시차</b>를 두고 퍼져. 그래서 중앙은행은 한 번 올리고 효과를 지켜보며 쉬어 가기도 해.' },
+  ]},
+  { id:'cpi', variants:[
+    { q:'9월 소비자물가 상승률이 8월보다 낮아졌는데도 한국은행이 마음을 놓기 어려운 이유로 가장 알맞은 것은?',
+      opts:['상승률이 둔화했어도 목표 수준을 웃돌고 있어, 내려가는 속도가 충분한지 더 확인해야 해서',
+            '물가 상승률이 낮아지면 한국은행의 법적 목표가 자동으로 높아져서',
+            '물가는 한 달치만 보고 금리를 정하는 것이 원칙이어서',
+            '물가 둔화는 통계 오류라는 점이 이미 확인돼서'],
+      answer:0,
+      explain:'오르는 <b>속도</b>가 줄었다는 것과 물가가 <b>목표로 돌아왔다</b>는 건 달라. 목표 위에 머무는 동안은 긴장이 이어져.' },
+  ]},
+  { id:'imbalance', variants:[
+    { q:'중앙은행이 물가뿐 아니라 집값·가계부채 같은 금융불균형을 금리 결정에서 함께 따지는 이유로 가장 알맞은 것은?',
+      opts:['금리를 낮게 두면 빚내서 집을 사는 쏠림이 커져, 나중에 한꺼번에 터질 위험이 쌓이기 때문',
+            '집값은 소비자물가 통계에 들어가지 않아 별도 규제 대상이기 때문',
+            '금융불균형을 줄이면 해외 중앙은행이 자동으로 금리를 따라 내리기 때문',
+            '가계부채는 높을수록 은행 건전성이 좋아지기 때문'],
+      answer:0,
+      explain:'싼 돈은 <b>자산 쪽으로 쏠리기</b> 쉬워. 그 쏠림이 커질수록 되돌릴 때 충격도 크니까 물가만 보고 정하지 않아.' },
+  ]},
+  { id:'fed', variants:[
+    { q:'한국은행 금통위(10/22)와 미 연준 FOMC(10/27~28)가 가까운 날짜에 열릴 때, 두 회의를 함께 봐야 하는 이유로 가장 알맞은 것은?',
+      opts:['두 나라 금리 격차가 환율과 자금 이동에 영향을 주어, 한쪽 결정이 다른 쪽 선택지를 좁힐 수 있어서',
+            '두 기관은 법적으로 같은 금리를 정해야 해서',
+            '연준이 결정을 내리면 한국은행이 의무적으로 같은 폭을 따라야 해서',
+            '한국은행의 결정은 FOMC가 끝난 뒤에야 효력이 생겨서'],
+      answer:0,
+      explain:'한국 금리가 미국보다 상대적으로 낮아지면 돈이 달러로 쏠려 <b>원화 약세</b> 압력이 생겨. 그래서 두 회의는 한 묶음으로 읽어.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'금리를 올려 소비·투자 같은 ○○를 식히는 방식으로 물가를 잡는다. ○○는? (두 글자)',
+    accept:['수요'],
+    explain:'정답은 <b>수요</b>. 금리는 수요 쪽 손잡이라 공급 부족으로 오른 값에는 효과가 제한적이야.' },
+  { q:'중앙은행이 금리를 올리자는 쪽의 성향을 뜻하는, 비둘기와 반대되는 새 이름은? (한 단어)',
+    accept:['매파'],
+    explain:'정답은 <b>매파</b>. 물가를 우선해 금리 인상·긴축을 선호하는 쪽이야.' },
+  { q:'금리를 올린 효과가 대출·소비·물가에 바로 나타나지 않고 늦게 퍼지는 현상을 무슨 시차라고 할까? (한 단어)',
+    accept:['시차','정책시차','전달시차'],
+    explain:'정답은 <b>(정책) 시차</b>. 그래서 한 번 올린 뒤 효과를 보며 동결로 쉬어 가기도 해.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
