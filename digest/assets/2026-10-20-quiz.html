@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.20</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.20 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'oper', variants:[
+    { q:'한국이 평시작전통제권은 되찾았는데 전시작전통제권(전작권)은 아직 미국 쪽에 있는 상태를 가장 알맞게 설명한 것은?',
+      opts:['평시에는 우리 군이 군을 움직이지만, 전쟁이 나면 한미연합사령관이 국군의 작전까지 지휘하는 구조이기 때문',
+            '평시와 전시 모두 미군이 국군을 지휘하되 평시에는 이를 공개하지 않기 때문',
+            '전시에는 한국 대통령이 지휘하지만 평시에는 유엔이 지휘하기 때문',
+            '평시작전통제권은 1994년에 미국으로 넘어갔고 전작권은 한국이 계속 갖고 있기 때문'],
+      answer:0,
+      explain:'1994년에 <b>평시</b> 권한은 돌아왔지만, 전쟁이 나면 한미연합사령관(=주한미군사령관)이 작전을 통제하는 구조는 그대로야.' },
+    { q:'전작권을 가진 사람이 주한미군사령관인 이유로 가장 알맞은 것은?',
+      opts:['1978년 한미연합사령부가 만들어질 때 연합사령관이 이 권한을 맡도록 했고, 연합사령관은 주한미군사령관이 겸하기 때문',
+            '주한미군사령관이 한국 국방부 장관의 임명을 받아 직무를 수행하기 때문',
+            '유엔 안전보장이사회가 매년 주한미군사령관을 지명해 권한을 위임하기 때문',
+            '한국군에는 전쟁 지휘를 맡을 법적 근거가 없어 미국 법으로 정해졌기 때문'],
+      answer:0,
+      explain:'6·25 때 유엔군사령관에게 넘어간 권한이 <b>1978년 한미연합사</b> 창설과 함께 연합사령관에게 이어졌어.' },
+  ]},
+  { id:'condition', variants:[
+    { q:'2014년 한미가 전작권 전환 날짜를 못 박지 않고 세 가지 조건 충족을 기준으로 삼은 방식의 특징으로 가장 알맞은 것은?',
+      opts:['날짜가 정해지지 않는 대신 조건을 충족했는지를 어떻게 판단하느냐가 곧 전환 시점을 좌우하게 된다',
+            '조건을 정하면 전환 시점이 자동으로 확정되어 판단의 여지가 사라진다',
+            '조건은 한국만 평가하므로 미국의 의견은 반영되지 않는다',
+            '조건이 충족되지 않아도 일정 기간이 지나면 자동으로 전환된다'],
+      answer:0,
+      explain:'날짜 기준은 "그날이 왔나"만 보면 되지만, <b>조건 기준</b>은 "충족했나"를 누가 어떻게 판단하느냐가 핵심 쟁점이 돼.' },
+    { q:'주한미군사령관이 "신문만 훑어봐도 조건이 변했다"고 말한 것이 한국 정부에게 문제가 되는 이유로 가장 알맞은 것은?',
+      opts:['합의된 세 조건의 기준이 이후에 바뀌면, 한국이 요건을 맞춰도 전환 시점이 계속 뒤로 밀릴 수 있기 때문',
+            '조건 자체가 이번 발언으로 폐지되어 전환이 영구히 불가능해졌기 때문',
+            '미국이 전작권 전환에 반대한다고 공식 선언한 것이기 때문',
+            '조건이 변했다는 말은 한국군의 능력이 충분하다는 뜻이기 때문'],
+      answer:0,
+      explain:'미국도 전환 자체엔 찬성해. 다만 <b>기준이 움직이면</b> 한국이 쫓아가도 골대가 멀어질 수 있다는 게 국방부의 우려야.' },
+  ]},
+  { id:'dispute', variants:[
+    { q:'정부는 "조건은 이미 합의됐다"고, 미국은 "안보 환경이 변했다"고 맞서는 상황을 가장 알맞게 설명한 것은?',
+      opts:['두 쪽이 전환 자체가 아니라 조건 충족 여부를 판단하는 기준과 시점을 두고 다투고 있다',
+            '한국은 전환을 반대하고 미국은 전환을 서두르는 구도이다',
+            '두 나라가 서로 다른 조건 목록을 갖고 있어 협의 자체가 시작되지 않았다',
+            '미국이 전작권을 돌려줄 법적 권한이 없어 협상이 불가능한 상태이다'],
+      answer:0,
+      explain:'양쪽 모두 <b>전환 자체엔 찬성</b>이야. 싸움은 "지금 충족했나?"에 있고, 이건 SCM(한미 연례안보협의회) 같은 자리에서 조율할 문제야.' },
+  ]},
+  { id:'seoul', variants:[
+    { q:'야당이 조건 미충족 상태의 전작권 전환을 "안보 도박"이라 부르는 논리로 가장 알맞은 것은?',
+      opts:['북한 도발이 잦은 시기에 지휘 체계를 바꾸면 억지력에 빈틈이 생길 위험을 감수하는 선택이라고 보기 때문',
+            '전환하면 미군이 즉시 전부 철수한다고 확정돼 있기 때문',
+            '전작권이 있어야 북한과 협상할 수 있다고 보기 때문',
+            '전환 시 한국의 국방 예산이 자동으로 절반으로 줄기 때문'],
+      answer:0,
+      explain:'찬반 모두 <b>안보</b>를 이유로 대. 정부는 "스스로 책임질 때"라 보고, 야당은 "준비 안 된 전환이 위험"이라고 봐.' },
+  ]},
+  { id:'mall', variants:[
+    { q:'홈플러스가 재개장 뒤에도 매출이 목표의 30% 수준에 머무는 상황에서 대표가 "M&A가 진행돼야 해결"이라 말하는 논리로 가장 알맞은 것은?',
+      opts:['영업만으로는 부진을 메우기 어려워 새 주인이 자금과 운영 방향을 정해주는 것이 근본 해법이라고 보기 때문',
+            '인수합병이 끝나면 매출 목표가 자동으로 낮아지기 때문',
+            '인수합병은 법원의 회생절차를 즉시 종료시키는 유일한 방법이기 때문',
+            '매출이 목표의 30%라는 숫자는 인수합병 전에는 집계되지 않기 때문'],
+      answer:0,
+      explain:'매장을 다시 열어도 <b>매출이 안 따라오면</b> 자금이 말라. 대표가 M&A를 해결 조건으로 거는 이유야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'전쟁이 났을 때 국군의 작전을 통제하는 권한을 줄여서 무엇이라 할까? (세 글자)',
+    accept:['전작권'],
+    explain:'정답은 <b>전작권</b>(전시작전통제권). 지금은 한미연합사령관인 주한미군사령관이 갖고 있어.' },
+  { q:'2014년 한미가 전작권 전환의 기준을 "날짜"가 아니라 무엇을 충족하느냐로 바꿨을까? (두 글자)',
+    accept:['조건'],
+    explain:'정답은 <b>조건</b>. 군사 능력·북핵 대응·안보 환경 세 가지를 충족하면 전환하기로 했어.' },
+  { q:'한미 국방장관이 해마다 열어 전작권 같은 안보 현안을 조율하는 회의의 약칭은? (알파벳 세 글자)',
+    accept:['scm'],
+    explain:'정답은 <b>SCM</b>(한미 연례안보협의회). 2014년 전작권 조건 합의도 이 자리에서 나왔어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
