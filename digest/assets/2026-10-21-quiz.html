@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.21</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.21 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'spark', variants:[
+    { q:'학생 시위로 시작한 프랑스 시위가 전국 반정부 시위로 번진 과정을 가장 알맞게 설명한 것은?',
+      opts:['교육 문제로 모인 시위에 고물가·생활고로 정부에 불만이 쌓여 있던 시민들이 합류하며 요구가 정부 전반에 대한 항의로 넓어졌다',
+            '학생들이 처음부터 정부 퇴진과 재정 개혁을 함께 요구하며 전국 조직을 만들었다',
+            '경찰의 과잉 진압 논란이 사라지면서 시위의 성격이 교육에서 경제로 바뀌었다',
+            '정부가 교육 예산을 삭감한다고 발표한 직후 시민들이 일제히 동조 시위를 열었다'],
+      answer:0,
+      explain:'시위는 교육 환경 항의로 시작했지만, 쌓여 있던 <b>생활비·복지 불만</b>이 합류하며 반정부 시위로 커졌어.' },
+    { q:'작은 계기의 시위가 짧은 시간에 전국 규모로 커질 수 있는 조건으로 가장 알맞은 것은?',
+      opts:['이미 퍼져 있던 불만이 계기를 만나 한꺼번에 터질 수 있는 상태였다',
+            '시위 주최 측이 참가자 수를 정부보다 적게 발표하는 관행이 있다',
+            '시위 장소가 파리 한 곳으로 제한돼 인원이 집중된다',
+            '정부가 요구를 즉시 수용해 시위 동기가 사라진다'],
+      answer:0,
+      explain:'불씨가 크지 않아도 <b>마른 장작</b>(누적된 불만)이 쌓여 있으면 번지는 속도가 빨라.' },
+  ]},
+  { id:'debt', variants:[
+    { q:'프랑스 정부가 "복지를 늘려달라"는 요구를 받아들이기 어렵다고 보는 논리로 가장 알맞은 것은?',
+      opts:['나랏빚이 GDP의 120%에 달하고 오랫동안 수입보다 지출이 많아, 지출을 더 늘릴 여력이 부족하다고 본다',
+            '복지를 늘리면 에너지 가격이 자동으로 내려 물가 문제가 해결되기 때문에 불필요하다',
+            '국가부채가 GDP의 20% 수준이라 재정에 여유가 있지만 시기가 안 맞는다',
+            '복지 지출은 헌법상 동결돼 있어 정부가 바꿀 수 없다'],
+      answer:0,
+      explain:'정부는 <b>빚이 이미 한계</b>라서 복지를 늘리기 어렵다는 입장이야.' },
+    { q:'"1974년 이후 균형재정을 맞춘 적이 없다"는 말이 뜻하는 것으로 가장 알맞은 것은?',
+      opts:['50년 가까이 정부가 걷은 세금보다 쓴 돈이 더 많은 해가 이어졌다',
+            '정부가 1974년 이후 세금을 한 번도 올리지 않았다',
+            '정부가 걷은 세금과 쓴 돈이 매년 정확히 일치했다',
+            '1974년 이후 나랏빚이 전혀 늘지 않았다'],
+      answer:0,
+      explain:'균형재정은 <b>걷은 돈 = 쓴 돈</b>. 계속 적자라면 부족분을 빚으로 메워 부채가 쌓여.' },
+  ]},
+  { id:'energy', variants:[
+    { q:'미국·이란 전쟁이 프랑스 시민의 불만을 키운 경로로 가장 알맞은 것은?',
+      opts:['에너지 가격 상승이 생활비를 밀어 올려 가계 부담이 커지고, 정부 대응을 요구하는 목소리로 이어졌다',
+            '전쟁 때문에 프랑스군이 파병돼 징병 반대 시위가 시작됐다',
+            '전쟁으로 프랑스 정부 세금이 줄어 공무원이 대량 해고됐다',
+            '이란이 프랑스 학교에 직접 제재를 가했다'],
+      answer:0,
+      explain:'멀리 있는 전쟁도 <b>에너지 값→생활비</b> 경로로 일상에 닿고, 정치 불만으로 이어질 수 있어.' },
+  ]},
+  { id:'cofix', variants:[
+    { q:'주담대 변동금리가 코픽스(COFIX)가 오르면 같이 오르는 이유로 가장 알맞은 것은?',
+      opts:['변동금리는 은행의 자금조달비용을 반영한 코픽스에 가산금리를 얹어 정하기 때문에 코픽스가 오르면 대출금리도 함께 오른다',
+            '코픽스는 집값 지수라서 집값이 오르면 대출이 자동으로 늘어나기 때문이다',
+            '코픽스는 정부가 정하는 세율이라 세금이 늘면 대출금리가 오르기 때문이다',
+            '변동금리는 대출을 받은 날 고정되어 이후 코픽스와 상관없기 때문이다'],
+      answer:0,
+      explain:'은행이 돈을 모으는 비용(<b>코픽스</b>)이 오르면 그 위에 얹는 대출금리도 같이 올라가.' },
+  ]},
+  { id:'fix', variants:[
+    { q:'주담대 변동금리와 고정금리를 비교한 설명으로 가장 알맞은 것은?',
+      opts:['변동금리는 기준금리 흐름에 따라 이자가 바뀌고, 고정금리는 정해진 기간 동안 이자가 유지된다',
+            '변동금리는 상환 기간이 끝날 때까지 이자가 같고, 고정금리는 매달 바뀐다',
+            '두 방식 모두 코픽스와 상관없이 은행이 매달 임의로 정한다',
+            '고정금리는 정부가 보증해서 항상 변동금리보다 낮다'],
+      answer:0,
+      explain:'<b>변동</b>은 시장금리를 따라 움직이고, <b>고정</b>은 약속한 기간 동안 유지돼.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'프랑스 국가부채는 GDP의 약 몇 퍼센트일까? (숫자만)',
+    accept:['120'],
+    explain:'정답은 <b>120%</b>. 약 3조 6,000억 유로 규모야.' },
+  { q:'정부가 걷은 세금과 쓰는 돈이 같은 상태를 무엇이라 할까? (네 글자)',
+    accept:['균형재정'],
+    explain:'정답은 <b>균형재정</b>. 프랑스는 1974년 이후 이걸 맞춘 적이 없어.' },
+  { q:'주담대 변동금리의 기준이 되는, 은행의 자금조달비용지수는? (알파벳 또는 한글)',
+    accept:['cofix','코픽스'],
+    explain:'정답은 <b>코픽스(COFIX)</b>. 최근 3년 10개월 만에 가장 큰 폭으로 올랐어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
