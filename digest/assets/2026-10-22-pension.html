@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국민연금 182조 증발 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .brow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .brow:last-child{margin-bottom:0}
+  .blabel{flex:0 0 92px;font-size:13px;color:var(--text2)}
+  .btrack{flex:1;background:var(--surface2);border-radius:6px;height:30px;overflow:hidden}
+  .bfill{height:100%;display:flex;align-items:center;padding-left:10px;font-size:13px;font-weight:700;color:#fff;white-space:nowrap}
+  .bfill.a{background:var(--blue);width:100%}
+  .bfill.b{background:var(--red);width:64.6%}
+  .bnote{margin-top:10px;font-size:13px;color:var(--text2)}
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--red-soft);color:#C6493E}
+  .badge.wait{background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .blabel{flex-basis:70px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.22 데일리 뉴스 · 시각자료</div>
+  <h1>📉 국민연금 182조 증발, 어디서 어떻게?</h1>
+  <div class="sub">숫자의 정체와, 비중 조정(리밸런싱)을 건너뛰면 왜 하락이 더 아픈지 한 장으로 보기</div>
+
+  <div class="section-title">5% 이상 보유 287개사 주식 평가액</div>
+  <div class="bars">
+    <div class="brow"><div class="blabel">6월 말</div><div class="btrack"><div class="bfill a">515.9조 원</div></div></div>
+    <div class="brow"><div class="blabel">10월 15일</div><div class="btrack"><div class="bfill b">333.5조 원 (−182.4조, −35%)</div></div></div>
+    <div class="bnote">감소분의 71.8%가 SK하이닉스(약 −74조)와 삼성전자(약 −56조). 팔아서 확정한 손실이 아니라 <b>장부상 평가손실</b>이고, 국민연금 전체 기금이 아니라 287개사만 센 값이야.</div>
+  </div>
+
+  <div class="section-title">리밸런싱을 건너뛰면 생기는 일</div>
+  <div class="mech">
+    <div class="mstep"><div class="mnum">1</div><div class="mtxt"><b>반도체 주가가 폭등</b><span class="mdesc">국내주식 평가액이 부풀고, 기금 전체에서 차지하는 실제 비중이 목표를 훌쩍 넘김</span></div></div>
+    <div class="mstep"><div class="mnum">2</div><div class="mtxt"><b>원칙대로면 초과분을 팔아 목표 비중으로 복귀</b><span class="mdesc">이게 리밸런싱 — 오른 걸 덜어 두는 안전장치</span></div></div>
+    <div class="mstep"><div class="mnum">3</div><div class="mtxt"><b>그런데 목표 비중 상한을 올려 잡고 팔지 않음</b><span class="mdesc">1월 14.4→14.9%, 5월 20.8%로 상향(뉴닉 보도 기준)</span></div></div>
+    <div class="mstep hot"><div class="mnum">4</div><div class="mtxt"><b>부풀어 오른 큰 비중이 그대로 하락을 맞음</b><span class="mdesc">미국 CPI 쇼크·외국인 매도·AI 투자 우려로 반도체가 꺾이자 평가액이 한 분기 만에 반납</span></div></div>
+  </div>
+
+  <div class="section-title">쟁점: 그때 팔았어야 했나</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">비판 쪽</span>
+      <h3>"규칙대로 덜어 놨어야지"</h3>
+      <p>비중이 넘으면 파는 게 원칙인데 목표를 올려 버티다 <b>손실을 키웠다</b>는 주장. 야당은 정부 개입 의혹까지 제기.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">반론 쪽</span>
+      <h3>"큰손이 팔면 시장이 먼저 무너져"</h3>
+      <p>국민연금의 대량 매도는 <b>그 자체가 하락 압력</b>. 여당은 "거짓 공세"라며 반박, 올해 1~7월 누적 수익률은 여전히 플러스.</p>
+    </div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.22 오늘의 딥다이브 내용 기반 · 수치 출처: 에프앤가이드 집계 보도</div>
+</div>
+</body>
+</html>
