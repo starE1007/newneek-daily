@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국민연금 182조는 어떻게 사라졌나 — 리밸런싱 한 장 정리</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-item{margin-bottom:16px}
+  .bar-item:last-child{margin-bottom:0}
+  .bar-label{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;color:var(--text2);margin-bottom:5px}
+  .bar-label b{font-size:16px;color:var(--text)}
+  .bar-track{height:30px;background:var(--surface2);border-radius:6px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 10px;font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap}
+  .bar-fill.before{width:100%;background:#7FB2E0}
+  .bar-fill.after{width:64.6%;background:var(--red)}
+  .delta{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .delta b{font-size:15.5px}
+
+  .who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .cbox{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .cbox .who{font-size:13px;color:var(--text2);margin-bottom:6px}
+  .cbox .amt{font-size:20px;font-weight:700;color:#C6493E}
+  .cbox .per{font-size:12.5px;color:var(--text2);margin-top:4px}
+  .cbox.big{background:var(--red-soft);border-color:#F6D5D1}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+  .fork-card{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .fork-card .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.sell{background:var(--orange-soft);color:#B06426}
+  .badge.hold{background:var(--red-soft);color:#C6493E}
+  .fork-card h3{font-size:15.5px;margin-bottom:6px}
+  .fork-card p{font-size:13.5px;color:var(--text2)}
+  .fork-card p b{color:var(--text)}
+  .fork-card p + p{margin-top:8px}
+
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs-card{border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+  .vs-card.a{background:var(--blue-soft);border-color:#CBE3F8}
+  .vs-card.b{background:var(--orange-soft);border-color:#F2DCC6}
+  .vs-card h3{font-size:15.5px;margin-bottom:6px}
+  .vs-card p{font-size:13.5px;color:#5B5852}
+
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.hot{background:var(--red-soft);border-color:#F6D5D1}
+  .t-item.hot .when{color:#C6493E}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .who-grid,.fork,.vs{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.22 데일리 뉴스 · 시각자료</div>
+  <h1>🏦 182조는 어떻게 사라졌나</h1>
+  <div class="sub">'리밸런싱'이 뭐고, 그걸 미룬 게 왜 100일 만에 182조로 돌아왔는지 한 장으로 보기</div>
+
+  <div class="section-title">리밸런싱 30초 정리 — 수익 장치가 아니라 <u>위험 장치</u></div>
+  <div class="tax-row">
+    <div class="tax-box"><b>① 목표 비중을 정해둬</b><span>"전체 기금 중 국내주식은 몇 %" — 미리 박아두는 칸</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box"><b>② 주가가 오르면 칸이 넘쳐</b><span>안 사도 가격만 올라 비중이 저절로 커져</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box result"><b>③ 넘친 만큼 팔아 칸을 맞춰</b><span>이게 <b>리밸런싱</b> — 한 바구니에 쏠리는 걸 막는 안전장치</span></div>
+  </div>
+  <div class="tax-note">핵심은 "더 벌기"가 아니라 "쏠림 막기"야. 비중이 넘친 채로 두면, 그 자산이 떨어질 때 맞는 매가 그만큼 세져.</div>
+
+  <div class="section-title">100일 사이 평가액 — 전 vs 후</div>
+  <div class="bars">
+    <div class="bar-item">
+      <div class="bar-label"><span>6월 말</span><b>515조 9,293억 원</b></div>
+      <div class="bar-track"><div class="bar-fill before">국민연금이 5% 이상 보유한 상장사 287곳 평가액</div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-label"><span>10월 15일</span><b>333조 5,330억 원</b></div>
+      <div class="bar-track"><div class="bar-fill after">−35%</div></div>
+    </div>
+    <div class="delta"><b>−182조 3,963억 원</b> · 7분기 만의 감소이자 역대 최대 감소폭. 4월 1일~7월 6일에 낸 역대급 수익(189조)을 한 분기에 거의 그대로 반납한 셈.</div>
+  </div>
+
+  <div class="section-title">누가 깎아먹었나 — 반도체 두 종목이 72%</div>
+  <div class="who-grid">
+    <div class="cbox"><div class="who">SK하이닉스</div><div class="amt">약 −74조</div><div class="per">6월 고점 대비 주가 −58%</div></div>
+    <div class="cbox"><div class="who">삼성전자</div><div class="amt">약 −56조</div><div class="per">6월 고점 대비 주가 −43%</div></div>
+    <div class="cbox big"><div class="who">둘이 전체 감소분에서</div><div class="amt">71.8%</div><div class="per">외국인은 10/12~16에만 코스피 11.2조 순매도 — 그중 78.8%가 이 두 종목</div></div>
+  </div>
+  <div class="tax-note">※ 삼성전자 외국인 보유율은 10/16 기준 45.98%로 2009년 7월 이후 가장 낮아졌어.</div>
+
+  <div class="section-title">그래서 뭐가 문제냐 — 미룬 결정의 타임라인</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1/26</div>
+      <div class="mtxt"><b>기금운용위원회가 국내주식 리밸런싱을 6월 말까지 유예</b><span class="mdesc">목표 비중 상한도 14.4% → 14.9%로 올림. 명분은 "상법 개정 등 국내 증시의 구조적 변화 + 매도 충격 완화"</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">5/28</div>
+      <div class="mtxt"><b>목표 비중을 14.9% → 20.8%로 다시 상향</b><span class="mdesc">넘치는 칸을 줄이는 대신 <b>칸 자체를 키운</b> 결정 — 야당이 "원칙을 바꿨다"고 보는 지점</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">6월말</div>
+      <div class="mtxt"><b>유예 종료 · 평가액은 515조로 정점</b><span class="mdesc">코스피가 지난해 말 4,214 → 10월 초 7,000선까지 오른 대세 상승장. 실제 비중은 <b>29.1%</b>까지 갔다는 보도도 있어 — 키운 칸(20.8%)마저 넘긴 상태</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">10/15</div>
+      <div class="mtxt"><b>반도체 급락 → 평가액 333조, 182조 감소</b><span class="mdesc">미국 9월 CPI 쇼크 + AI 투자 회수 의심 + 중국 CXMT 추격이 한꺼번에</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">지금</div>
+      <div class="mtxt"><b>국정조사 요구 · 공수처 고발까지</b><span class="mdesc">주주단체가 대통령·복지부 장관·공단 이사장을 직권남용으로 고발, 국민의힘은 국정조사 추진</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">양쪽 다 일리가 있어서 어려운 문제</div>
+  <div class="fork">
+    <div class="fork-card">
+      <div class="badge sell">규칙대로 팔았다면</div>
+      <h3>국민연금이 너무 커서, 파는 게 곧 하락 요인</h3>
+      <p>김성주 공단 이사장 해명: 유예하지 않았으면 <b>하루 8,000억 원 넘게</b> 팔아야 했어.</p>
+      <p>"개미가 산 주식을 연금이 계속 눌러 팔았다"는 비판도 그때 쏟아졌지.</p>
+      <p>1~7월 누적 수익률은 <b>+14.84%</b>였다는 보도도 있어 — 유예가 수익엔 보탬이 된 구간.</p>
+    </div>
+    <div class="fork-card">
+      <div class="badge hold">안 팔고 뒀더니</div>
+      <h3>비중이 부푼 채로 하락장을 그대로 맞음</h3>
+      <p>칸을 키워둔 만큼 <b>반도체 두 종목의 쏠림</b>이 그대로 손실로 전달됐어.</p>
+      <p>위험 관리 장치를 끄고 상승에 베팅한 셈이라는 비판이 핵심이야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">"182조 날렸다"를 어떻게 읽어야 할까</div>
+  <div class="vs">
+    <div class="vs-card a">
+      <h3>평가손실 (지금 상태)</h3>
+      <p>안 팔았으면 장부상 숫자야. 지난해 말 코스피가 4,214였으니 <b>연초 대비로는 여전히 플러스</b> — 여당이 "확정 손실이 아니다"라고 하는 근거.</p>
+    </div>
+    <div class="vs-card b">
+      <h3>그래도 그냥 넘길 수 없는 이유</h3>
+      <p>연금은 매년 수급자에게 줄 돈을 <b>실제로 팔아서</b> 만들어야 해. 팔아야 할 때 값이 낮으면 평가손이 확정손으로 바뀌어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">앞으로 볼 지점</div>
+  <div class="timeline">
+    <div class="t-item next"><div class="when">오늘 09:00</div><div class="what"><b>한은 금통위</b> — 기준금리 결정(동결 전망). 금리 방향이 증시·반도체 수급의 배경</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">국감 중</div><div class="what">기금위 회의록 공개 여부 · 국정조사 성립 여부</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">다음 기금위</div><div class="what">목표 비중 20.8%를 유지할지, 되돌릴지</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 평가액은 에프앤가이드 집계(10/15 기준)를 인용한 보도 기준이고, 국민연금이 지분 5% 이상 보유해 공시한 287개 종목만 센 숫자야(기금 전체 포트폴리오가 아님).</div>
+</div>
+</body>
+</html>
