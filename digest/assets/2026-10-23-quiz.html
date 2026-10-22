@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.23</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.23 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'settle', variants:[
+    { q:'직장가입자의 건보료 정산이 돌아가는 방식으로 가장 알맞은 것은?',
+      opts:['전년도 소득으로 보험료를 먼저 내고, 올해 실제 소득이 확정되면 차액을 맞춘다',
+            '올해 실제 소득을 매달 실시간으로 파악해 그 달 보험료에 바로 반영한다',
+            '매년 같은 금액을 내다가 소득이 크게 오른 해에만 한 번 재산정한다',
+            '병원을 이용한 횟수가 많은 해에는 보험료를 나중에 깎아 준다'],
+      answer:0,
+      explain:'핵심은 <b>"지난 소득으로 먼저, 확정 소득으로 나중에"</b>야. 소득은 해가 지나야 확정되니 먼저 내고 맞추는 시차가 생겨.' },
+    { q:'작년보다 올해 소득이 줄어든 가입자에게 소득정산을 하면 결과는 어떻게 될까?',
+      opts:['작년 소득 기준으로 이미 낸 보험료가 더 많았으니 차액을 돌려받는다',
+            '소득이 줄었어도 이미 낸 보험료는 정산 대상이 아니라 그대로 둔다',
+            '줄어든 소득만큼 다음 해 보험료율이 자동으로 인상된다',
+            '줄어든 소득은 증빙이 있어야만 반영되어 대부분 변동이 없다'],
+      answer:0,
+      explain:'먼저 낸 기준(작년 소득)이 실제(올해 소득)보다 컸으면 <b>환급</b>, 작았으면 <b>추가 납부</b>야.' },
+  ]},
+  { id:'direct', variants:[
+    { q:'정산 방식을 가입자 신청에서 공단 직권으로 바꾸려는 이유로 가장 설득력 있는 것은?',
+      opts:['신청제에서는 환급받을 사람만 움직이기 쉬워, 추가로 낼 사람은 정산에서 빠지는 비대칭이 생기기 때문',
+            '신청 절차 자체가 법으로 금지되어 있기 때문',
+            '직권 정산을 하면 가입자의 소득이 자동으로 줄어들기 때문',
+            '국세청 자료는 가입자가 직접 제출한 서류보다 항상 보험료가 낮게 나오기 때문'],
+      answer:0,
+      explain:'신청제의 허점은 <b>방향의 비대칭</b>이야. 돌려받을 사람만 신청하면 재정은 새고, 더 낼 사람은 그대로 남아.' },
+  ]},
+  { id:'net', variants:[
+    { q:'지역가입자 정산 추산에서 추가 납부 3조 2,911억 원, 환급 1조 8,014억 원이 함께 나오는 것을 가장 정확히 읽은 것은?',
+      opts:['두 금액이 서로 상쇄되고 남는 약 1조 5천억 원이 건강보험 재정에 순증으로 들어온다',
+            '추가 납부액 전부가 건강보험 재정에 그대로 더해진다',
+            '환급액이 더 커서 건강보험 재정은 오히려 줄어든다',
+            '두 금액은 별개의 제도라 재정에 미치는 영향은 계산할 수 없다'],
+      answer:0,
+      explain:'돈은 양방향으로 움직이니 <b>순액으로 읽어야</b> 해. 거둔 돈에서 돌려줄 돈을 빼면 약 1.49조야.' },
+  ]},
+  { id:'rate', variants:[
+    { q:'한국은행이 7·8월 인상 뒤 이번에 금리를 동결한 결정을 가장 정확히 설명한 것은?',
+      opts:['이미 올린 금리를 유지하며 그 효과와 경기·물가 지표를 확인하는 숨 고르기다',
+            '금리를 낮추는 방향으로 돌아섰다는 신호다',
+            '물가가 목표 수준으로 안정되어 더 이상 인상이 필요 없다는 선언이다',
+            '위원 간 의견이 갈려 아무 결정도 내리지 못한 것이다'],
+      answer:0,
+      explain:'동결은 인하가 아니야. <b>3분기 GDP·10월 물가</b>를 본 뒤 11월에 다시 판단하겠다는, 긴축 기조 속의 멈춤이야.' },
+  ]},
+  { id:'share', variants:[
+    { q:'"지난 1년간 늘어난 임금노동자 10명 중 9명이 비정규직"이라는 문장을 바르게 읽은 것은?',
+      opts:['늘어난 몫(증가분) 중 비정규직 비중이 약 90%라는 뜻이지, 전체 임금노동자의 90%라는 뜻이 아니다',
+            '전체 임금노동자의 90%가 비정규직이라는 뜻이다',
+            '정규직 일자리가 1년 동안 90% 줄었다는 뜻이다',
+            '비정규직 임금이 정규직보다 90% 높아졌다는 뜻이다'],
+      answer:0,
+      explain:'<b>"증가분 중 비중"</b>과 <b>"전체 중 비중"</b>은 달라. 비중 뉴스는 분모가 무엇인지부터 확인해야 해.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'전년도 소득으로 보험료를 먼저 낸 뒤, 확정된 실제 소득에 맞춰 차액을 맞추는 절차를 뭐라고 할까? (두 글자)',
+    accept:['정산'],
+    explain:'정답은 <b>정산</b>. 먼저 내고 나중에 맞추는 시차 장치야.' },
+  { q:'가입자 신청이 없어도 공단이 알아서 정산하는 방식을 "○○ 정산"이라고 해. ○○에 들어갈 두 글자는?',
+    accept:['직권'],
+    explain:'정답은 <b>직권</b>. 신청제의 비대칭(환급받을 사람만 신청)을 없애려는 방식이야.' },
+  { q:'한은이 올린 기준금리를 올리지도 내리지도 않고 그대로 두는 결정을 두 글자로 뭐라고 할까?',
+    accept:['동결'],
+    explain:'정답은 <b>동결</b>. 인하가 아니라 효과를 점검하는 숨 고르기야.' },
+  { q:'지역가입자 정산 추산에서 추가 납부액에서 환급액을 빼고 남는 건강보험 재정 증가분처럼, 오간 돈을 서로 빼고 남는 금액을 뭐라고 할까? (두 글자)',
+    accept:['순액','순증'],
+    explain:'정답은 <b>순액</b>(순증). 양방향으로 움직이는 돈은 순액으로 읽어야 실제 효과가 보여.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
