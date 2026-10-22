@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.23</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.23 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'settle', variants:[
+    { q:'건강보험료 "소득정산"의 구조를 가장 정확히 설명한 것은?',
+      opts:['확정되지 않은 소득으로 보험료를 먼저 걷고, 나중에 실제 소득이 확인되면 차액을 더 걷거나 돌려주는 것',
+            '소득이 일정 수준을 넘는 가입자만 골라 보험료를 더 걷는 것',
+            '보험료를 한 해 치 미리 다 낸 사람에게 할인을 돌려주는 것',
+            '병원에 많이 다닌 사람의 보험료를 다음 해에 올려 받는 것'],
+      answer:0,
+      explain:'핵심은 <b>"선납 후 정산"</b>이야. 직장인 연말정산과 같은 뼈대 — 미리 어림잡아 걷고, 실제 숫자가 나오면 차액을 맞춰.' },
+    { q:'소득정산 제도가 "연말정산 같다"고 비유되는 이유로 가장 알맞은 것은?',
+      opts:['둘 다 어림잡은 금액을 먼저 낸 뒤 확정 소득으로 다시 계산해 차액을 주고받기 때문',
+            '둘 다 매달 소득을 신고해야 공제를 받을 수 있기 때문',
+            '둘 다 내야 할 금액이 최종적으로 반드시 줄어들기 때문',
+            '둘 다 국세청이 아니라 건강보험공단이 계산을 맡기 때문'],
+      answer:0,
+      explain:'비유가 통하는 지점은 <b>"나중에 맞춘다"</b>는 구조야. 그래서 환급도 추가 납부도 양쪽 다 생겨.' },
+  ]},
+  { id:'lagbase', variants:[
+    { q:'지역가입자의 건강보험료가 지금 소득이 아니라 1~2년 전 소득으로 매겨지는 이유로 가장 알맞은 것은?',
+      opts:['월급처럼 매달 확정되는 소득 자료가 없어서, 국세청에 신고가 끝난 과거 소득을 기다려야 하기 때문',
+            '법에 보험료를 2년 주기로만 다시 계산하도록 정해져 있기 때문',
+            '지역가입자는 소득보다 재산으로만 보험료를 매기도록 되어 있기 때문',
+            '공단이 소득보다 과거 보험료 납부 실적을 기준으로 삼기 때문'],
+      answer:0,
+      explain:'원인은 <b>자료의 시차</b>야. 자영업·프리랜서 소득은 확정 신고가 끝나야 숫자가 나오니, 보험료는 늘 한 발 늦은 소득을 쓰게 돼.' },
+    { q:'폐업으로 소득이 크게 줄어든 자영업자가 당장은 예전처럼 높은 보험료를 내게 되는 구조적 이유는?',
+      opts:['보험료 기준이 잘 벌던 시기의 확정 소득이라, 줄어든 소득은 아직 자료에 반영되지 않았기 때문',
+            '폐업 신고를 하면 보험료가 자동으로 최고 등급으로 올라가기 때문',
+            '지역가입자는 소득이 없어도 평균 보험료를 내도록 규정돼 있기 때문',
+            '보험료는 매달 그달의 매출을 기준으로 다시 계산되기 때문'],
+      answer:0,
+      explain:'보험료는 <b>과거 소득이라는 사진</b>을 보고 매겨져. 그래서 사정이 바뀐 직후가 가장 어긋나는 시점이야.' },
+  ]},
+  { id:'optin', variants:[
+    { q:'보험료 조정을 "신청한 사람만" 받을 수 있는 현행 방식의 문제로 가장 알맞은 것은?',
+      opts:['제도를 아는 사람과 모르는 사람의 부담이 갈려, 같은 소득이어도 내는 돈이 달라질 수 있다는 점',
+            '신청 건수가 많아지면 보험료율 자체가 올라간다는 점',
+            '신청을 하면 그해 의료비 혜택이 줄어든다는 점',
+            '신청한 사람은 다음 해 정산 대상에서 제외된다는 점'],
+      answer:0,
+      explain:'신청주의의 비용은 <b>정보 격차</b>야. 깎아줄 근거가 있어도 모르면 그대로 내고, 그게 제도 불신으로 이어져.' },
+    { q:'신청 없이 공단이 국세청 자료로 정산하는 "직권 정산"으로 바뀌면 생기는 변화를 바르게 설명한 것은?',
+      opts:['지금은 사실상 지나가던 "덜 낸 경우"까지 함께 잡혀 환급과 추가 납부가 양방향으로 일어난다',
+            '모든 가입자의 보험료가 일률적으로 같은 비율만큼 오른다',
+            '소득이 줄어든 사람은 더 이상 환급을 받을 수 없게 된다',
+            '보험료 계산에서 소득 자료를 쓰지 않고 재산만 보게 된다'],
+      answer:0,
+      explain:'방향이 하나 늘어나는 게 핵심. 신청주의에선 <b>깎는 쪽만</b> 움직였는데, 직권이면 더 걷는 쪽도 같이 움직여.' },
+  ]},
+  { id:'netfinance', variants:[
+    { q:'"394만 세대가 3조 2,911억 원을 더 낸다"는 수치를 읽을 때 함께 챙겨야 할 전제로 알맞은 것은?',
+      opts:['같은 정산으로 232만 세대는 1조 8,014억 원을 돌려받아, 재정 순증은 약 1조 5,000억 원 수준이라는 점',
+            '전체 지역가입자가 예외 없이 추가 납부 대상이 된다는 점',
+            '추가 납부액이 전액 가입자에게 다시 환급된다는 점',
+            '이 금액이 이미 걷기로 확정된 올해 예산이라는 점'],
+      answer:0,
+      explain:'"더 걷는다"는 헤드라인만 보면 <b>돌려받는 232만 세대</b>가 안 보여. 추가 납부에서 환급을 뺀 순증이 실제 재정 효과야.' },
+    { q:'소득정산 확대로 보험료가 "오른다"고 단정하기 어려운 이유로 가장 알맞은 것은?',
+      opts:['소득이 늘어난 세대는 더 내지만 줄어든 세대는 돌려받아, 개인별로 방향이 서로 반대이기 때문',
+            '정산은 보험료율을 낮추는 조치와 항상 함께 시행되기 때문',
+            '정산 대상은 소득이 전혀 없는 세대로 한정되기 때문',
+            '추가로 걷은 보험료는 이듬해 전액 감면으로 돌아오기 때문'],
+      answer:0,
+      explain:'정산은 <b>세율 인상이 아니라 자리 맞추기</b>야. 내 소득이 올랐으면 더 내고 줄었으면 덜 내는, 개인별로 갈리는 변화지.' },
+  ]},
+  { id:'sideincome', variants:[
+    { q:'월급을 받는 직장가입자인데도 소득정산 확대가 내 일이 될 수 있는 경우는?',
+      opts:['이자·배당·임대·부업 같은 월급 외 소득이 기준(연 2,000만 원)을 넘어 따로 보험료가 매겨지는 경우',
+            '회사가 연말정산을 대신해 주지 않는 경우',
+            '한 해에 병원 이용 횟수가 평균보다 많았던 경우',
+            '월급이 전년보다 오른 경우'],
+      answer:0,
+      explain:'월급만 있으면 회사가 이미 매년 맞춰줘. 변수는 <b>월급 외 소득</b>이야 — 투자·부업이 커진 해일수록 정산액이 커져.' },
+    { q:'투자·부업 소득이 크게 늘어난 해에 대비해 둘 점으로 가장 알맞은 것은?',
+      opts:['늘어난 소득이 확정되는 다음 해에 보험료 정산액이 함께 청구될 수 있어 그만큼을 미리 떼놓는 것',
+            '그해 안에 보험료가 즉시 조정되니 따로 준비할 게 없다는 것',
+            '월급 외 소득은 보험료 계산에서 아예 빠진다는 것',
+            '소득이 늘면 보험료 상한이 없어져 전액이 부과된다는 것'],
+      answer:0,
+      explain:'시차가 부담을 뒤로 밀어줄 뿐 없애주진 않아. 소득이 튄 해의 청구서는 <b>다음 해</b>에 와.' },
+  ]},
+  { id:'hawkish', variants:[
+    { q:'한은이 기준금리를 연 3.00%로 동결한 것을 시장이 "매파적 동결"로 읽은 이유로 가장 알맞은 것은?',
+      opts:['동결은 했지만 추가 인상의 시기와 속도를 보겠다며 다음 인상 가능성을 함께 내비쳤기 때문',
+            '동결 결정이 금통위원 과반의 반대 속에 간신히 통과됐기 때문',
+            '동결과 함께 금리 인하 시점을 구체적으로 제시했기 때문',
+            '동결이 시장 예상과 정반대의 결정이었기 때문'],
+      answer:0,
+      explain:'금리 뉴스는 <b>결정보다 다음 신호</b>가 중요해. 숫자는 그대로 둔 채 "다음은 올릴 수 있다"고 말하면 효과는 인상 쪽이야.' },
+    { q:'"지표를 더 보고 결정해도 늦지 않다"는 총재 발언이 담고 있는 뜻에 가장 가까운 것은?',
+      opts:['이번엔 쉬지만 물가·성장 지표가 확인되면 인상에 나설 수 있다는 조건부 예고',
+            '앞으로는 지표와 무관하게 금리를 움직이지 않겠다는 선언',
+            '이미 인상 효과가 충분해 인하로 돌아설 준비가 됐다는 신호',
+            '금리 결정 권한을 정부로 넘기겠다는 의미'],
+      answer:0,
+      explain:'중앙은행 화법은 <b>조건문</b>으로 읽어야 해. "늦지 않다"는 건 안 한다는 게 아니라 <b>순서를 미뤘다</b>는 뜻이야.' },
+  ]},
+  { id:'whipsaw', variants:[
+    { q:'코스피가 −3.73% → +3.29% → −3.52%처럼 큰 폭으로 오르락내리락할 때 이 흐름을 바르게 해석한 것은?',
+      opts:['하루 반등이 추세 전환이라기보다, 방향을 정하지 못한 변동성 확대 국면일 수 있다는 것',
+            '큰 폭의 반등이 나왔으므로 상승 추세가 확인된 것',
+            '하락과 상승이 번갈아 나오면 평균적으로 손실이 사라진다는 것',
+            '변동성이 커지면 거래량은 반드시 줄어든다는 것'],
+      answer:0,
+      explain:'하루치 등락은 방향이 아니라 <b>흔들림의 크기</b>를 알려줘. 반등 하루 만에 되밀렸다는 건 매수·매도 어느 쪽도 못 이긴 상태야.' },
+  ]},
+  { id:'safeasset', variants:[
+    { q:'주식이 급락한 날 미국 국채 금리가 함께 내려가는 과정을 바르게 설명한 것은?',
+      opts:['안전한 자산을 찾는 돈이 국채로 몰려 채권 가격이 오르고, 가격이 오르면 수익률인 금리는 내려간다',
+            '주가가 내리면 중앙은행이 그날 기준금리를 함께 내리기 때문이다',
+            '국채를 파는 사람이 늘어 가격이 떨어지고 금리도 같이 떨어지기 때문이다',
+            '주식과 채권의 금리는 같은 기준으로 정해져 늘 함께 움직이기 때문이다'],
+      answer:0,
+      explain:'채권은 <b>가격과 금리가 시소</b>야. 사려는 사람이 많아 비싸게 사면 받는 이자는 그대로이니 수익률(금리)은 떨어져.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'확정 안 된 소득으로 보험료를 먼저 걷고 나중에 실제 소득으로 차액을 맞추는 제도를 뭐라고 할까? (네 글자)',
+    accept:['소득정산','사후정산'],
+    explain:'정답은 <b>소득정산</b>. 직장인 연말정산과 같은 "선납 후 정산" 구조를 건강보험료에 붙인 거야.' },
+  { q:'소득이 줄어든 사람이 직접 증빙을 내고 신청해야 보험료를 깎아주는 현행 방식을 뭐라고 부를까? (네 글자, "○○주의")',
+    accept:['신청주의'],
+    explain:'정답은 <b>신청주의</b>. 반대는 공단이 알아서 정산하는 <b>직권주의</b>(직권 정산)이고, 개편안이 가려는 방향이 이쪽이야.' },
+  { q:'금리를 올리자는 쪽, 즉 물가를 더 걱정하는 통화정책 성향을 새 이름으로 뭐라고 할까? (두 글자)',
+    accept:['매파'],
+    explain:'정답은 <b>매파</b>(금리 올리자는 쪽). 반대는 비둘기파. 금리를 동결하면서 인상 신호를 주면 "매파적 동결"이라고 불러.' },
+  { q:'안전자산을 찾는 돈이 국채로 몰려 채권 가격이 오르면, 그 채권의 수익률(금리)은 오를까 내릴까?',
+    accept:['내린다','내려간다','하락','떨어진다','내려감','하락한다'],
+    explain:'정답은 <b>내린다</b>. 채권은 가격과 금리가 시소 관계 — 비싸게 살수록 받게 되는 수익률은 낮아져.' },
+  { q:'월급 외 소득(이자·배당·임대·사업 등)이 연 2,000만 원을 넘는 직장가입자가 월급분과 별도로 내는 보험료의 이름은?',
+    accept:['소득월액보험료','소득월액'],
+    explain:'정답은 <b>소득월액보험료</b>. 소득정산 확대에서 직장가입자 110만 명이 대상으로 꼽힌 게 바로 이 부분이야.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
