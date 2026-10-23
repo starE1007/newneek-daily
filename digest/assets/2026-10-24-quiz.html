@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.24</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.24 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'daily', variants:[
+    { q:'단일종목 레버리지 ETF의 "2배"가 정확히 지켜지는 기간은?',
+      opts:['매 거래일 하루의 등락률에 대해서만','상품에 가입한 날부터 팔 때까지 누적한 수익률에 대해',
+            '한 달 단위로 정산한 수익률에 대해','종목이 오른 날과 내린 날을 합산한 연간 수익률에 대해'],
+      answer:0,
+      explain:'"2배"는 <b>하루 단위</b> 약속이야. 다음 날엔 어제 결과가 원금에 반영된 채로 새로 2배를 계산해.' },
+    { q:'레버리지 ETF를 며칠 보유한 뒤 수익률이 "종목 수익률의 2배"와 어긋나는 가장 근본적인 이유는?',
+      opts:['매일 2배를 새로 적용해 복리처럼 쌓이기 때문에 보유 기간 전체에는 2배가 성립하지 않아서',
+            '운용사가 수수료를 하루마다 두 배로 올리기 때문에',
+            '종목 가격과 ETF 가격이 서로 다른 거래소에서 정해져서',
+            '레버리지 ETF는 상승한 날의 수익만 반영하기 때문에'],
+      answer:0,
+      explain:'원인은 <b>매일 리셋 + 복리</b>야. 기간 전체의 2배가 아니라 하루하루의 2배가 이어 붙은 값이라 경로에 따라 결과가 달라져.' },
+  ]},
+  { id:'decay', variants:[
+    { q:'종목이 +10%, −10%를 반복해 제자리를 맴돌 때 2배 레버리지 ETF가 원금보다 줄어드는 이유로 가장 알맞은 것은?',
+      opts:['오른 날 불어난 원금에 다음 날 −20%가 걸려, 내린 날의 손실 금액이 더 커지기 때문',
+            '내린 날의 손실만 장부에 반영되도록 설계돼 있기 때문',
+            '하락일에는 2배가 아니라 3배가 적용되기 때문',
+            '운용사가 오른 날의 수익을 일부 떼어 가기 때문'],
+      answer:0,
+      explain:'100→120→96처럼 <b>+20% 뒤 −20%는 본전이 아니야</b>. 커진 원금에 같은 비율이 걸려 손실 금액이 더 커져.' },
+    { q:'등락이 심한 장에서 레버리지 ETF를 오래 들고 있을수록 불리해지는 현상을 가장 잘 설명한 것은?',
+      opts:['흔들림이 클수록 매일의 복리 계산에서 깎이는 폭이 커져 종목 수익률 대비 격차가 벌어진다',
+            '변동성이 커지면 ETF 보수가 자동으로 면제돼 수익이 줄어든다',
+            '변동성이 커지면 거래가 정지돼 매도를 못 하게 된다',
+            '오르내림이 클수록 ETF가 종목보다 항상 더 많이 오른다'],
+      answer:0,
+      explain:'격차의 재료는 <b>방향이 아니라 흔들림의 크기</b>야. 같은 종목이라도 변동성이 큰 시기에 오래 들수록 불리해.' },
+  ]},
+  { id:'loss', variants:[
+    { q:'레버리지 ETF에서 큰 손실이 났다는 보도를 읽을 때 "종목이 떨어진 만큼의 2배"로만 이해하면 놓치는 것은?',
+      opts:['하락과 반등이 섞인 경로에서 복리로 깎이는 몫이 더해져 손실이 2배 이상 커질 수 있다는 점',
+            '레버리지 ETF의 손실은 항상 종목 하락폭의 절반이라는 점',
+            '손실이 나도 운용사가 일정 부분 보전해 준다는 점',
+            '손실액은 거래소가 매일 집계해 투자자에게 돌려준다는 점'],
+      answer:0,
+      explain:'종목이 같은 값으로 돌아와도 ETF는 못 돌아올 수 있어. <b>경로가 결과를 바꾸는 상품</b>이라는 게 핵심이야.' },
+  ]},
+  { id:'guard', variants:[
+    { q:'정부가 단일종목 레버리지 ETF 투자 예탁금을 1,000만 원에서 3,000만 원으로 올리고 현금만 허용한 취지로 가장 알맞은 것은?',
+      opts:['구조를 이해하고 손실을 감당할 수 있는 투자자만 들어오도록 문턱을 높이는 것',
+            '레버리지 ETF의 수수료 수입을 늘려 운용사를 지원하는 것',
+            '삼성전자·SK하이닉스 주가를 직접 끌어올리는 것',
+            '투자자의 수익률을 정부가 보장해 주는 것'],
+      answer:0,
+      explain:'예탁금은 <b>진입 장벽</b>이야. 복리로 깎이는 구조를 모르고 들어온 소액 투자자를 걸러 내려는 장치지.' },
+  ]},
+  { id:'apec', variants:[
+    { q:'미·러·중 정상의 3자 회담에서 우크라이나 종전을 논의한다는 소식에 우려가 커진 이유로 가장 알맞은 것은?',
+      opts:['전쟁 당사국인 우크라이나 없이 강대국끼리 종전 조건을 정하면 그 나라의 이해가 빠질 수 있어서',
+            '3자 회담은 국제법상 어떤 합의도 효력이 없어서',
+            '우크라이나가 회담 참석을 자발적으로 거부해서',
+            '회담 장소가 중국이라 합의 내용이 공개되지 않아서'],
+      answer:0,
+      explain:'쟁점은 <b>당사자 배제</b>야. 협상 테이블에 없는 쪽이 조건을 떠안게 될 수 있다는 걱정이지.' },
+  ]},
+  { id:'patch', variants:[
+    { q:'보안 패치가 예정보다 일찍 공개되면 오히려 위험해질 수 있다는 우려의 논리로 가장 알맞은 것은?',
+      opts:['공격자가 패치 내용을 거꾸로 분석해 취약점을 알아내고, 아직 패치를 못 적용한 곳을 노릴 수 있어서',
+            '패치가 공개되는 순간 모든 사이트가 자동으로 안전해져서',
+            '패치를 일찍 내면 소프트웨어 라이선스가 무효가 되어서',
+            '취약점은 패치가 나온 뒤에는 더 이상 존재하지 않아서'],
+      answer:0,
+      explain:'패치는 <b>"어디가 뚫려 있었는지" 알려주는 지도</b>이기도 해. 공개와 적용 사이의 시차가 공격 창구가 돼.' },
+  ]},
+  { id:'books', variants:[
+    { q:'AI 기업이 2022년 이전에 나온 종이책을 높이 평가한다는 설명의 논리로 가장 알맞은 것은?',
+      opts:['AI가 만든 글이 섞이기 전, 순전히 사람이 쓴 글이라 학습 재료로 질이 높다고 보기 때문',
+            '오래된 책일수록 저작권이 완전히 소멸해 비용이 들지 않기 때문',
+            '종이책은 디지털 파일보다 무조건 용량이 작아서',
+            '2022년 이전 책에는 AI가 이해할 수 없는 문자가 쓰여서'],
+      answer:0,
+      explain:'기준선은 <b>챗GPT 공개(2022년)</b>야. 그 뒤엔 AI가 쓴 글이 웹에 섞여, 사람 글만 남은 책의 값이 올라가.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'하루의 수익·손실이 다음 날 원금에 합쳐져 계속 불어나거나 줄어드는 계산 방식을 뭐라고 할까? (두 글자)',
+    accept:['복리'],
+    explain:'정답은 <b>복리</b>. 하루의 결과가 다음 날 원금이 되니, +20%와 −20%를 겹치면 본전이 아니라 96이 돼.' },
+  { q:'100이 +20% 뒤 −20%를 맞으면 얼마가 될까? (숫자만)',
+    accept:['96'],
+    explain:'정답은 <b>96</b>. 100×1.2=120, 120×0.8=96 — 오른 만큼 내려도 본전이 아니야.' },
+  { q:'레버리지 ETF의 배수가 지켜지는 기간 단위는 "○○"야. ○○에 들어갈 두 글자는? (예: 일간 수익률)',
+    accept:['하루','1일','일간','일일'],
+    explain:'정답은 <b>하루</b>(일간). 기간이 길어질수록 "2배"에서 멀어져.' },
+  { q:'전쟁이나 협상의 당사자를 회담에서 빼고 다른 나라들끼리 결론을 정하는 상황을 두고 쓰는 말은 "당사자 ○○"야. ○○에 들어갈 두 글자는?',
+    accept:['배제'],
+    explain:'정답은 <b>배제</b>. 우크라이나 없는 종전 논의가 걱정되는 이유가 이거야.' },
+  { q:'신청 없이 공단이 알아서 정산하는 방식을 "○○주의"라고 해. 어제 배운 두 글자는?',
+    accept:['직권'],
+    explain:'정답은 <b>직권</b>(직권주의). 어제 복습 겸 한 번 더!' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

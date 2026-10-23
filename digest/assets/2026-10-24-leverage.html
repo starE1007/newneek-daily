@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>'2배' 레버리지는 왜 오르내리면 깎일까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--blue-soft);color:#1B6BB8}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.hot{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)}
+  th{background:var(--soft);font-size:13px;color:var(--text2)}
+  td.l,th.l{text-align:left}
+  tr:last-child td{border-bottom:none}
+  .up{color:#2F7A52;font-weight:600}.down{color:#C6493E;font-weight:600}
+  tr.end td{background:var(--red-soft);font-weight:700}
+  .note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.24 데일리 뉴스 · 시각자료</div>
+  <h1>📉 '2배' 레버리지는 왜 오르내리면 깎일까</h1>
+  <div class="sub">단일종목 레버리지 ETF의 '2배'는 하루짜리 약속 — 등락이 반복될 때 계좌가 줄어드는 과정</div>
+
+  <div class="section-title">'2배'가 걸리는 기간</div>
+  <div class="flow">
+    <div class="step">오늘 종목 +10%<small>하루 단위로 계산</small></div>
+    <div class="arrow">→</div>
+    <div class="step">ETF +20%<small>그날만 정확히 2배</small></div>
+    <div class="arrow">→</div>
+    <div class="step">내일 새 출발<small>어제 수익도 원금에 합쳐서</small></div>
+    <div class="arrow">→</div>
+    <div class="step hot">며칠 쌓이면?<small>'2배'가 아니게 됨</small></div>
+  </div>
+
+  <div class="section-title">+10% / −10%를 두 번 반복하면 (시작 100)</div>
+  <table>
+    <tr><th class="l">날</th><th>종목 등락</th><th>종목 값</th><th>ETF 등락(2배)</th><th>ETF 값</th></tr>
+    <tr><td class="l">1일차</td><td class="up">+10%</td><td>110</td><td class="up">+20%</td><td>120</td></tr>
+    <tr><td class="l">2일차</td><td class="down">−10%</td><td>99</td><td class="down">−20%</td><td>96</td></tr>
+    <tr><td class="l">3일차</td><td class="up">+10%</td><td>108.9</td><td class="up">+20%</td><td>115.2</td></tr>
+    <tr class="end"><td class="l">4일차</td><td class="down">−10%</td><td>98.0 (−2.0%)</td><td class="down">−20%</td><td>92.2 (−7.8%)</td></tr>
+  </table>
+  <div class="note">종목은 제자리에서 흔들렸을 뿐인데 −2%, ETF는 −7.8%. '2배'였다면 −4%여야 맞지만 실제 손실은 약 4배 — 오른 날보다 내린 날의 낙폭이 더 큰 원금에 걸리기 때문이야.</div>
+
+  <div class="paradox"><b>⚠️ 오르내림이 클수록, 길게 들고 있을수록 격차가 커진다</b>삼성전자·SK하이닉스처럼 하루 3~5%씩 흔들리는 장에서는 이 깎임이 더 빠르게 쌓여.</div>
+
+  <div class="foot">※ 이해를 돕기 위한 단순 계산(수수료·보수 제외) · 2026.10.24 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
