@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.25</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.25 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴다.
+const MC_BANK = [
+  { id:'cofix', variants:[
+    { q:'기준금리를 올린 뒤 한은이 쉬어 가는데도 변동금리 대출 이자가 한동안 더 오를 수 있는 가장 알맞은 이유는?',
+      opts:['코픽스는 지난달 조달비용을 반영하고 대출금리는 재산정 주기가 돌아와야 바뀌어서, 두 번의 시차가 끼기 때문',
+            '은행이 기준금리 발표와 동시에 모든 대출에 인상분을 한꺼번에 적용하기 때문',
+            '한은이 쉬는 동안 시중에 풀린 돈이 늘어 은행의 조달비용이 자동으로 내려가기 때문',
+            '코픽스가 은행 대출을 받는 사람의 신용도를 평균 낸 값이어서 반영이 늦어지기 때문'],
+      answer:0,
+      explain:'기준금리→은행 조달비용→코픽스→<b>내 대출 재산정일</b>로 가는 길에 시차가 두 번 껴. 수도꼭지를 잠가도 호스에 남은 물이 나오는 것과 같아.' },
+    { q:'6개월 주기 변동금리 대출을 가진 사람에게 코픽스가 오른 소식이 곧바로 이자 상승으로 이어지지 않을 수 있는 까닭은?',
+      opts:['내 대출은 다음 재산정일이 돌아와야 새 코픽스로 금리가 바뀌기 때문',
+            '코픽스는 신규 대출에만 적용되고 기존 대출에는 어떤 경우에도 쓰이지 않기 때문',
+            '은행이 코픽스 상승분을 우대금리로 전부 되돌려 주기 때문',
+            '코픽스 공시가 연 1회뿐이라 한 해가 지나야 확인되기 때문'],
+      answer:0,
+      explain:'코픽스는 매월 공시되지만 내 금리는 <b>재산정일</b>에만 갈아타. 그래서 도착 시점이 사람마다 달라.' },
+  ]},
+  { id:'rebal', variants:[
+    { q:'국민연금의 리밸런싱을 미룬 것이 위험을 키울 수 있는 가장 알맞은 이유는?',
+      opts:['주가가 오른 종목의 비중이 정해 둔 칸을 넘어도 덜어내지 않아, 하락기에 한 바구니 쏠림 손실이 커지기 때문',
+            '리밸런싱을 미루면 기금이 주식을 새로 살 수 없게 되어 수익이 구조적으로 막히기 때문',
+            '리밸런싱은 채권을 전부 팔아 주식으로 바꾸는 절차라서, 미루면 채권 가격이 폭락하기 때문',
+            '리밸런싱을 미루면 수급자에게 줄 연금액이 법적으로 즉시 삭감되기 때문'],
+      answer:0,
+      explain:'리밸런싱은 넘친 비중을 덜어 <b>쏠림을 막는 안전장치</b>야. 미루거나 칸을 키우면 오른 종목이 그대로 큰 비중으로 남아 하락 충격을 전부 맞아.' },
+    { q:'규칙대로 국내주식 비중을 맞추려고 국민연금이 대규모로 팔면 생길 수 있는 부작용으로 가장 알맞은 것은?',
+      opts:['그 매도 물량이 그대로 지수를 누르는 압력이 되어 시장 하락을 키울 수 있다',
+            '매도 대금이 곧바로 국내 주식으로 재투자돼 주가가 오히려 오른다',
+            '해외 투자자가 국민연금을 따라 사들여 환율이 급등한다',
+            '상장사들이 연금의 지분을 의무적으로 되사야 해서 배당이 줄어든다'],
+      answer:0,
+      explain:'덩치가 큰 투자자라 <b>파는 행위 자체가 시장 충격</b>이 돼. 그래서 유예의 명분이 되기도 했지만 쏠림은 쌓였어.' },
+  ]},
+  { id:'nhis', variants:[
+    { q:'지역가입자의 건보료가 현재 소득과 어긋나기 쉬운 근본 원인은?',
+      opts:['신고가 끝난 과거 소득을 기준으로 매겨서 소득이 변한 해에는 낡은 숫자로 계산되기 때문',
+            '지역가입자는 소득과 상관없이 모두 같은 정액 보험료를 내기 때문',
+            '보험료를 매달 병원 이용 횟수에 따라 다시 계산하기 때문',
+            '국세청이 소득 자료를 공단에 한 번도 넘기지 않기 때문'],
+      answer:0,
+      explain:'1~10월은 <b>2년 전</b>, 11~12월은 1년 전 소득이 기준이야. 폐업으로 줄었거나 크게 늘어도 반영이 늦어.' },
+    { q:'소득정산을 신청주의로 두면 환급 쪽으로 결과가 기울기 쉬운 이유는?',
+      opts:['덜 내고 있던 사람은 굳이 신청할 이유가 없고, 돌려받을 사람만 움직이기 때문',
+            '신청 절차가 어려워서 환급 대상자도 대부분 신청하지 못하기 때문',
+            '신청하면 반드시 더 걷는 쪽으로만 결과가 나오기 때문',
+            '공단이 신청자에게만 국세청 자료를 열람해 주기 때문'],
+      answer:0,
+      explain:'움직일 <b>동기가 한쪽에만</b> 있어서야. 직권주의는 공단이 자료로 양쪽을 다 정산하는 방식이야.' },
+  ]},
+  { id:'reset', variants:[
+    { q:'건보료 소득정산과 레버리지 ETF의 일일 리셋을 "기준을 맞추는 주기" 관점에서 비교한 설명으로 가장 알맞은 것은?',
+      opts:['건보료는 과거 소득으로 길게 어긋난 뒤 한꺼번에 맞추고, 레버리지는 매일 맞추되 복리로 경로 차이가 쌓인다',
+            '건보료는 매일 정산되어 오차가 거의 없고, 레버리지는 일 년에 한 번 맞춰서 오차가 크다',
+            '두 제도 모두 정산 주기가 같아서 결과 차이는 오직 가입자의 소득 수준에서만 생긴다',
+            '건보료는 주기가 길어 오차가 없고, 레버리지는 주기가 짧아 오차가 없다'],
+      answer:0,
+      explain:'코픽스·건보료는 <b>길게 어긋났다 한꺼번에</b> 맞추고, 레버리지는 <b>매일 맞추며 복리로</b> 쌓여. 주기가 결과의 모양을 바꿔.' },
+    { q:'레버리지 ETF가 매일 2배를 새로 맞추는데도 장기 보유 수익이 "종목의 2배"와 어긋나는 이유는?',
+      opts:['어제 결과가 오늘 원금이 되는 복리 때문에 오르내림이 반복되면 깎임이 쌓여서',
+            '운용사가 매일 배수를 임의로 낮추기 때문에',
+            '장기로 들면 상장 폐지 위험이 법으로 정해져 있어서',
+            '내린 날에는 배수가 적용되지 않아서'],
+      answer:0,
+      explain:'+20% 뒤 −20%는 120→<b>96</b>. 하루의 2배가 이어 붙으면 경로가 결과를 바꿔.' },
+  ]},
+  { id:'dogwater', variants:[
+    { q:'182조 원이라는 국민연금 보유 주식의 감소액을 읽을 때 가장 조심할 점은?',
+      opts:['팔아서 확정된 손실이 아니라 주가 하락에 따른 평가손실이며, 287개사만 센 숫자라는 점',
+            '기금 전체가 그만큼 현금으로 사라졌다는 뜻이라는 점',
+            '정부가 세금으로 곧바로 메워야 하는 빚이라는 점',
+            '주가가 회복되어도 장부에 절대 반영되지 않는다는 점'],
+      answer:0,
+      explain:'<b>평가손실</b>은 팔기 전 장부 가치의 변화야. 다만 연금 지급을 위해 실제 팔아야 하면 확정 손실이 될 수 있어.' },
+    { q:'같은 시기 같은 금액의 평가손실이라도 기금마다 체감이 다른 가장 알맞은 이유는?',
+      opts:['특정 종목에 비중이 몰려 있을수록 그 종목 하락의 영향을 크게 받아서',
+            '평가손실은 기금 규모와 상관없이 같은 비율로만 계산되어서',
+            '큰 기금은 주가 변화에 전혀 영향을 받지 않아서',
+            '작은 기금은 평가손실이 장부에 기록되지 않아서'],
+      answer:0,
+      explain:'<b>집중도</b>가 충격을 키워. 이번 감소의 71.8%가 두 종목에서 나온 것도 같은 이야기야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'하루 결과가 다음 날 원금이 되어 계속 불어나거나 줄어드는 계산 방식은? (두 글자)',
+    accept:['복리'],
+    explain:'정답은 <b>복리</b>. 100이 +20% 뒤 −20%를 맞으면 96이 돼.' },
+  { q:'건보료 지역가입자의 소득정산을 신청 없이 공단이 알아서 하는 방식을 "○○주의"라고 해. ○○는? (두 글자)',
+    accept:['직권'],
+    explain:'정답은 <b>직권</b>(직권주의). 신청주의의 반대야.' },
+  { q:'주가가 올라 정해 둔 비중이 넘칠 때 넘친 만큼 덜어 비중을 되돌리는 일을 뭐라고 할까? (다섯 글자)',
+    accept:['리밸런싱','리밸런스'],
+    explain:'정답은 <b>리밸런싱</b>. 쏠림을 막는 안전장치야.' },
+  { q:'은행이 지난달 신규로 돈을 구해 온 비용의 평균으로, 주담대 변동금리의 기준이 되는 지표는?',
+    accept:['코픽스','COFIX','cofix'],
+    explain:'정답은 <b>코픽스</b>. 매월 15일쯤 공시돼.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
