@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>김정은 단둥 당일치기 — 어디를 건넜고 왜 베이징은 안 갔나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .route-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .new-sample{display:inline-block;width:30px;height:7px;border-radius:2px;background:var(--green)}
+  .old-sample{display:inline-block;width:30px;height:7px;border-radius:2px;background:#B9B6B1}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .choke-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .choke{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .choke .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.old{background:var(--surface2);color:#6E6B66}
+  .badge.now{background:var(--green-soft);color:#2F7351}
+  .choke h3{font-size:16px;margin-bottom:6px}
+  .choke p{font-size:14px;color:var(--text2)}
+  .choke p b{color:var(--text)}
+  .choke p + p{margin-top:8px}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px 12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--green-soft);color:#2F7351}
+  .step.s2{background:var(--blue-soft);color:#1B6BB8}
+  .step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--orange-soft);color:#9A5620}
+  .step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .choke-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.27 데일리 뉴스 · 시각자료</div>
+  <h1>🗺️ 김정은은 압록강 위 '새 다리'만 건넜다</h1>
+  <div class="sub">평양 → 신의주 → 신압록강대교 → 단둥, 그리고 같은 길로 당일 복귀 — 베이징은 가지 않았어</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="압록강 국경 지도: 중국 단둥과 북한 신의주를 잇는 두 다리, 김정은의 당일치기 이동 경로, 가지 않은 베이징">
+      <defs>
+        <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#D5803B"/>
+        </marker>
+      </defs>
+
+      <!-- North Korea side (base fill) -->
+      <rect x="0" y="0" width="900" height="560" fill="#F7EFE9"/>
+
+      <!-- China side (north-west of the river) -->
+      <path d="M0,0 L700,0 C620,110 540,180 460,250 C380,320 300,400 230,480 L186,540 L0,540 Z"
+            fill="#EDEFF0" stroke="#C9C7C3" stroke-width="1.5" stroke-linejoin="round"/>
+
+      <!-- Sea wedge (bottom-left): 서한만 / 황해 -->
+      <path d="M0,418 L268,560 L0,560 Z" fill="#D8E9F7" stroke="#B9D4EC" stroke-width="1.5"/>
+
+      <!-- Yalu river -->
+      <path d="M700,20 C620,110 540,180 460,250 C380,320 300,400 230,480 L198,548"
+            fill="none" stroke="#B9D4EC" stroke-width="30" stroke-linecap="round"/>
+      <path d="M700,20 C620,110 540,180 460,250 C380,320 300,400 230,480 L198,548"
+            fill="none" stroke="#D8E9F7" stroke-width="24" stroke-linecap="round"/>
+
+      <!-- Kim's route: 평양 → 신의주 → bridge → 단둥 (dashed, two-way) -->
+      <path d="M742,436 C660,392 598,350 556,312 L512,308 L408,192"
+            fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#ah)"/>
+      <path d="M396,204 L500,320" fill="none" stroke="#D5803B" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#ah)" opacity="0.65"/>
+
+      <!-- Bridge 1: 북중우의교 (1943, upstream) -->
+      <line x1="408" y1="192" x2="512" y2="308" stroke="#B9B6B1" stroke-width="9" stroke-linecap="round"/>
+      <line x1="408" y1="192" x2="512" y2="308" stroke="#F4F3F2" stroke-width="3" stroke-linecap="round" stroke-dasharray="7 5"/>
+
+      <!-- Bridge 2: 신압록강대교 (2026.10.15, downstream) -->
+      <line x1="293" y1="297" x2="397" y2="413" stroke="#46A171" stroke-width="11" stroke-linecap="round"/>
+      <line x1="293" y1="297" x2="397" y2="413" stroke="#E8F1EC" stroke-width="3" stroke-linecap="round"/>
+
+      <!-- River label -->
+      <text transform="translate(608,128) rotate(42)" font-style="italic" fill="#5B87B5" font-size="14" text-anchor="middle" font-family="inherit">압  록  강</text>
+      <text x="96" y="512" font-style="italic" fill="#5B87B5" font-size="13" text-anchor="middle" font-family="inherit">서한만 (황해)</text>
+
+      <!-- Country labels -->
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#EDEFF0" stroke-width="4" font-family="inherit">
+        <text x="236" y="86" font-size="17">중국 (랴오닝성)</text>
+      </g>
+      <text x="706" y="212" font-size="17" font-weight="600" fill="#A9733F" text-anchor="middle" paint-order="stroke" stroke="#F7EFE9" stroke-width="4" font-family="inherit">북  한</text>
+
+      <!-- City: 단둥 -->
+      <circle cx="390" cy="168" r="9" fill="#2783DE" stroke="#FFFFFF" stroke-width="3"/>
+      <text x="390" y="150" font-size="14.5" font-weight="700" fill="#1B6BB8" text-anchor="middle" paint-order="stroke" stroke="#EDEFF0" stroke-width="4" font-family="inherit">단둥</text>
+
+      <!-- City: 신의주 -->
+      <circle cx="556" cy="312" r="9" fill="#D5803B" stroke="#FFFFFF" stroke-width="3"/>
+      <text x="586" y="306" font-size="14.5" font-weight="700" fill="#A9733F" text-anchor="middle" paint-order="stroke" stroke="#F7EFE9" stroke-width="4" font-family="inherit">신의주</text>
+
+      <!-- City: 평양 -->
+      <circle cx="748" cy="440" r="8" fill="#A9733F" stroke="#FFFFFF" stroke-width="3"/>
+      <text x="748" y="466" font-size="14" font-weight="700" fill="#A9733F" text-anchor="middle" paint-order="stroke" stroke="#F7EFE9" stroke-width="4" font-family="inherit">평양 — 당일 복귀</text>
+
+      <!-- Beijing: NOT visited -->
+      <g>
+        <circle cx="92" cy="146" r="22" fill="#E56458" opacity="0.14"/>
+        <circle cx="92" cy="146" r="12" fill="#E56458" stroke="#FFFFFF" stroke-width="3"/>
+        <line x1="85" y1="153" x2="99" y2="139" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+        <text x="92" y="190" font-size="13.5" font-weight="700" fill="#C6493E" text-anchor="middle" paint-order="stroke" stroke="#EDEFF0" stroke-width="4" font-family="inherit">베이징</text>
+        <text x="92" y="208" font-size="12.5" fill="#C6493E" text-anchor="middle" paint-order="stroke" stroke="#EDEFF0" stroke-width="4" font-family="inherit">이번엔 안 감 · 정상회담 없음</text>
+      </g>
+
+      <!-- chip: 신압록강대교 -->
+      <g font-family="inherit">
+        <line x1="238" y1="402" x2="316" y2="352" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="42" y="368" width="276" height="56" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="180" y="389" font-size="13.5" font-weight="700" fill="#2F7351" text-anchor="middle">① 신압록강대교</text>
+        <text x="180" y="409" font-size="12.5" fill="#7D7A75" text-anchor="middle">2014년 완공 → 2026.10.15 개통</text>
+      </g>
+
+      <!-- chip: 북중우의교 -->
+      <g font-family="inherit">
+        <line x1="620" y1="176" x2="478" y2="238" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="608" y="146" width="268" height="56" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="742" y="167" font-size="13.5" font-weight="700" fill="#6E6B66" text-anchor="middle">② 북중우의교</text>
+        <text x="742" y="187" font-size="12.5" fill="#7D7A75" text-anchor="middle">1943년 · 단선 철교, 그동안 유일한 통로</text>
+      </g>
+
+      <!-- chip: route note -->
+      <g font-family="inherit">
+        <rect x="352" y="476" width="316" height="34" rx="8" fill="#FFFFFF" stroke="#E6E5E3" opacity="0.97"/>
+        <text x="510" y="498" font-size="13" font-weight="700" fill="#9A5620" text-anchor="middle">10/24 · 같은 다리로 건너갔다 같은 다리로 돌아옴</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="new-sample"></span> 신압록강대교 (이번에 건넌 새 다리)</span>
+      <span class="item"><span class="old-sample"></span> 북중우의교 (기존 단선 철교)</span>
+      <span class="item"><span class="route-sample"></span> 김정은 당일치기 이동 경로</span>
+      <span class="item"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#E56458"/><line x1="5.5" y1="14.5" x2="14.5" y2="5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg> 가지 않은 곳</span>
+    </div>
+  </div>
+
+  <div class="section-title">다리 하나가 왜 뉴스야? — 통로가 둘로 늘었다</div>
+  <div class="choke-grid">
+    <div class="choke">
+      <span class="badge old">2026.10.14까지</span>
+      <h3>통로가 사실상 하나뿐</h3>
+      <p>단둥과 신의주를 잇는 길은 <b>1943년에 놓인 북중우의교</b>뿐이었어. 단선 철교라 차량·열차가 번갈아 지나가는 구조야.</p>
+      <p>중국은 이 병목을 풀려고 <b>약 22억 위안(4,400억 원)</b>을 들여 2014년 신압록강대교를 완공했는데, 북한 쪽 접속도로·통관시설이 없어 <b>12년간 '개점휴업'</b>이었어.</p>
+    </div>
+    <div class="choke">
+      <span class="badge now">2026.10.15부터</span>
+      <h3>왕복 4차선이 열렸다</h3>
+      <p>총연장 <b>3,026m</b>·왕복 4차선 다리가 공식 개통했어. 완공 후 <b>12년 만</b>이야.</p>
+      <p>그래서 이번 방문의 핵심은 '누구를 만났나'가 아니라 <b>어디로 건넜나</b>였어. 김정은은 개통 9일 만에 그 다리를 왕복해 보이면서, 교역 통로가 실제로 작동한다는 걸 몸으로 증명한 셈이야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">다리 개통 → 나한테까지 오는 길</div>
+  <div class="flow">
+    <div class="step s1">① 새 다리 개통<small>통로 2개로, 병목 완화</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">② 북중 교역 여력↑<small>트럭이 줄 서지 않아도 됨</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">③ 제재의 실효 약화<small>안보리 제재는 그대로 유효</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">④ 북한 협상력↑<small>버틸 뒷배가 생김</small></div>
+    <div class="arrow">→</div>
+    <div class="step s5">⑤ APEC·대미 협상 조건 변화<small>11/18~19 선전</small></div>
+  </div>
+
+  <div class="foot">
+    ※ 지도는 위치 관계를 보여주는 개략도야 — 국경선·강 모양·도시 위치는 실제 축척이 아니야. 유엔 안보리 대북제재는 <b>여전히 유효</b>해서, 다리가 열렸다고 교역이 자유로워지는 건 아니야. '제재 실효 약화 → 협상력'은 확정된 사실이 아니라 전문가 해석이고, 김정은이 시진핑을 만나지 않은 이유도 공식 설명이 아니라 분석이야.
+  </div>
+</div>
+</body>
+</html>
