@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>성장률 1.0%, 민간소비 −0.2% — 한 장으로 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 막대 비교 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;padding:9px 0}
+  .bar-row + .bar-row{border-top:1px dashed var(--border)}
+  .bar-label{flex:0 0 112px;font-size:14px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:11.5px;color:var(--text2);margin-top:1px}
+  .bar-track{flex:1;position:relative;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden}
+  .bar-zero{position:absolute;left:12%;top:0;bottom:0;width:1px;background:#C9C6C2}
+  .bar-fill{position:absolute;top:4px;bottom:4px;border-radius:4px}
+  .bar-val{flex:0 0 62px;text-align:right;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+  .pos{background:var(--blue)} .gov{background:#7FB5E4} .gdp{background:var(--orange)} .neg{background:var(--red)}
+  .v-pos{color:#1B6BB8} .v-gdp{color:#B06426} .v-neg{color:#C6493E}
+  .bars-foot{margin-top:12px;font-size:12.5px;color:var(--text2)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 92px;font-size:13px}
+    .bar-val{flex:0 0 54px;font-size:13px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.28 데일리 뉴스 · 시각자료</div>
+  <h1>📉 성장률은 1.0%, 내 지갑은 −0.2%</h1>
+  <div class="sub">같은 발표문 안에 들어 있던 두 숫자 — 누가 성장을 만들었고 왜 체감이 반대인지 한 장으로 보기</div>
+
+  <div class="section-title">3분기 성적표 (전 분기 대비)</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">설비투자<small>반도체 제조용 기계류</small></div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill pos" style="left:12%;width:70.4%"></div></div>
+      <div class="bar-val v-pos">+4.1%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">정부소비<small>물건비·건강보험급여비</small></div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill gov" style="left:12%;width:32.6%"></div></div>
+      <div class="bar-val v-pos">+1.9%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">전체 GDP<small>한은 8월 전망은 0.3%</small></div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill gdp" style="left:12%;width:17.2%"></div></div>
+      <div class="bar-val v-gdp">+1.0%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">민간소비<small>2022년 1분기 이후 첫 감소</small></div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill neg" style="left:8.6%;width:3.4%"></div></div>
+      <div class="bar-val v-neg">−0.2%</div>
+    </div>
+    <div class="bars-foot">※ 2026년 3분기 실질 GDP 속보치(한국은행, 10/27 발표) · 전년 동기 대비로는 +3.4%</div>
+  </div>
+
+  <div class="section-title">왜 성장과 체감이 갈라질까</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>반도체 수출이 잘 됨</b><span class="mdesc">기업이 증산을 위해 설비를 사들임</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>그 돈은 사람이 아니라 기계로 감</b><span class="mdesc">설비투자는 제조 장비 구입비 — 공장이 커져도 사람은 그만큼 안 늘어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>고용·임금 증가가 작음</b><span class="mdesc">성장의 과실이 가계 소득으로 넘어오는 통로가 좁음</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>여기에 고금리가 길어짐</b><span class="mdesc">버는 돈은 그대로인데 이자로 먼저 빠져나감</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>민간소비 −0.2% (4년여 만의 감소)</b><span class="mdesc">자동차·가전 같은 물건도, 음식·금융 같은 서비스도 함께 줄었어</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 좋은 숫자가 부담이 되는 지점</b>성장률이 전망의 3배로 나오면 한국은행은 금리를 더 올릴 명분이 생겨. 그 이자는 다시 4번 칸으로 들어가 소비를 한 번 더 누르고.</div>
+  </div>
+
+  <div class="section-title">금리 달력 — 다음에 볼 날</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">10/22</div><div class="what">금통위 <b>3.00% 만장일치 동결</b> — "3분기 GDP와 10월 물가를 보고 정하겠다"</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/27</div><div class="what">그 <b>3분기 GDP가 1.0%</b>로 나옴 (전망 0.3%)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11/26</div><div class="what"><b>다음 금통위</b> — 남은 변수는 10월 물가</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.28 딥다이브 내용 기반 · 수치는 한국은행 속보치 기준</div>
+</div>
+</body>
+</html>
