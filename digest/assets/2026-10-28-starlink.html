@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스타링크 통제권 — 한눈에 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}h1{font-size:21px}.bar .lab{flex-basis:90px}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+  .bar{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13.5px}
+  .bar .lab{flex:0 0 120px;font-weight:600}
+  .bar .trk{flex:1;background:var(--surface2);border-radius:6px;height:22px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+  .rel{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+  .node{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--soft);font-size:13.5px;text-align:center}
+  .node.key{background:var(--red-soft);border-color:#F3C9C4}
+  .node small{display:block;color:var(--text2);font-size:12px;margin-top:2px}
+  .arrow2{align-self:center;color:#B9B6B1;font-weight:700}
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.28 데일리 뉴스 · 시각자료</div>
+  <h1>🛰️ 통신망의 스위치는 누가 쥐고 있나</h1>
+  <div class="sub">스타링크 제한 논란 — 구조(누가 누구에게 기대나)와 규모 격차를 한 장으로</div>
+
+  <div class="section-title">🔗 의존 구조 — 스위치가 어디 있나</div>
+  <div class="rel">
+    <div class="node">우크라이나군<small>드론·작전 통신</small></div>
+    <div class="arrow2">→ 접속 →</div>
+    <div class="node key"><b>스페이스X(스타링크)</b><small>계정·약관으로 접속 승인 = 스위치</small></div>
+    <div class="arrow2">← 발사 ←</div>
+    <div class="node">경쟁사 위성<small>스페이스X 로켓에 의존하기도</small></div>
+  </div>
+  <div class="foot" style="margin-top:8px">망(위성)과 발사체 양쪽이 한 기업에 겹쳐 있어서, 한쪽만 대체해선 의존이 안 풀려.</div>
+
+  <div class="section-title">📊 위성 수 — 약 17배 격차</div>
+  <div class="card" style="padding:14px 18px">
+    <div class="bar"><div class="lab">스타링크</div><div class="trk"><div class="fill" style="width:100%;background:#2783DE">약 11,000개+</div></div></div>
+    <div class="bar"><div class="lab">원웹(유텔샛)</div><div class="trk"><div class="fill" style="width:6%;background:#D5803B"></div></div><span>약 650개</span></div>
+  </div>
+
+  <div class="section-title">⏳ 경과와 독자망 계획</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">10/14</div><div class="what">우크라 군용 스타실드 통신에 사전 통보 없는 속도 제한</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">이후</div><div class="what">머스크 “약관 위반 허점 차단” 인정 · 일주일 넘게 이어진 뒤 복구</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">12월 · 2028 · 2029</div><div class="what">캐나다 라이트스피드 발사(12월)·서비스(2028), EU IRIS² 가동(2029)</div></div>
+  </div>
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.28 딥다이브 내용 기반 (WSJ의 ‘머스크 직접 지시’ 보도와 미 국방장관 부인은 엇갈림)</div>
+</div>
+</body>
+</html>
