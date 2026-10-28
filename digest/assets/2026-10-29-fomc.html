@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동결인데 매파 — 연준 10월 FOMC 한 장으로 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 금리 막대 비교 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;padding:9px 0}
+  .bar-row + .bar-row{border-top:1px dashed var(--border)}
+  .bar-label{flex:0 0 118px;font-size:14px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:11.5px;color:var(--text2);margin-top:1px}
+  .bar-track{flex:1;position:relative;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden}
+  .bar-fill{position:absolute;left:0;top:4px;bottom:4px;border-radius:4px}
+  .bar-val{flex:0 0 86px;text-align:right;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+  .us{background:var(--red)} .kr{background:var(--blue)} .gapfill{background:var(--orange)}
+  .v-us{color:#C6493E} .v-kr{color:#1B6BB8} .v-gap{color:#B06426}
+  .bars-foot{margin-top:12px;font-size:12.5px;color:var(--text2)}
+
+  /* 표결 구도 */
+  .vote{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .vcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vcard .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.hold{background:var(--blue-soft);color:#1B6BB8}
+  .badge.hike{background:var(--red-soft);color:#C6493E}
+  .vcard .big{font-size:26px;font-weight:800;line-height:1.1;margin-bottom:6px}
+  .vcard p{font-size:13.5px;color:var(--text2)}
+  .vcard p b{color:var(--text)}
+  .dots{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 10px}
+  .dot{width:16px;height:16px;border-radius:50%}
+  .dot.h{background:#8FC0E8} .dot.k{background:var(--red)}
+
+  /* 성명 문구 비교 */
+  .words{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .wrow{display:flex;gap:0;font-size:14px;border-top:1px solid var(--border)}
+  .wrow:first-child{border-top:none;background:var(--soft);font-size:12.5px;font-weight:700;color:var(--text2)}
+  .wrow > div{padding:11px 14px}
+  .wk{flex:0 0 118px;font-weight:600;border-right:1px solid var(--border)}
+  .wv{flex:1}
+  .wv em{font-style:normal;background:var(--orange-soft);color:#9A5620;padding:1px 4px;border-radius:4px;font-weight:700}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .vote{grid-template-columns:1fr}
+    .bar-label{flex:0 0 96px;font-size:13px}
+    .bar-val{flex:0 0 76px;font-size:13px}
+    .wk{flex:0 0 86px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.29 데일리 뉴스 · 시각자료</div>
+  <h1>🏦 금리는 그대로, 방향은 바뀌었다</h1>
+  <div class="sub">연준 10월 FOMC — 숫자가 아니라 <b>표결과 형용사</b>를 읽는 법, 그리고 그게 내 대출이자까지 오는 길</div>
+
+  <div class="section-title">① 지금 금리는 누가 더 높나 (한미 금리차)</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">🇺🇸 미국<small>10/28 동결 · 9/16에 0.25%p 인상</small></div>
+      <div class="bar-track"><div class="bar-fill us" style="width:80%"></div></div>
+      <div class="bar-val v-us">3.75~4.00%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">🇰🇷 한국<small>10/22 동결 · 7·8월 연속 인상</small></div>
+      <div class="bar-track"><div class="bar-fill kr" style="width:60%"></div></div>
+      <div class="bar-val v-kr">3.00%</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">격차<small>미국이 더 높은 쪽</small></div>
+      <div class="bar-track"><div class="bar-fill gapfill" style="width:20%"></div></div>
+      <div class="bar-val v-gap">0.75~1.00%p</div>
+    </div>
+    <div class="bars-foot">※ 미국은 상·하단이 있는 밴드(목표 범위)로 발표해서 격차도 범위로 나와 · 돈은 금리가 높은 쪽으로 흐르는 성질이 있어</div>
+  </div>
+
+  <div class="section-title">② 동결인데 왜 '매파'라고 할까 — 표결 10 대 2</div>
+  <div class="vote">
+    <div class="vcard">
+      <span class="badge hold">동결 찬성</span>
+      <div class="big">10명</div>
+      <div class="dots"><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span><span class="dot h"></span></div>
+      <p>"데이터를 더 보고 정하자" — <b>7월엔 인상을 주장했던 로건·카슈카리 총재</b>가 이번엔 동결에 동참했어.</p>
+    </div>
+    <div class="vcard">
+      <span class="badge hike">0.25%p 인상 주장 (반대표)</span>
+      <div class="big">2명</div>
+      <div class="dots"><span class="dot k"></span><span class="dot k"></span></div>
+      <p><b>리사 쿡 이사</b>(2022년 합류 후 첫 반대표) · <b>베스 해먹 클리블랜드 총재</b>. 인상 요구가 사라진 게 아니라 <b>자리만 바뀐</b> 거야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">③ 성명서에서 바뀐 두 줄</div>
+  <div class="words">
+    <div class="wrow"><div class="wk">항목</div><div class="wv">이번 성명의 표현</div></div>
+    <div class="wrow"><div class="wk">경기 판단</div><div class="wv">경제가 <em>강한 속도로 확장</em>하고 있다 — 지난번보다 <b>상향</b></div></div>
+    <div class="wrow"><div class="wk">물가 판단</div><div class="wv">물가상승률은 <em>여전히 높다</em> — 경계 유지</div></div>
+    <div class="wrow"><div class="wk">앞으로</div><div class="wv">추가 데이터를 본 뒤 정하겠다 (인상 시점은 못 박지 않음)</div></div>
+    <div class="wrow"><div class="wk">시장의 해석</div><div class="wv"><b>12월 인상 확률 85%</b> (CME 페드워치 기준)</div></div>
+  </div>
+
+  <div class="section-title">④ 그게 내 통장까지 오는 길</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>미국이 금리를 더 올린다 (12월 가능성)</b><span class="mdesc">물가가 아직 높다고 보니까 — 경기가 튼튼할 때가 올릴 수 있는 때야</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>한미 금리차가 더 벌어짐</b><span class="mdesc">달러에 넣어두면 이자를 더 주니 돈이 달러 쪽으로 몰려</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>원화 값이 내려감 (환율 상승)</b><span class="mdesc">10월 말 1,320원대 중반 — 달러를 사려면 원화를 더 많이 줘야 하는 상태</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>수입 물가가 올라감</b><span class="mdesc">기름·곡물·부품은 달러로 사와 — 환율이 오르면 같은 물건이 원화로 비싸져</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>국내 물가를 한 번 더 밀어올림</b><span class="mdesc">이미 3% 내외라 한국은행이 제일 신경 쓰는 칸이야</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">6</div>
+      <div class="mtxt"><b>한국은행도 올릴 명분이 쌓임 → 대출이자</b><span class="mdesc">어제 나온 3분기 성장률 1.0%(전망 0.3%)까지 더하면 인상 쪽 재료가 둘</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 동결의 뜻</b>동결은 '안 올린다'가 아니라 '<b>아직</b> 안 올린다'야. 그 차이를 알려주는 게 반대표 2장과 형용사 두 줄이고, 그래서 금리를 그대로 뒀는데도 시장은 더 긴장했어.</div>
+  </div>
+
+  <div class="section-title">⑤ 금리 달력 — 다음에 볼 날</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">10/22</div><div class="what">금통위 <b>3.00% 동결</b> — "물가 보고 인상 시기·속도 결정"</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/27</div><div class="what">3분기 GDP <b>+1.0%</b> (전망 0.3%)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/28</div><div class="what">FOMC <b>동결 · 반대표 2장</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11/26</div><div class="what"><b>다음 금통위</b> — 10월 물가가 변수</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">12/8~9</div><div class="what"><b>올해 마지막 FOMC</b> — 점도표(위원별 금리 전망) 공개</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.29 딥다이브 내용 기반 · 금리·환율 수치는 보도 시점 기준이고 12월 인상은 아직 확정이 아니야</div>
+</div>
+</body>
+</html>
