@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>헌정사상 첫 대법원장 국정조사 — 구조로 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+    --purple:#8B6BC4; --purple-soft:#EFE9F8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .section-note{font-size:13px;color:var(--text2);margin:-6px 0 12px}
+
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:660px;width:100%;height:auto}
+
+  /* 세 가지 칼 */
+  .knife-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .knife{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .knife .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.routine{background:var(--green-soft);color:#2F7A52}
+  .badge.pick{background:var(--orange-soft);color:#B06426}
+  .badge.heavy{background:var(--red-soft);color:#C6493E}
+  .knife h3{font-size:15.5px;margin-bottom:5px}
+  .knife p{font-size:13.5px;color:var(--text2)}
+  .knife p b{color:var(--text)}
+  .knife p + p{margin-top:6px}
+
+  /* 제청 사슬 */
+  .chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .link{flex:1 1 170px;min-width:160px;border-radius:10px;padding:12px 14px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--blue-soft);color:#1B6BB8}
+  .link small{font-weight:500;font-size:12px;color:var(--text2)}
+  .link.broken{background:var(--red-soft);color:#C6493E}
+  .link.broken small{color:#C6493E;opacity:.9}
+  .c-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .chain-note{margin-top:12px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .chain-note b{color:var(--text)}
+
+  /* 쟁점 */
+  .issues{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .issues ol{margin:0;padding-left:20px}
+  .issues li{font-size:13.5px;color:var(--text2);margin-bottom:5px}
+  .issues li:last-child{margin-bottom:0}
+  .issues li b{color:var(--text)}
+
+  /* 양쪽 입장 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.dp{background:var(--blue-soft);color:#1B6BB8}
+  .badge.pp{background:var(--red-soft);color:#C6493E}
+  .badge.bar{background:var(--purple-soft);color:#6B4CA8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:11px 13px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .knife-grid{grid-template-columns:1fr}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.30 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ 헌정사상 첫 대법원장 국정조사</h1>
+  <div class="sub">누가 누구를 어떤 권한으로 건드리는 건지, 삼권 구조로 보기</div>
+
+  <div class="section-title">누가 누구에게 — 삼권 관계도</div>
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="국회·대통령·대법원 삼권 관계도와 이번 충돌 지점">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#7D7A75"/>
+        </marker>
+        <marker id="arRed" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#E56458"/>
+        </marker>
+      </defs>
+
+      <rect x="0" y="0" width="760" height="420" fill="#FFFFFF"/>
+
+      <!-- 국회 -->
+      <rect x="40" y="50" width="200" height="86" rx="12" fill="#E5F2FC" stroke="#CBE3F8" stroke-width="1.5"/>
+      <text x="140" y="82" font-size="17" font-weight="700" fill="#1B6BB8" text-anchor="middle" font-family="inherit">국회 (입법)</text>
+      <text x="140" y="104" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">국정감사 · 국정조사</text>
+      <text x="140" y="121" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">대법관 임명동의 · 탄핵소추</text>
+
+      <!-- 대통령 -->
+      <rect x="520" y="50" width="200" height="86" rx="12" fill="#FBEBDE" stroke="#F2DCC8" stroke-width="1.5"/>
+      <text x="620" y="82" font-size="17" font-weight="700" fill="#9A5620" text-anchor="middle" font-family="inherit">대통령 (행정)</text>
+      <text x="620" y="104" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">대법관 임명권</text>
+      <text x="620" y="121" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">대법원장 임명(국회 동의)</text>
+
+      <!-- 대법원 -->
+      <rect x="280" y="268" width="200" height="86" rx="12" fill="#E8F1EC" stroke="#CFE4D8" stroke-width="1.5"/>
+      <text x="380" y="300" font-size="17" font-weight="700" fill="#2F7A52" text-anchor="middle" font-family="inherit">대법원 (사법)</text>
+      <text x="380" y="322" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">재판 · 최종 심판</text>
+      <text x="380" y="339" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">대법원장의 대법관 제청권</text>
+
+      <!-- 국회 → 대법원 (이번 충돌) -->
+      <path d="M140,140 L140,230 Q140,250 170,258 L300,286" fill="none" stroke="#E56458" stroke-width="2.5" marker-end="url(#arRed)"/>
+      <rect x="44" y="176" width="150" height="40" rx="8" fill="#FCE9E7" stroke="#F6D7D3" stroke-width="1.2"/>
+      <text x="119" y="192" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle" font-family="inherit">⚡ 이번 국정조사</text>
+      <text x="119" y="208" font-size="11.5" fill="#C6493E" text-anchor="middle" font-family="inherit">현직 대법원장 · 헌정 첫 사례</text>
+
+      <!-- 대법원 → 대통령 (제청) -->
+      <path d="M470,282 Q560,250 600,200 L612,146" fill="none" stroke="#7D7A75" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+      <text x="586" y="238" font-size="12" fill="#7D7A75" text-anchor="middle" font-family="inherit" paint-order="stroke" stroke="#FFFFFF" stroke-width="4">대법관 제청</text>
+
+      <!-- 대통령 → 국회 (동의 요청) -->
+      <path d="M516,80 L248,80" fill="none" stroke="#7D7A75" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+      <text x="382" y="70" font-size="12" fill="#7D7A75" text-anchor="middle" font-family="inherit" paint-order="stroke" stroke="#FFFFFF" stroke-width="4">임명동의 요청</text>
+
+      <!-- 충돌 지점 ⊘ -->
+      <g>
+        <circle cx="548" cy="196" r="17" fill="#E56458" opacity="0.14"/>
+        <circle cx="548" cy="196" r="10" fill="#E56458" stroke="#FFFFFF" stroke-width="2.5"/>
+        <line x1="542" y1="202" x2="554" y2="190" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+      <text x="548" y="174" font-size="12" font-weight="700" fill="#C6493E" text-anchor="middle" font-family="inherit" paint-order="stroke" stroke="#FFFFFF" stroke-width="4">재제청 거부</text>
+
+      <text x="380" y="396" font-size="12" fill="#7D7A75" text-anchor="middle" font-family="inherit">점선 = 평소 작동하는 견제 · 빨간 선 = 이번에 처음 쓰인 길</text>
+    </svg>
+    </div>
+  </div>
+
+  <div class="section-title">감사 · 조사 · 탄핵 — 서로 다른 칼</div>
+  <div class="knife-grid">
+    <div class="knife">
+      <span class="badge routine">정기</span>
+      <h3>국정감사</h3>
+      <p>매년 정해진 기간에 <b>정부 전반</b>을 훑는 정기 점검.</p>
+      <p>10/6 대법원 감사에서 조 대법원장이 증인 선서를 거부한 게 이번 쟁점 중 하나.</p>
+    </div>
+    <div class="knife">
+      <span class="badge pick">사안별</span>
+      <h3>국정조사 ← 지금</h3>
+      <p><b>사안을 특정</b>해 본회의 의결로 특위를 띄우는 비정기 조사.</p>
+      <p>파면이 아니라 <b>사실관계 규명</b>이 목적 — "탄핵 전에 먼저"라는 선택.</p>
+    </div>
+    <div class="knife">
+      <span class="badge heavy">파면</span>
+      <h3>탄핵</h3>
+      <p>국회가 소추하고 <b>헌법재판소가 파면 여부를 결정</b>하는 절차.</p>
+      <p>10월 중순부터 논의가 시작됐고, 추진 여부는 지도부에 위임된 상태.</p>
+    </div>
+  </div>
+
+  <div class="section-title">'재제청 거부'가 뇌관인 이유 — 대법관이 뽑히는 사슬</div>
+  <div class="chain">
+    <div class="link">대법원장이 제청<small>후보를 골라 올림</small></div>
+    <div class="c-arrow">→</div>
+    <div class="link broken">⊘ 대통령이 임명<small>"협의 없었다, 다시 올려라"<br>↔ "재제청 못 한다"</small></div>
+    <div class="c-arrow">→</div>
+    <div class="link">국회가 동의<small>본회의 표결</small></div>
+  </div>
+  <div class="chain-note">세 기관이 <b>한 칸씩</b> 쥐고 서로 견제하도록 만든 설계야. 8월에 조 대법원장이 손봉기·김성수 부장판사를 서면 제청하자 청와대가 재제청을 요구했고, 대법원장은 거부했어. <b>양쪽 다 헌법이 준 제 칸을 쥔 거라 제도 안에서는 승부가 안 나</b> — 그래서 국회가 쥔 다른 칸(국정조사)으로 넘어온 거야.</div>
+
+  <div class="section-title">국정조사에서 다루겠다는 5대 쟁점 (10/29 공개)</div>
+  <div class="issues">
+    <ol>
+      <li><b>대법관 재제청 거부</b> — 대통령 임명권을 부정했다는 주장</li>
+      <li><b>이재명 대통령 공직선거법 사건 파기환송</b> — 대선 직전 판결의 경위</li>
+      <li><b>12·3 비상계엄 당시 대법원 대응</b></li>
+      <li><b>업무추진비·현금 격려금</b> — 참석 인원 부풀림 의혹(경찰 수사 중)</li>
+      <li><b>김건희 여사 재판 지연</b> 의혹</li>
+    </ol>
+  </div>
+
+  <div class="section-title">세 갈래 반응</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge dp">민주당</span>
+      <h3>"의혹 규명은 국회 일"</h3>
+      <p>정치 개입·권한 남용 의혹을 밝히는 게 국회의 역할이고, <b>탄핵 전에 사실관계부터</b> 보자는 순서라고 설명해. 다만 당내에도 "사법부와 싸워서 얻을 이익이 뭔가"라는 신중론이 있어.</p>
+    </div>
+    <div class="vs">
+      <span class="badge pp">국민의힘</span>
+      <h3>"노골적 사법부 탄압"</h3>
+      <p>국회가 현직 대법원장을 조사 대상으로 세우는 것 자체가 <b>삼권분립 위반</b>이라며 강경 대응을 예고했어.</p>
+    </div>
+  </div>
+  <div class="vs" style="margin-top:16px">
+    <span class="badge bar">법조계 · 변호사단체</span>
+    <h3>"압박 수단으로 전락할 우려"</h3>
+    <p>판결의 결론이 마음에 들지 않는다고 대법원 수장을 증언대에 세우는 모양이 되면, 조사가 <b>재판에 대한 압박</b>으로 쓰일 수 있다는 지적. 조사 이유가 분명하지 않다는 의견도 나와.</p>
+  </div>
+
+  <div class="section-title">여기까지 온 길</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">8월</div><div class="what">대법관 2명 <b>서면 제청</b> → 청와대 재제청 요구 → 거부</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/6</div><div class="what">대법원 국정감사, <b>증인 선서 거부</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10월 중순</div><div class="what">탄핵 논의 시작</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10/27</div><div class="what">의원총회에서 <b>국정조사</b>로 정리</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11/5 (유력)</div><div class="what"><b>본회의 요구서 보고</b> — 여야 충돌 예상</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.30 딥다이브 내용 기반. 일정·쟁점은 보도 시점 기준이고, 특위 구성과 실제 실시 여부는 아직 확정되지 않았어.</div>
+</div>
+</body>
+</html>

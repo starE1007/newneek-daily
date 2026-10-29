@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>열흘에 네 곳 — 연쇄 해킹을 한 장으로</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .section-note{font-size:13px;color:var(--text2);margin:-6px 0 12px}
+
+  /* 뚫린 네 곳 */
+  .case-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .case{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .case .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.confirmed{background:var(--red-soft);color:#C6493E}
+  .badge.probing{background:var(--orange-soft);color:#B06426}
+  .case h3{font-size:15.5px;margin-bottom:4px}
+  .case .when{font-size:12.5px;color:var(--text2);margin-bottom:6px}
+  .case p{font-size:13.5px;color:var(--text2)}
+  .case p b{color:var(--text)}
+
+  /* 공격 표면 */
+  .surface{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .srow{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+  .sbox{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .sbox b{display:block;font-size:14.5px;margin-bottom:2px}
+  .sbox span{font-size:13px;color:var(--text2)}
+  .sbox.known{background:var(--green-soft);border-color:#CFE4D8}
+  .sbox.unknown{background:var(--red-soft);border-color:#F6D7D3}
+  .sop{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .snote{margin-top:12px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .snote b{color:var(--text)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 내가 할 일 */
+  .todo{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .td{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--blue-soft);border-color:#CBE3F8}
+  .td b{display:block;font-size:14.5px;margin-bottom:3px;color:#1B6BB8}
+  .td span{font-size:13px;color:var(--text2)}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .case-grid{grid-template-columns:1fr}
+    .todo{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.30 데일리 뉴스 · 시각자료</div>
+  <h1>🔓 열흘에 네 곳 — 같은 구멍을 공유했어</h1>
+  <div class="sub">어디서 무엇이 샜고, 그게 왜 내 전화기로 오는지 한 장으로 보기</div>
+
+  <div class="section-title">뚫린 네 곳 · 샌 것</div>
+  <div class="case-grid">
+    <div class="case">
+      <span class="badge confirmed">유출 확인</span>
+      <h3>대신증권</h3>
+      <div class="when">10/17 접근 징후 → 10/26 확인</div>
+      <p>비대면 계좌개설 연계 서버. <b>3만 8,490명</b>의 8개 항목 — 이름·이메일·주소·통신ID·은행명·<b>입출금 계좌번호</b>(암호화) 등.</p>
+    </div>
+    <div class="case">
+      <span class="badge probing">범위 분석 중</span>
+      <h3>빗썸</h3>
+      <div class="when">10/28 확인</div>
+      <p>사내 <b>모바일 그룹웨어</b>에서 유출을 인지. 회사는 비정상 출금 시도에서 비롯된 것으로 보지만 경로는 미공개.</p>
+    </div>
+    <div class="case">
+      <span class="badge probing">조사 중</span>
+      <h3>미래에셋자산운용</h3>
+      <div class="when">10/28 확인</div>
+      <p>일부 정보가 샜지만 <b>고유식별정보</b>(주민번호·여권번호)·민감정보·개인신용정보는 빠졌다는 입장.</p>
+    </div>
+    <div class="case">
+      <span class="badge confirmed">추정 · 전액 보상 방침</span>
+      <h3>SK플래닛 (기프티콘)</h3>
+      <div class="when">10/28 18:40 차단</div>
+      <p>이름·전화번호·이메일·<b>구매쿠폰 일련번호</b>·<b>환급계좌</b>. 유출 쿠폰은 폐기 후 재발송.</p>
+    </div>
+  </div>
+
+  <div class="section-title">왜 하필 몰려서 터졌을까 — '공격 표면'</div>
+  <div class="section-note">공격 표면 = 인터넷에서 두드려볼 수 있는 모든 접점(서버·로그인창·외부 연계 API)</div>
+  <div class="surface">
+    <div class="srow">
+      <div class="sbox known"><b>① 아는 문</b><span>보안팀 관리 목록에 올라 있어 패치·점검이 돌아가는 접점</span></div>
+      <div class="sop">+</div>
+      <div class="sbox unknown"><b>② 잊은 문</b><span>연계·테스트·외주로 늘어났다가 목록에서 빠진 접점</span></div>
+      <div class="sop">=</div>
+      <div class="sbox"><b>진짜 공격 표면</b><span>공격자는 ①이 아니라 <b>②</b>를 찾는다</span></div>
+    </div>
+    <div class="snote"><b>집에 문이 몇 개인지 모르면 다 잠글 수도 없다.</b> 금융권 사고에서 침해 경로로 지목된 쪽이 바로 회사가 제대로 파악·관리하지 못한 <b>인터넷 접점 자산</b>이야. 거기에 널리 쓰는 공통 소프트웨어(PHP 등) 취약점이 겹치면, 한 번 익힌 수법으로 <b>여러 회사를 돌아가며</b> 열 수 있어 — 그래서 각자 운이 나쁜 게 아니라 동시에 터진 거야.</div>
+  </div>
+
+  <div class="section-title">유출이 내 돈까지 오는 길</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>조각 유출</b><span class="mdesc">A사에서 이름·전화번호, B사에서 은행명·계좌번호</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>조각 결합</b><span class="mdesc">따로면 쓰임이 없던 항목이 한 사람 단위로 합쳐짐</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>'사실을 아는' 사칭</b><span class="mdesc">"○○증권인데요, □□은행 계좌가…" — 맞는 말이니 의심이 풀림</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>링크 클릭 · 비밀번호 입력 · 송금</b><span class="mdesc">환급계좌·쿠폰 일련번호는 중간 단계 없이 바로 돈</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>비밀번호 돌려쓰기로 번짐</b><span class="mdesc">한 곳에서 새면 같은 조합으로 다른 사이트를 자동 로그인 시도(크리덴셜 스터핑)</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 거꾸로 읽기</b>내 정보를 정확히 아는 문자·전화는 진짜라는 증거가 아니라, 이미 <b>유출됐다는 증거</b>야.</div>
+  </div>
+
+  <div class="section-title">오늘 10분이면 되는 것</div>
+  <div class="todo">
+    <div class="td"><b>① 끊고 다시 걸기</b><span>온 번호로 되묻지 말고 공식 대표번호로</span></div>
+    <div class="td"><b>② 비밀번호 분리</b><span>금융·메일부터. 돌려쓰기 하나만 끊어도 번짐이 멈춤</span></div>
+    <div class="td"><b>③ 2단계 인증</b><span>비밀번호가 새도 한 겹이 남음</span></div>
+  </div>
+
+  <div class="section-title">정부 점검 일정</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">10/28</div><div class="what">과기정통부, 민간 주요 정보통신기반시설 <b>172곳(111개 기관)</b> 점검 착수 — 이통 3사·주요 데이터센터 포함</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">10월 말</div><div class="what">기관별 점검 대상 현황·동의서·자체점검 체크리스트 취합</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11월~연내</div><div class="what"><b>결과 확인 후 보완 조치 요구</b> — 인터넷 접점 자산 공격 표면 집중 점검</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.10.30 딥다이브 내용 기반. 유출 규모·경로는 모두 조사 중이라 숫자가 바뀔 수 있어.</div>
+</div>
+</body>
+</html>
