@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.10.30</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.30 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+
+// 문제은행 — concept별 변형 문제. 보기 길이는 서로 비슷하게 맞춰 '긴 게 정답' 단서를 없앴고, 정답 위치도 분산했다.
+const MC_BANK = [
+  { id:'sameip', variants:[
+    { q:'여러 금융사에서 같은 공격자 IP가 발견됐다는 사실이 보여주는 것으로 가장 알맞은 것은?',
+      opts:['각 사고가 우연히 같은 날 터진 서로 무관한 사건이라는 점', '한 공격자가 자동화 도구로 여러 회사를 연쇄적으로 노렸을 가능성', '피해 회사들이 같은 보안업체를 써서 사고가 난 것이라는 점', '해당 IP 주인이 내부 직원이었다는 점'],
+      answer:1,
+      explain:'같은 IP는 <b>같은 공격 주체가 여러 곳을 훑었다</b>는 단서야. 그래서 한 곳의 정보가 다른 곳 방어에 바로 쓰여.' },
+    { q:'금융당국이 공격 IP를 전 금융권에 즉시 공유하는 가장 큰 이유는?',
+      opts:['이미 뚫린 회사의 피해액을 보상하기 위해서', '공격자가 다른 회사를 노릴 때 같은 흔적으로 먼저 차단하기 위해서', 'IP 주인 국가에 외교적으로 항의하기 위해서', '해킹 도구의 판매를 금지하기 위해서'],
+      answer:1,
+      explain:'한 곳에서 나온 흔적(IP)은 <b>아직 안 뚫린 곳의 방패</b>가 돼. 공유 속도가 곧 방어 속도야.' },
+  ]},
+  { id:'weaklink', variants:[
+    { q:'이번 사고에서 은행 앱이 아니라 직원용·대출모집인용 부가 시스템이 먼저 뚫린 이유로 가장 알맞은 것은?',
+      opts:['부가 시스템에 고객 돈이 가장 많이 쌓여 있어서', '대고객 서비스보다 보안 점검과 관리가 상대적으로 느슨했을 가능성이 커서', '부가 시스템만 인터넷에 연결돼 있어서', '공격 도구가 앱만 피하도록 만들어져서'],
+      answer:1,
+      explain:'공격자는 <b>가장 약한 고리</b>를 찾아. 겉문은 튼튼해도 외부에 열린 부가 시스템이 관리 사각지대면 거기가 입구가 돼.' },
+    { q:'금융권 보안에서 "가장 약한 고리"를 줄이려는 조치로 알맞은 것은?',
+      opts:['외부에 노출된 IT자산을 목록으로 파악해 점검하는 것', '고객 앱의 글자 크기를 키우는 것', '점검 주기를 연 1회로 고정하는 것', '사고 보도를 모두 비공개로 돌리는 것'],
+      answer:0,
+      explain:'관리하는 자산 목록에 없으면 점검도 못 해. 그래서 점검 항목에 <b>외부 노출 IT자산 식별</b>이 들어 있어.' },
+  ]},
+  { id:'spoof', variants:[
+    { q:'개인정보가 유출된 뒤 소비자가 가장 현실적으로 마주치기 쉬운 2차 피해는?',
+      opts:['정보를 활용한 보이스피싱·스미싱이 더 정교해지는 것', '은행 금리가 자동으로 오르는 것', '내 통장 잔액이 즉시 0원이 되는 것', '내 휴대폰 요금이 반값이 되는 것'],
+      answer:0,
+      explain:'이름·연락처·거래 정보를 알면 사기범이 <b>진짜 같은 말투</b>로 접근해. 모르는 링크를 안 여는 게 가장 싼 방어야.' },
+  ]},
+  { id:'hynix', variants:[
+    { q:'SK하이닉스 영업이익이 매출의 약 80%에 달했다는 사실이 가장 직접적으로 뜻하는 것은?',
+      opts:['매출이 늘었어도 이익은 줄었다는 것', '판매가가 원가보다 훨씬 빠르게 올라 남는 몫이 매우 컸다는 것', '직원 수가 줄어 인건비가 거의 없다는 것', '회사가 세금을 한 푼도 내지 않았다는 것'],
+      answer:1,
+      explain:'영업이익률은 <b>팔고 남기는 비율</b>이야. 80%면 수요가 공급을 크게 앞질러 가격 결정력이 컸다는 신호야.' },
+    { q:'AI 투자가 늘수록 메모리 반도체 수요가 커지는 연결고리로 가장 알맞은 것은?',
+      opts:['AI는 계산하는 동안 방대한 데이터를 빠르게 읽고 써야 해 메모리가 많이 필요하다', 'AI는 전기를 안 써서 반도체가 남아돈다', 'AI 서버는 메모리 없이도 돌아간다', 'AI 학습에는 종이 서류가 필요하다'],
+      answer:0,
+      explain:'AI 연산은 <b>데이터를 옮기는 속도</b>가 병목이라 고성능 메모리 수요가 같이 커져.' },
+  ]},
+  { id:'toss', variants:[
+    { q:'토스뱅크가 주택담보대출을 시작했을 때 기대되는 변화로 가장 알맞은 것은?',
+      opts:['은행들 사이 대출 금리 경쟁이 더 치열해질 수 있다', '모든 은행의 주담대 금리가 즉시 같아진다', '집값이 자동으로 내려간다', '한국은행 기준금리가 바뀐다'],
+      answer:0,
+      explain:'새 경쟁자가 들어오면 <b>금리·수수료를 비교하는 대상</b>이 늘어 기존 은행도 조건을 손볼 압력을 받아.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'국정조사처럼 국회가 특정 사안을 조사하는 권한을 쓰려면 필요한, 입법·행정·사법이 서로 견제하는 원리의 이름은? (네 글자)',
+    accept:['삼권분립'],
+    explain:'<b>삼권분립</b>. 국조 찬반 논쟁의 뿌리가 여기 있어.' },
+  { q:'금융권 해킹에서 공격자가 여러 나라를 거쳐 접속해 위치를 숨기는 데 쓰는 주소의 영문 약자는?',
+    accept:['ip', 'IP'],
+    explain:'<b>IP</b>(인터넷 주소). 같은 IP가 반복 발견돼서 한 묶음 사고로 본 거야.' },
+  { q:'문자로 가짜 링크를 보내 정보를 빼내는 사기 수법을 뜻하는 말은? (네 글자)',
+    accept:['스미싱'],
+    explain:'<b>스미싱</b>. 문자(SMS)+피싱이야.' },
+  { q:'SK하이닉스가 올해 3분기 처음 넘긴 분기 매출 단위는 몇 조 원일까? (숫자만)',
+    accept:['100', '100조'],
+    explain:'<b>100조 원</b>. 3분기 매출은 104조 원대였어.' },
+  { q:'어제 복습: 금리를 그대로 둬도 다음 방향을 알려주는 위원들의 엇갈린 표를 뭐라고 할까? (세 글자)',
+    accept:['반대표'],
+    explain:'<b>반대표</b>. 이번엔 2장 모두 인상 쪽이었어.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
