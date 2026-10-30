@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서울 경계 5km, 그린벨트 6곳 — 한눈에 보는 지도</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:2px dashed var(--green)}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 12px;border-bottom:1px solid var(--border);text-align:left}
+  th{background:var(--soft);font-size:12.5px;color:var(--text2);font-weight:600}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.big td{font-weight:700}
+  tfoot td{background:var(--soft);font-weight:700}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--green-soft);color:#2F7A52}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .cut{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .cut-box{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .cut-box .lbl{font-size:12.5px;color:var(--text2);margin-bottom:2px}
+  .cut-box .val{font-size:20px;font-weight:700}
+  .cut-box.after{background:var(--blue-soft);border-color:#CBE3F8}
+  .bar{height:8px;border-radius:99px;background:#D9D7D4;margin-top:8px}
+  .bar i{display:block;height:8px;border-radius:99px;background:var(--orange)}
+  .cut-box.after .bar i{background:var(--blue)}
+
+  .note{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .note b{display:block;margin-bottom:2px;font-size:14.5px}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.10.30 데일리 뉴스 · 시각자료</div>
+  <h1>🏘️ 서울을 둘러싼 그린벨트 6곳이 풀렸어</h1>
+  <div class="sub">7만 6,700호 — 여섯 곳이 전부 서울 경계에서 5km 안쪽인 경기도야. 어디인지, 왜 거기인지 지도로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="서울 주변 그린벨트 해제 신규택지 6곳 위치 개략 지도">
+      <rect x="0" y="0" width="900" height="560" fill="#F0EFED"/>
+
+      <!-- 한강 -->
+      <path d="M0,232 C120,238 200,222 280,236 C360,250 420,268 500,262 C600,254 700,236 900,244"
+            fill="none" stroke="#B9D4EC" stroke-width="22" stroke-linecap="round"/>
+      <path d="M0,232 C120,238 200,222 280,236 C360,250 420,268 500,262 C600,254 700,236 900,244"
+            fill="none" stroke="#D8E9F7" stroke-width="17" stroke-linecap="round"/>
+      <text transform="translate(96,214)" font-size="13" font-style="italic" fill="#5B87B5" font-family="inherit">한강</text>
+
+      <!-- 서울 경계 5km 띠 -->
+      <ellipse cx="470" cy="268" rx="248" ry="196" fill="none" stroke="#46A171" stroke-width="2" stroke-dasharray="7 6"/>
+      <text x="470" y="486" font-size="13" font-weight="600" fill="#2F7A52" text-anchor="middle" font-family="inherit" paint-order="stroke" stroke="#F0EFED" stroke-width="4">⌁ 서울 경계에서 약 5km — 6곳 모두 이 안쪽</text>
+
+      <!-- 서울 -->
+      <ellipse cx="470" cy="268" rx="138" ry="104" fill="#FFFFFF" stroke="#D9D7D4" stroke-width="1.5"/>
+      <text x="470" y="262" font-size="21" font-weight="700" fill="#2C2C2B" text-anchor="middle" font-family="inherit">서 울</text>
+      <text x="470" y="284" font-size="12.5" fill="#7D7A75" text-anchor="middle" font-family="inherit">집값이 오른 쪽</text>
+
+      <!-- 경기도 라벨 -->
+      <text x="60" y="520" font-size="14" font-weight="600" fill="#9A9792" font-family="inherit">경 기 도</text>
+
+      <!-- ① 김포아라 (서쪽, 최대) -->
+      <g font-family="inherit">
+        <circle cx="152" cy="252" r="30" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/>
+        <text x="152" y="257" font-size="13" font-weight="700" fill="#9A5620" text-anchor="middle">3.7만</text>
+        <text x="152" y="206" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">① 김포아라</text>
+        <text x="152" y="304" font-size="12" fill="#7D7A75" text-anchor="middle">서울 서쪽 · 아라뱃길</text>
+      </g>
+      <!-- ② 구리건원 (동쪽) -->
+      <g font-family="inherit">
+        <circle cx="722" cy="212" r="20" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/>
+        <text x="722" y="217" font-size="12" font-weight="700" fill="#9A5620" text-anchor="middle">1.5만</text>
+        <text x="722" y="176" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">② 구리건원</text>
+        <text x="722" y="252" font-size="12" fill="#7D7A75" text-anchor="middle">서울 동쪽 · 구리시</text>
+      </g>
+      <!-- ③ 하남미사 K-컬처 (동남) -->
+      <g font-family="inherit">
+        <circle cx="736" cy="340" r="19" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/>
+        <text x="736" y="345" font-size="12" font-weight="700" fill="#9A5620" text-anchor="middle">1.2만</text>
+        <text x="736" y="306" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">③ 하남미사</text>
+        <text x="736" y="378" font-size="12" fill="#7D7A75" text-anchor="middle">한강 남쪽 · K-컬처 단지</text>
+      </g>
+      <!-- ④ 하남감일2 (남동) -->
+      <g font-family="inherit">
+        <circle cx="614" cy="436" r="15" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/>
+        <text x="614" y="441" font-size="11" font-weight="700" fill="#9A5620" text-anchor="middle">6.5천</text>
+        <text x="614" y="470" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">④ 하남감일2</text>
+        <text x="614" y="488" font-size="12" fill="#7D7A75" text-anchor="middle">송파 바로 옆</text>
+      </g>
+      <!-- ⑤ 고양대곡 (북서) -->
+      <g font-family="inherit">
+        <circle cx="286" cy="112" r="13" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/>
+        <text x="286" y="117" font-size="11" font-weight="700" fill="#9A5620" text-anchor="middle">4천</text>
+        <text x="286" y="78" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">⑤ 고양대곡</text>
+        <text x="286" y="146" font-size="12" fill="#7D7A75" text-anchor="middle">서울 북서쪽 · 대곡역</text>
+      </g>
+      <!-- ⑥ 의정부다락원 (북) -->
+      <g font-family="inherit">
+        <circle cx="560" cy="86" r="11" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/>
+        <text x="560" y="90" font-size="10.5" font-weight="700" fill="#9A5620" text-anchor="middle">2.6천</text>
+        <text x="560" y="54" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle">⑥ 의정부다락원</text>
+        <text x="560" y="120" font-size="12" fill="#7D7A75" text-anchor="middle">서울 북쪽 · 도봉 위</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2"/></svg> 원 크기 = 공급 호수</span>
+      <span class="item"><span class="dash-sample"></span> 서울 경계에서 약 5km</span>
+    </div>
+  </div>
+
+  <div class="section-title">여섯 곳, 규모 순으로</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>후보지</th><th>위치 감각</th><th class="num">공급 호수</th></tr></thead>
+      <tbody>
+        <tr class="big"><td>① 김포아라</td><td>서울 강서 서쪽, 아라뱃길 쪽</td><td class="num">37,000</td></tr>
+        <tr><td>② 구리건원</td><td>서울 중랑·광진 동쪽</td><td class="num">14,600</td></tr>
+        <tr><td>③ 하남미사 K-컬처</td><td>한강 남쪽, 강동 옆</td><td class="num">12,000</td></tr>
+        <tr><td>④ 하남감일2</td><td>송파 바로 옆</td><td class="num">6,500</td></tr>
+        <tr><td>⑤ 고양대곡 지식융합 확장</td><td>서울 북서쪽, 대곡역 일대</td><td class="num">4,000</td></tr>
+        <tr><td>⑥ 의정부다락원</td><td>서울 도봉 위쪽</td><td class="num">2,600</td></tr>
+      </tbody>
+      <tfoot><tr><td colspan="2">합계</td><td class="num">76,700</td></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="section-title">집이 생기는 데까지 — 단계와 걸리는 시간</div>
+  <div class="flow">
+    <div class="step s1">후보지 발표<small>10/29 — 지금 이 단계</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">지구 지정·보상<small>그린벨트 해제 절차</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">착공<small>2030년 안 목표</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">입주<small>착공 뒤 또 몇 년</small></div>
+  </div>
+  <div class="cut">
+    <div class="cut-box">
+      <div class="lbl">여태 평균 (발표 → 착공)</div>
+      <div class="val">68개월</div>
+      <div class="bar"><i style="width:100%"></i></div>
+    </div>
+    <div class="cut-box after">
+      <div class="lbl">이번 목표</div>
+      <div class="val">37개월</div>
+      <div class="bar"><i style="width:54%"></i></div>
+    </div>
+  </div>
+  <div class="note"><b>⚠️ 발표와 입주 사이의 시간 차</b>절차를 절반 가까이 줄여도 삽을 뜨는 게 2030년이야. 지금 전월세·집값에 먼저 닿는 건 벽돌이 아니라 <b>"곧 7.7만 호가 나온다"는 기대</b> 쪽이야.</div>
+
+  <div class="foot">※ 지도는 방향·거리 감각을 위한 개략도(실제 축척 아님) · 2026.10.29 국토교통부 발표 기준</div>
+</div>
+</body>
+</html>
