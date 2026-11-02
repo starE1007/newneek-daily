@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이란이 꺼낸 '48시간' — 호르무즈 거래 구조</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+
+  /* 거래 구조 */
+  .deal{display:grid;grid-template-columns:1fr 54px 1fr;gap:12px;align-items:stretch}
+  .side{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .side.iran{border-color:#F3CFCA;background:var(--red-soft)}
+  .side.usa{border-color:#C9E2F6;background:var(--blue-soft)}
+  .side h3{font-size:15.5px;margin-bottom:4px}
+  .side .who{font-size:12.5px;color:var(--text2);margin-bottom:10px}
+  .side ul{list-style:none;margin:0;padding:0}
+  .side li{font-size:13.5px;padding:7px 0 7px 20px;position:relative;border-top:1px solid rgba(0,0,0,.055)}
+  .side li:first-child{border-top:0}
+  .side li::before{content:"□";position:absolute;left:0;top:7px;font-size:12px;color:var(--text2)}
+  .side li b{color:var(--text)}
+  .swap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#B9B6B1;font-size:20px;font-weight:700}
+  .swap small{font-size:11px;font-weight:600;color:var(--text2);writing-mode:vertical-rl;letter-spacing:.08em}
+  .holdout{margin-top:14px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:13.5px;color:#9A5620}
+  .holdout b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 시한 비교 */
+  .ruler{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .rule{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .rule .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.before{background:var(--surface2);color:#6F6C68}
+  .badge.after{background:var(--orange-soft);color:#B06426}
+  .rule h3{font-size:15.5px;margin-bottom:6px}
+  .rule p{font-size:13.5px;color:var(--text2)}
+  .rule p b{color:var(--text)}
+
+  /* 유가 */
+  .num-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .num-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .num-box .label{font-size:12.5px;color:var(--text2);margin-bottom:2px}
+  .num-box .val{font-size:19px;font-weight:700;margin-bottom:2px}
+  .num-box .note{font-size:12.5px;color:var(--text2)}
+  .num-box.bad{background:var(--red-soft);border-color:#F3CFCA}
+  .num-box.bad .val{color:#C6493E}
+  .num-box.good{background:var(--green-soft);border-color:#CFE3D7}
+  .num-box.good .val{color:#2F7A52}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--green-soft);color:#2F7A52}
+  .step.s2,.step.s3{background:var(--blue-soft);color:#1B6BB8}
+  .step.s4{background:var(--green-soft);color:#2F7A52}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .ruler{grid-template-columns:1fr}
+    .deal{grid-template-columns:1fr;gap:8px}
+    .swap{flex-direction:row;padding:4px 0}
+    .swap small{writing-mode:horizontal-tb}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.03 데일리 뉴스 · 시각자료</div>
+  <h1>🛢️ 이란이 '48시간'을 꺼냈어</h1>
+  <div class="sub">막힌 건 바닷길인데 흥정 대상은 제재와 돈이야 — 어디가 막혔고 뭘 주고받는 중인지 한 장으로 보기</div>
+
+  <div class="section-title">① 어디가 문제야 — 호르무즈 해협</div>
+  <div class="card">
+    <div class="map-scroll">
+      <svg viewBox="0 0 760 440" role="img" aria-label="호르무즈 해협 개략 지도">
+        <rect x="0" y="0" width="760" height="440" fill="#EAF4FB"/>
+        <path d="M0,0 L760,0 L760,120 L600,128 L545,165 L510,198 L470,176 L400,150 L300,146 L150,138 L0,130 Z"
+              fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5"/>
+        <path d="M0,440 L0,330 L150,338 L300,345 L385,352 L404,300 L430,250 L452,206 L470,232 L466,290 L452,330 L470,360 L560,372 L760,378 L760,440 Z"
+              fill="#F0EFED" stroke="#D9D7D3" stroke-width="1.5"/>
+        <path d="M470,360 L560,372 L760,378 L760,440 L470,440 Z" fill="#EDEBE8" stroke="#D9D7D3" stroke-width="1.5"/>
+
+        <text x="300" y="68" font-size="20" font-weight="700" fill="#7D7A75">이란</text>
+        <text x="560" y="86" font-size="13" fill="#9A9792">반다르아바스 ●</text>
+        <text x="120" y="408" font-size="18" font-weight="700" fill="#7D7A75">U A E</text>
+        <text x="610" y="420" font-size="18" font-weight="700" fill="#7D7A75">오만</text>
+        <text x="516" y="344" font-size="12" fill="#9A9792">무산담 반도(오만) — 해협 남쪽 벽</text>
+        <line x1="512" y1="340" x2="470" y2="314" stroke="#C3C0BC" stroke-width="1.2"/>
+
+        <text x="150" y="235" font-size="17" font-weight="700" fill="#5B9BD0">페르시아만</text>
+        <text x="150" y="256" font-size="12" fill="#86AFD0">산유국들이 기름을 싣는 안쪽 바다</text>
+        <text x="640" y="235" font-size="17" font-weight="700" fill="#5B9BD0">오만만</text>
+        <text x="640" y="256" font-size="12" fill="#86AFD0">→ 인도양 · 아시아로</text>
+
+        <line x1="505" y1="200" x2="461" y2="214" stroke="#D5803B" stroke-width="2.5" stroke-dasharray="5 4"/>
+        <text x="483" y="166" font-size="13" font-weight="700" fill="#B06426" text-anchor="middle">호르무즈 해협</text>
+        <text x="483" y="183" font-size="12" fill="#B06426" text-anchor="middle">가장 좁은 데가 약 33km</text>
+
+        <path d="M110,300 C250,312 400,300 468,250 C520,214 600,205 720,210"
+              fill="none" stroke="#D5803B" stroke-width="3.5" stroke-dasharray="11 7" opacity="0.45"/>
+        <polygon points="720,210 706,203 707,217" fill="#D5803B" opacity="0.45"/>
+        <text x="215" y="332" font-size="13" font-weight="600" fill="#B06426">유조선이 지나던 길 (지금 막힘)</text>
+
+        <circle cx="446" cy="262" r="5" fill="#7D7A75"/>
+        <text x="438" y="250" font-size="12" font-weight="600" fill="#5F5C58" text-anchor="end">카사브</text>
+
+        <!-- 봉쇄 표시 -->
+        <circle cx="483" cy="207" r="22" fill="#FCE9E7" stroke="#E56458" stroke-width="3"/>
+        <line x1="468" y1="192" x2="498" y2="222" stroke="#E56458" stroke-width="3.5"/>
+        <rect x="508" y="246" width="228" height="68" rx="8" fill="#FCE9E7" stroke="#E56458" stroke-width="1.2"/>
+        <text x="518" y="266" font-size="13" font-weight="700" fill="#C6493E">⊘ 해협이 막혀 있는 상태</text>
+        <text x="518" y="285" font-size="12" fill="#B2564C">기뢰 + 미국의 해상봉쇄가 겹쳐 있음</text>
+        <text x="518" y="303" font-size="12" fill="#B2564C">10/30 유조선 피격 지점도 이 근처</text>
+        <line x1="498" y1="222" x2="540" y2="246" stroke="#E56458" stroke-width="1.5" stroke-dasharray="3 3"/>
+      </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="dash-sample"></span> 유조선 항로(흐리게 = 지금 정상 통행이 아님)</span>
+      <span class="item">⊘ 막힌 지점</span>
+      <span class="item">※ 정밀 지도가 아니라 위치 관계만 보는 개략도</span>
+    </div>
+  </div>
+
+  <div class="section-title">② 뭘 주고받는 거야 — 거래 구조</div>
+  <div class="deal">
+    <div class="side iran">
+      <h3>이란이 내놓는 것</h3>
+      <div class="who">외무부 바가이 대변인 · 11/2 정례 브리핑</div>
+      <ul>
+        <li><b>호르무즈 해협 개방</b> — 조건이 충족되면 <b>48시간 안에</b></li>
+        <li>기뢰 제거 등 통항 재개 조치</li>
+      </ul>
+      <div class="holdout"><b>⚠️ 단서</b>"요구가 받아들여지지 않으면 개방은 불가능" — 미국이 봉쇄를 유지한 채 이란에만 이행을 요구할 수 없다는 입장이야.</div>
+    </div>
+    <div class="swap">⇄<small>맞교환</small></div>
+    <div class="side usa">
+      <h3>미국에 요구하는 것</h3>
+      <div class="who">알려진 4가지 (세부 내용은 비공개)</div>
+      <ul>
+        <li><b>해상봉쇄 해제</b> — 이란 선박·수출을 막는 해상 차단을 풀라</li>
+        <li><b>동결자산 즉시 반환</b> — 제재로 묶인 이란 돈</li>
+        <li><b>원유 수출 제재 면제</b> — 기름을 다시 팔 수 있게</li>
+        <li><b>전 전선 전투 중단</b> — 공습 재개 가능성까지 포함</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">③ 달라진 건 '내용'이 아니라 '시한'</div>
+  <div class="ruler">
+    <div class="rule">
+      <span class="badge before">9월 제안</span>
+      <h3>조건 충족 시 <b>7일</b> 내 개방</h3>
+      <p>같은 7단계 제안을 9월에 냈고, 당시 미 행정부는 이를 <b>거부</b>했어. 요구 목록 자체는 그때와 크게 다르지 않아.</p>
+    </div>
+    <div class="rule">
+      <span class="badge after">11/2 제안</span>
+      <h3>이행 기간을 <b>2일(48시간)</b>로 단축</h3>
+      <p>내용은 그대로 두고 <b>속도만 당긴</b> 거야. "우리는 바로 열 준비가 돼 있다"는 신호를 보내 공을 미국 쪽으로 넘기는 흥정 수법이야. 협상은 <b>카타르 중재</b>로 간접 진행 중.</p>
+    </div>
+  </div>
+
+  <div class="section-title">④ 시장은 이미 반응했어</div>
+  <div class="num-row">
+    <div class="num-box bad">
+      <div class="label">브렌트유 10/30 종가</div>
+      <div class="val">117.64달러</div>
+      <div class="note">유조선 피격 직후 · 6개월 최고</div>
+    </div>
+    <div class="num-box good">
+      <div class="label">브렌트유 11/2 (현지)</div>
+      <div class="val">112달러 아래</div>
+      <div class="note">WTI는 102달러 안팎 · 협상 기대</div>
+    </div>
+    <div class="num-box">
+      <div class="label">OPEC+ 12월 생산목표</div>
+      <div class="val">유지</div>
+      <div class="note">주말 회의 · 증산도 감산도 아님</div>
+    </div>
+  </div>
+
+  <div class="section-title">⑤ 나한테 오는 경로</div>
+  <div class="flow">
+    <div class="step s1">해협 개방 합의<small>되면</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">유가 하락<small>이미 117 → 112 아래</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">수입물가 부담 완화<small>기름·곡물·부품</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">물가·유류할증료 숨통<small>오늘 딥다이브의 물가와 직결</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 이란 외무부 11/2 브리핑 보도 기준이고, <b>합의된 게 아니라 이란이 낸 제안</b>이야. 미국의 공식 반응은 확인되지 않았고 9월 같은 제안은 거부된 바 있어 · 요구 조건의 세부 내용은 공개되지 않았음</div>
+</div>
+</body>
+</html>
