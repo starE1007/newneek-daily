@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미래대응기금 162조 — 예산과 기금은 뭐가 다를까</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 예산 규모 막대 */
+  .bar-box{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .bar-label{display:flex;justify-content:space-between;font-size:13.5px;color:var(--text2);margin-bottom:6px}
+  .bar-label b{color:var(--text);font-size:14.5px}
+  .bar{display:flex;height:34px;border-radius:8px;overflow:hidden;background:var(--surface2)}
+  .bar .seg1{width:19.8%;background:var(--blue);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .bar .seg2{flex:1;background:#CFD6DB;color:#4A5257;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .bar-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 예산 vs 기금 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.normal{background:var(--surface2);color:#5A5752}
+  .badge.fund{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:8px}
+  .vs ul{list-style:none;font-size:13.5px;color:var(--text2)}
+  .vs li{padding-left:14px;position:relative;margin-bottom:5px}
+  .vs li::before{content:"·";position:absolute;left:3px;color:#B9B6B1;font-weight:700}
+  .vs li b{color:var(--text)}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-item.warn{background:var(--red-soft);border-color:#F3CFCA}
+  .t-item.warn .when{color:#C6493E}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar .seg1{font-size:11px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.04 데일리 뉴스 · 시각자료</div>
+  <h1>💰 나랏돈 162조를 '기금'에 담는다는 뜻</h1>
+  <div class="sub">2027년 예산안의 20%를 따로 떼 통장에 넣는다 — 예산과 기금이 뭐가 다른지, 왜 싸우는지 한 장으로</div>
+
+  <div class="section-title">① 규모부터 — 예산 5분의 1</div>
+  <div class="bar-box">
+    <div class="bar-label"><b>2027년 정부 예산안 820조 9000억 원</b><span>미래대응기금 162조 3000억 원 = 약 20%</span></div>
+    <div class="bar">
+      <div class="seg1">미래대응기금 162.3조</div>
+      <div class="seg2">나머지 예산 658.6조</div>
+    </div>
+    <div class="bar-note">재원은 반도체 호황으로 예상보다 더 걷힐 세금(초과세수). 이 중 <b>12조 5000억 원</b>은 새 국채를 찍는 대신 쓰겠다는 몫으로 배정돼 있어.</div>
+  </div>
+
+  <div class="section-title">② 왜 '기금'이 쟁점일까 — 쓰는 방식이 달라</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge normal">일반 예산</span>
+      <h3>한 해 단위로 항목까지 정해 둔 돈</h3>
+      <ul>
+        <li>국회가 <b>항목별로</b> 심사·승인</li>
+        <li>원칙적으로 <b>그 해에 쓰고</b> 정산</li>
+        <li>딴 데 쓰려면 다시 국회를 거쳐야 함</li>
+      </ul>
+    </div>
+    <div class="vs">
+      <span class="badge fund">기금</span>
+      <h3>목적만 정해 따로 떼 둔 별도 통장</h3>
+      <ul>
+        <li><b>여러 해에 걸쳐</b> 쌓아 두고 집행</li>
+        <li>운용 재량이 상대적으로 <b>넓음</b></li>
+        <li>그래서 "정부 쌈짓돈 되는 거 아냐?"라는 반발이 붙는 자리</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">③ 진짜 쟁점은 '초과세수가 끝난 뒤'</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>반도체 호황 → 세금이 예상보다 더 걷힘</b><span class="mdesc">이 여윳돈을 기금으로 모아 미래 사업에 쓰겠다는 구상</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>기금으로 청년미래적금 같은 지출 사업을 시작</b><span class="mdesc">한번 시작한 현금성 지원은 줄이거나 되돌리기 어려움(경직성 지출)</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>2028년 약 57조 원을 끝으로 추가세수 종료 전망</b><span class="mdesc">국회예산정책처 추계 — 호황이 꺾이면 더 걷힐 세금이 사라짐</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>지출은 남는데 재원은 사라짐 → 본예산·국채로 메워야</b><span class="mdesc">그래서 "빚부터 갚자"와 "그때를 대비해 기금이 필요하다"가 맞붙는 거야</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 한 줄 요약</b>논쟁의 핵심은 162조라는 금액이 아니라, <b>초과세수가 끝난 뒤에도 남을 지출을 지금 만드는지</b>야.</div>
+  </div>
+
+  <div class="section-title">④ 확인 포인트 일정</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">11/2</div><div class="what">대통령 시정연설 — 기금 구체안 공개</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11월 내내</div><div class="what">예결위 종합정책질의 → 부처별 심사</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">12/2</div><div class="what"><b>예산안 본회의 처리 시한</b> — 기금 규모가 깎이는지가 관전 포인트</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item warn"><div class="when">2028</div><div class="what">추가세수 종료 전망 지점</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.04 딥다이브 내용 기반 (금액은 정부 제출안 기준)</div>
+</div>
+</body>
+</html>
