@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.04</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.04 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 보기 길이도 서로 비슷하게 맞췄다. 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'mix', variants:[
+    { q:'10월 소비자물가 상승률이 2.8%인데 석유류는 14.9% 올랐다. 이 두 숫자가 함께 나올 수 있는 이유로 가장 알맞은 것은?',
+      opts:['석유류의 물가 반영 비중이 커서 전체 평균이 석유류와 거의 같아지기 때문',
+            '농산물처럼 내린 품목이 석유류의 상승을 상쇄해 전체 평균을 끌어내렸기 때문',
+            '석유류는 소비자물가 조사 대상이 아니라 별도 통계라서',
+            '석유류 상승률은 전월 대비이고 전체 상승률은 전년 대비라서'],
+      answer:1,
+      explain:'종합 상승률은 <b>품목별 오르내림의 가중평균</b>이야. 석유류 +14.9%를 농산물 -7.5%가 눌러서 2.8%가 됐어.' },
+    { q:'헤드라인 물가가 둔화(3.1→2.9→2.8)됐다는 사실만으로 "물가 부담이 풀렸다"고 결론 내기 어려운 이유로 가장 알맞은 것은?',
+      opts:['둔화 폭이 너무 작아서 통계 오차 범위에 들어가기 때문',
+            '내린 품목(농산물)이 평균을 끌어내린 것일 수 있어서, 안 내린 품목의 흐름을 따로 봐야 하기 때문',
+            '발표 때마다 과거 수치가 크게 수정되기 때문',
+            '헤드라인 물가는 정부가 임의로 산정하기 때문'],
+      answer:1,
+      explain:'평균이 내려간 이유가 <b>일부 품목의 하락</b>이면 체감 압력은 그대로일 수 있어. 그래서 근원물가·품목별 구성을 같이 봐.' },
+  ]},
+  { id:'core', variants:[
+    { q:'근원물가(농산물·석유류 제외)가 2.8%로 전월보다 0.1%p 오른 것이 주는 신호로 가장 알맞은 것은?',
+      opts:['유가와 농산물 요인을 걷어내도 물가 오름세가 가라앉지 않았다는 신호',
+            '석유류 가격이 내려가기 시작했다는 신호',
+            '농산물 가격이 폭락해 근원물가까지 끌어내렸다는 신호',
+            '정부의 가격 통제가 풀렸다는 신호'],
+      answer:0,
+      explain:'근원은 <b>들썩이는 품목을 뺀 기조</b>야. 이게 오르면 오름세가 다른 품목으로 번지고 있을 수 있다는 뜻이라 금통위가 더 신경 써.' },
+    { q:'가공식품 상승률이 11개월 만에 가장 높아진 것(2.9%)을 가장 신중하게 읽은 것은?',
+      opts:['농산물 값 하락이 가공식품으로 바로 전달된 결과다',
+            '비용 상승이 시차를 두고 제품 가격에 반영되는 흐름일 수 있어 추이를 더 봐야 한다',
+            '가공식품 가격은 정부가 매달 고시하므로 의미가 없다',
+            '한 달 숫자이므로 어떤 해석도 불가능하다'],
+      answer:1,
+      explain:'원가 변화는 <b>시차를 두고</b> 제품 가격에 올라타는 경우가 많아. 한 달로 단정하진 말고 다음 달 추이를 같이 봐야 해.' },
+  ]},
+  { id:'oilpath', variants:[
+    { q:'호르무즈 불안이 한국 소비자물가로 이어지는 경로로 가장 알맞은 것은?',
+      opts:['국제유가 상승 → 휘발유·경유 등 석유류 가격 상승 → 물류·교통비 등으로 번져 물가 상승',
+            '국제유가 상승 → 원화 강세 → 수입품 값 하락',
+            '국제유가 상승 → 정부 세수 감소 → 공공요금 인하',
+            '국제유가 상승 → 국내 정유사 생산 증가 → 휘발유 값 하락'],
+      answer:0,
+      explain:'유가 → 석유류(직접) → 운송·물류비(간접) 순이야. 석유류는 <b>14.9%</b>로 두 자릿수 상승을 이어갔어.' },
+    { q:'석유류가 직접 오르는 것 말고 "간접 경로"로 물가를 올릴 수 있는 설명으로 가장 알맞은 것은?',
+      opts:['기름값이 오르면 운송·배달 비용이 올라 여러 상품·서비스 가격에 전가될 수 있다',
+            '기름값이 오르면 사람들이 소비를 늘려 모든 가격이 내린다',
+            '기름값은 식료품 가격과 구조상 아무 관련이 없다',
+            '기름값이 오르면 환율이 자동으로 고정된다'],
+      answer:0,
+      explain:'기름은 <b>운송의 원가</b>라 시간이 지나며 다른 가격에 얹혀. 그래서 유가가 내려도 물가는 바로 안 내려와.' },
+  ]},
+  { id:'prob', variants:[
+    { q:'브렌트유가 11/2 협상 기대로 7.63% 급락했다가 3일 106달러대로 반등했다. 이 움직임을 가장 알맞게 설명한 것은?',
+      opts:['공급 설비가 하루 만에 복구되고 다시 고장 났기 때문',
+            '협상 타결 확률에 대한 기대가 커졌다 식으면서 가격이 같이 오르내렸기 때문',
+            'OPEC+가 하루 사이 증산과 감산을 번갈아 발표했기 때문',
+            '유가는 뉴스와 무관하게 무작위로 움직이기 때문'],
+      answer:1,
+      explain:'가격에는 <b>앞으로의 확률</b>이 얹혀 있어. 합의가 아닌 기대로 내려간 값이라 협상 소식 한마디에 되돌아가.' },
+  ]},
+  { id:'review', variants:[
+    { q:'(복습) 바이낸스 해킹에서 북한이 훔치기보다 "쓰기"가 어렵다고 한 이유로 가장 알맞은 것은?',
+      opts:['코인은 가격이 너무 낮아 현금화 가치가 없어서',
+            '모든 이동이 공개 장부에 남아 추적되고, 추적된 지갑은 동결될 수 있어서',
+            '북한에는 인터넷이 없어서',
+            '코인은 법적으로 거래가 불가능해서'],
+      answer:1,
+      explain:'블록체인은 <b>공개 장부</b>라 경로가 남고, 거래소·발행사가 동결할 수 있어. 그래서 바이낸스도 90%를 보전할 수 있었지.' },
+  ]},
+  { id:'bok', variants:[
+    { q:'한은이 헤드라인보다 근원물가를 더 비중 있게 보는 이유로 가장 알맞은 것은?',
+      opts:['근원물가가 항상 헤드라인보다 높게 나오기 때문',
+            '금리는 일시적 변동이 아니라 지속되는 오름세에 대응하는 도구라서, 기조를 보여주는 지표가 필요하기 때문',
+            '헤드라인 물가는 공식 통계가 아니기 때문',
+            '근원물가는 한은이 직접 조사하기 때문'],
+      answer:1,
+      explain:'금리 조정은 효과가 늦게 나타나서 <b>일시적 출렁임에 반응하면 오히려 해로워.</b> 그래서 추세를 보여주는 근원을 더 봐. 다음 금통위는 11월 26일, 기준금리는 3.00%야.' },
+  ]},
+  { id:'forecast', variants:[
+    { q:'한은이 10월을 "3% 내외"로 전망했는데 실제는 2.8%였다. 이 차이에서 가장 먼저 확인할 점은?',
+      opts:['전망이 틀렸으니 한은의 다른 전망은 모두 무효라는 점',
+            '어떤 품목이 전망보다 덜 올랐거나 더 내렸는지, 즉 오차의 원인이 일시적인지 지속적인지',
+            '통계청이 숫자를 고의로 낮췄는지',
+            '환율이 고정돼 있었는지'],
+      answer:1,
+      explain:'전망과 실제의 차이는 <b>원인</b>을 봐야 의미가 있어. 이번엔 농산물 하락(-7.5%)이 평균을 눌렀다는 점이 핵심이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'10월 소비자물가 상승률(전년 동월 대비)은 몇 %일까? (소수점 한 자리까지 숫자만)',
+    accept:['2.8','2.8%'],
+    explain:'<b>2.8%</b>. 9월 2.9%, 8월 3.1%에 이어 두 달째 둔화됐지만 석유류는 14.9% 올랐어.' },
+  { q:'10월에 14.9% 올라 두 자릿수 상승세를 이어간 품목군은? (○○류)',
+    accept:['석유류','석유'],
+    explain:'정답은 <b>석유류</b>. 호르무즈발 유가 불안이 직접 반영된 자리야.' },
+  { q:'10월에 7.5% 내려 전체 물가를 끌어내린 품목군은? (○○물)',
+    accept:['농산물','농산'],
+    explain:'정답은 <b>농산물</b>. 이게 석유류 상승을 눌러서 헤드라인이 2.8%에 머물렀어.' },
+  { q:'농산물·석유류를 빼고 기조적 흐름을 보는 물가 지표는? (○○물가)',
+    accept:['근원물가','근원','근원 물가'],
+    explain:'정답은 <b>근원물가</b>. 10월엔 2.8%로 전월보다 0.1%p 올랐어.' },
+  { q:'다음 금융통화위원회(금통위)가 열리는 날은 11월 며칠일까? (숫자만)',
+    accept:['26','26일'],
+    explain:'<b>11월 26일</b>. 기준금리는 지금 3.00%야.' },
+  { q:'복습: 훔친 코인의 출처를 지우려고 여러 코인을 섞는 세탁 도구는? (두 글자)',
+    accept:['믹서','믹서기'],
+    explain:'정답은 <b>믹서</b>. 하지만 공개 장부라 추적·동결 위험이 커.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
