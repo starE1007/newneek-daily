@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>유가가 7.6% 꺾였다 — 호르무즈와 내 물가 사이의 길</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:700px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-sample{display:inline-block;width:34px;height:0;border-top:3px dashed var(--orange)}
+  .blocked-sample{display:inline-flex;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+  /* 가격 추이 */
+  .trend{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .bar-row:last-of-type{margin-bottom:0}
+  .bar-lab{flex:0 0 104px;font-size:13px;color:var(--text2);text-align:right}
+  .bar-track{flex:1 1 auto;height:28px;background:var(--surface2);border-radius:6px;position:relative;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:12.5px;font-weight:700;color:#fff}
+  .bar-fill.peak{background:var(--red)}
+  .bar-fill.mid{background:#E09A62}
+  .bar-fill.now{background:var(--green)}
+  .trend .legend2{margin-top:12px;font-size:12.5px;color:var(--text2);border-top:1px solid var(--border);padding-top:10px}
+  .trend .legend2 b{color:var(--text)}
+
+  .ruler{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .rule{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .rule .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.yes{background:var(--green-soft);color:#2F7A52}
+  .badge.no{background:var(--red-soft);color:#C6493E}
+  .rule h3{font-size:15.5px;margin-bottom:6px}
+  .rule p{font-size:13.5px;color:var(--text2)}
+  .rule p b{color:var(--text)}
+
+  /* 전이 경로 (시차) */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mstep.cool .mnum{background:var(--green-soft);color:#2F7A52}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .lagtag{display:inline-block;font-size:11.5px;font-weight:700;background:var(--surface2);color:var(--text2);border-radius:99px;padding:2px 9px;margin-left:6px;vertical-align:1px}
+  .paradox{margin-top:16px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .paradox > b:first-child{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .ruler{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-lab{flex:0 0 84px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.04 데일리 뉴스 · 시각자료</div>
+  <h1>🛢️ 유가가 하루에 7.6% 꺾였다</h1>
+  <div class="sub">어디가 막힌 길인지, 그 길이 내 물가까지 어떻게 오는지 한 장으로 보기</div>
+
+  <div class="section-title">① 어디가 문제인가 — 개략 지도</div>
+  <div class="card">
+    <div class="map-scroll">
+      <svg viewBox="0 0 720 330" role="img" aria-label="호르무즈 해협 개략 지도">
+        <defs>
+          <marker id="arrowOrange" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+            <path d="M0,0 L10,4 L0,8 Z" fill="#D5803B"/>
+          </marker>
+        </defs>
+        <!-- 바다 -->
+        <rect x="0" y="0" width="720" height="330" fill="#DCEEFA"/>
+        <!-- 이란 (북쪽 육지) -->
+        <path d="M0,0 H720 V92 C655,97 598,103 545,117 C505,128 478,141 455,153 L428,151 C378,129 300,113 200,109 C120,106 60,105 0,104 Z"
+              fill="#E8E4DC" stroke="#CFC9BE" stroke-width="1.5"/>
+        <!-- 아라비아반도 (남쪽 육지, 무산담 곶이 위로 뾰족) -->
+        <path d="M0,330 H480 C478,302 480,268 470,240 C462,206 450,186 436,176 L412,192 C382,207 340,216 280,220 C200,224 100,226 0,228 Z"
+              fill="#E8E4DC" stroke="#CFC9BE" stroke-width="1.5"/>
+        <!-- 유조선 항로 (페르시아만 → 해협 → 인도양) -->
+        <path d="M70,172 C190,168 320,164 420,163 C470,163 520,185 570,225 C600,248 625,268 660,284"
+              fill="none" stroke="#D5803B" stroke-width="3.5" stroke-dasharray="11 8" marker-end="url(#arrowOrange)"/>
+        <!-- 병목 마커 -->
+        <circle cx="446" cy="163" r="15" fill="#E56458" stroke="#fff" stroke-width="2.5"/>
+        <text x="446" y="169" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">⊘</text>
+        <!-- 라벨 -->
+        <text x="150" y="58" font-size="19" font-weight="700" fill="#6B6559">이란</text>
+        <text x="150" y="80" font-size="13" fill="#8C8578">해협 북쪽 — 봉쇄를 건 쪽</text>
+        <text x="140" y="292" font-size="19" font-weight="700" fill="#6B6559">사우디 · UAE · 오만</text>
+        <text x="140" y="313" font-size="13" fill="#8C8578">해협 남쪽 — 산유국이 모여 있는 쪽</text>
+        <text x="95" y="146" font-size="14.5" font-weight="600" fill="#2E6FA8">페르시아만</text>
+        <text x="596" y="150" font-size="14.5" font-weight="600" fill="#2E6FA8">오만만 → 인도양</text>
+        <text x="560" y="172" font-size="12.5" fill="#4A86BE">여기서 한국·중국·일본으로</text>
+        <text x="446" y="126" text-anchor="middle" font-size="14.5" font-weight="700" fill="#C6493E">호르무즈 해협</text>
+        <text x="446" y="210" text-anchor="middle" font-size="12.5" fill="#B23F34">가장 좁은 곳 폭 약 33km</text>
+        <text x="236" y="193" font-size="12.5" font-weight="600" fill="#B06426">세계가 쓰는 석유의 약 1/5이 지나는 길</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="dash-sample"></span> 유조선이 지나는 길</span>
+      <span class="item"><span class="blocked-sample">⊘</span> 이란이 봉쇄를 건 병목</span>
+      <span class="item">※ 실제 해안선이 아니라 위치 관계만 단순화한 개략도</span>
+    </div>
+  </div>
+
+  <div class="section-title">② 값은 어떻게 움직였나</div>
+  <div class="trend">
+    <div class="bar-row">
+      <div class="bar-lab">10/30 브렌트유</div>
+      <div class="bar-track"><div class="bar-fill peak" style="width:100%">117.64달러</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lab">직전 거래일</div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:96.4%">약 113달러</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lab">11/2(현지) 종가</div>
+      <div class="bar-track"><div class="bar-fill now" style="width:89.1%">104.77달러</div></div>
+    </div>
+    <div class="legend2">하루에 <b>−7.6%</b>, 10/30 고점(6개월 최고)에서는 <b>−11%</b>. 같은 날 WTI도 <b>−7.3%, 96.46달러</b>로 100달러 밑으로 내려왔어. 그래도 브렌트유는 <b>여전히 100달러 위</b>라는 게 핵심 — 떨어진 게 아니라 <b>덜 비싸진</b> 거야.</div>
+  </div>
+
+  <div class="section-title">③ 왜 꺾였나 — 기름이 아니라 '확률'이 움직였다</div>
+  <div class="ruler">
+    <div class="rule">
+      <span class="badge yes">값을 내린 소식</span>
+      <h3>협상 테이블이 생겼다</h3>
+      <p>페제시키안 이란 대통령이 <b>최고지도자에게서 협상 권한을 위임받았다</b>고 밝혔고, 트럼프 대통령도 "이란이 전쟁을 끝내는 합의를 원한다, <b>합의가 가능하다</b>"고 했어. <b>카타르 중재단</b>은 테헤란을 찾아 이란 외무당국과 만났어.</p>
+    </div>
+    <div class="rule">
+      <span class="badge no">아직 안 바뀐 것</span>
+      <h3>기름은 한 방울도 더 안 나왔다</h3>
+      <p>해협은 <b>여전히 봉쇄 중</b>이야. 어제 전한 '48시간 안에 개방'은 <b>이란이 조건을 달아 내민 제안</b>일 뿐 합의된 일정이 아니고, 이란 고위 관계자는 로이터에 "<b>합의까지 상당한 거리</b>"라고 했어. 유조선·후티 공격이 이어지는 동안 위험 프리미엄은 다 못 빠져.</p>
+    </div>
+  </div>
+  <div class="paradox"><b>💡 그래서 이 값을 어떻게 읽나</b>유가에 붙어 있는 건 <b>지금의 공급량이 아니라 '타결 확률'</b>이야. 공급은 그대로인데 값만 11% 내려온 이유가 그거고, 같은 이유로 <b>말 한마디에 되돌아갈 수도</b> 있어.</div>
+
+  <div class="section-title">④ 이 길이 내 물가까지 오는 경로</div>
+  <div class="mech">
+    <div class="mstep hot">
+      <div class="mnum">0주</div>
+      <div class="mtxt"><b>호르무즈 봉쇄 → 국제 유가 급등</b><span class="mdesc">10월에 브렌트유가 117달러까지 올라간 구간. 여기가 출발점이야</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">2~3주</div>
+      <div class="mtxt"><b>국내 주유소 값에 반영</b><span class="mdesc">배로 들여와 정제·유통하는 시차가 있어서 국제 유가는 2~3주쯤 늦게 주유소에 붙어. 10월 물가에서 <b>경유 +19.7% · 휘발유 +11.6%</b>로 찍힌 자리</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">1~2달</div>
+      <div class="mtxt"><b>운송·물류비 → 가공식품·외식값</b><span class="mdesc">경유가 오르면 트럭·배로 나르는 모든 것의 원가가 올라. 10월 <b>가공식품이 2.1%→2.9%</b>로 11개월 만에 가장 크게 뛴 게 이 경로야</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">수개월</div>
+      <div class="mtxt"><b>근원물가로 스며든다</b><span class="mdesc">석유류 자체는 근원물가에서 <b>빠진다</b>. 그런데 운송비를 타고 외식·서비스값으로 번지면 <b>그건 근원에 남아</b>. 한은이 말한 "누적된 비용 압력"이 이거야 — 그래서 기름값이 꺾여도 근원은 바로 안 내려와</span></div>
+    </div>
+    <div class="mstep cool">
+      <div class="mnum">앞으로</div>
+      <div class="mtxt"><b>11월 헤드라인엔 도움, 금리엔 글쎄</b><span class="mdesc">지금의 유가 하락은 <b>11월·12월 헤드라인 물가를 낮추는 쪽</b>으로 와. 하지만 한은이 보는 자리는 근원이고, 한은은 "<b>11월에도 2%대 후반</b>"을 전망했어</span></div>
+    </div>
+    <div class="paradox"><b>🔑 여기서 남길 한 줄</b>기름값은 <b>물가에 두 번</b> 들어와. 한 번은 주유소에서 바로(=석유류, 근원에서 빠짐), 또 한 번은 <b>운송비를 타고 음식·서비스값으로 몇 달 뒤에</b>(=근원에 남음). 두 번째가 느리게 오는 대신 <b>잘 안 빠진다</b>는 게 지금 근원 2.8%가 안 꺾이는 이유야.</div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 유가는 11월 2일(현지시간) 종가 기준이고 월물 표기는 매체에 따라 12월물·1월물로 갈려 적혀 있어 수치만 옮겼음 · 물가 수치는 국가데이터처 「2026년 10월 소비자물가동향」(11/3 발표) 기준 · 전이 단계의 소요 기간(0주·2~3주·1~2달)은 통상적인 경험 범위를 단순화한 것으로 확정된 값이 아님 · 지도는 바다·육지 구분과 병목 위치만 보여주는 개략도로 실제 해안선·축척과 다름</div>
+</div>
+</body>
+</html>
