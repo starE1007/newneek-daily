@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>필수의료는 왜 비는가 — 악순환과 대책</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-box.result{background:var(--red-soft);border-color:#F3CFCA}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px;background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--red-soft);border-color:#F3CFCA}
+  .t-item.next .when{color:#C6493E}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.05 데일리 뉴스 · 시각자료</div>
+  <h1>🏥 필수의료는 왜 '사람을 뽑아도' 비는가</h1>
+  <div class="sub">아주대 소아응급실 압수수색이 왜 전문의 8명의 사직으로 이어졌는지, 고리 하나씩 보기</div>
+
+  <div class="section-title">필수의료 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>응급의학과</b><span>밤낮없이 중증 환자를 먼저 받는 자리</span></div>
+    <div class="tax-op">+</div>
+    <div class="tax-box"><b>소아청소년과</b><span>작은 몸을 다루는 고난도 처치</span></div>
+    <div class="tax-op">+</div>
+    <div class="tax-box"><b>산부인과</b><span>분만은 미룰 수 없는 응급</span></div>
+    <div class="tax-op">=</div>
+    <div class="tax-box result"><b>필수의료</b><span>없으면 <b>대체가 안 되는</b> 진료 영역</span></div>
+  </div>
+  <div class="tax-note">공통점은 '급하고, 어렵고, 결과가 나쁠 수 있다'야 — 그래서 책임의 무게가 다른 과보다 크게 얹혀.</div>
+
+  <div class="section-title">공백이 만들어지는 고리</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>야간·고난도 업무 + 나쁜 결과에 대한 법적 위험</b><span class="mdesc">진료 중인 응급실에 수사가 들어오는 일까지 겹침</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>그 과를 고르는 의사가 줄어듦</b><span class="mdesc">같은 면허로 부담 적은 과를 택할 선택지가 있음</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>남은 사람에게 당직·중환자가 몰림</b><span class="mdesc">아주대 센터는 전문의 9명으로 24시간을 돌리던 자리</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>버티던 사람도 떠남 → 1번이 더 심해짐</b><span class="mdesc">9명 중 8명 사직 의사 — 한 사건이 고리 전체를 당긴 셈</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 그래서 '정원 확대'만으로는 안 메워져</b>의대 정원을 늘려도 졸업생이 1번 조건이 그대로인 과를 고를 이유가 없으면, 늘어난 인원은 다른 과로 흘러. 공백은 <b>인원의 문제가 아니라 '남아 있을 이유'의 문제</b>로 봐야 하는 자리야.</div>
+  </div>
+
+  <div class="section-title">정부가 끊겠다고 내놓은 세 자리</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge">1번 고리</span>
+      <h3>압수수색 가이드라인</h3>
+      <p>응급실·중환자실·분만실 수사는 <b>의심할 정황·관련성이 있을 때만</b> 한정 진행하기로. 환자단체는 "증거 확보 권리까지 막으면 안 된다"며 선을 긋는 쪽.</p>
+    </div>
+    <div class="vs">
+      <span class="badge">1번 고리</span>
+      <h3>배상 보험료 국가 지원</h3>
+      <p>의료사고 배상 보험료를 국가가 대 주는 방식. 나쁜 결과의 <b>금전 위험을 개인에서 떼어내</b> 기피 이유를 줄이겠다는 접근.</p>
+    </div>
+    <div class="vs">
+      <span class="badge">3번 고리</span>
+      <h3>계약형 지역필수의사제</h3>
+      <p>내년부터 <b>서울 제외 전 지역</b> 시행. 지역 필수과 근무를 약속하면 지원을 받는 구조로, 사람이 몰리지 않는 지역의 당직 부담을 분산하려는 것.</p>
+    </div>
+  </div>
+
+  <div class="section-title">공급 쪽은 10년 뒤에 도착해</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">2026.11.04</div><div class="what">순천대(60명)·경국대(40명) <b>의대 신설 확정</b> — 전남은 36년 만</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">2030</div><div class="what">첫 신입생 입학</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">2036 전후</div><div class="what">졸업·의사 면허</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">2040 안팎</div><div class="what"><b>전문의로 현장 배치</b> — 지금 빈 자리를 지금 메우는 대책이 아님</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.05 오늘의 딥다이브 내용 기반 (전문의 배치 시점은 의대 6년 + 수련 기간을 더한 통상 경로 기준)</div>
+</div>
+</body>
+</html>
