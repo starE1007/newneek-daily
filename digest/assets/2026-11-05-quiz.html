@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.05</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.05 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 보기 길이도 서로 비슷하게 맞췄다. 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'veto', variants:[
+    { q:'의회 다수당이 대통령과 다른 당일 때, 대통령이 거부권을 쓰면 법안이 살아남으려면 어떻게 돼야 하는가?',
+      opts:['대통령이 서명을 거부해도 15일 뒤 자동으로 법이 된다',
+            '상원과 하원이 각각 3분의 2 이상으로 다시 가결해야 한다',
+            '대법원이 해당 법안의 위헌 여부를 먼저 판단해야 한다',
+            '하원이 과반으로 다시 가결하면 충분하다'],
+      answer:1,
+      explain:'거부권을 뒤집으려면 <b>상·하원 각각 3분의 2</b>가 필요해. 과반 정당 혼자서는 모자라서 <b>상대 당 이탈표</b>가 있어야 해.' },
+    { q:'민주당이 상·하원 과반을 가져갔는데도 입법이 교착되기 쉬운 이유로 가장 알맞은 것은?',
+      opts:['과반이면 법안 발의 자체가 금지되기 때문',
+            '법안은 통과시켜도 대통령 거부권을 넘기 어렵기 때문',
+            '중간선거 이후에는 법안 표결이 1년간 중단되기 때문',
+            '상원이 하원이 낸 법안을 무조건 폐기하기 때문'],
+      answer:1,
+      explain:'<b>통과 ≠ 시행</b>이야. 대통령 서명이 없으면 3분의 2라는 더 높은 문턱이 기다려.' },
+  ]},
+  { id:'tools', variants:[
+    { q:'의회를 뺏긴 대통령이 그래도 비교적 자유롭게 할 수 있는 일로 가장 알맞은 것은?',
+      opts:['예산안을 단독으로 확정하는 일',
+            '의회 승인 없이 가능한 행정 조치(행정명령 등)를 내리는 일',
+            '상원의 동의 없이 고위 인사를 임명하는 일',
+            '의회 청문회를 열지 못하게 막는 일'],
+      answer:1,
+      explain:'행정부 권한 안의 조치는 <b>의회 승인 없이</b> 가능해. 의회는 그걸 법으로 되돌리기 어렵고, 대신 <b>예산·조사·인사</b>로 압박해.' },
+    { q:'하원과 상원 중 고위 인사·조약에 대한 승인 권한이 있는 쪽과, 그 의미로 가장 알맞은 것은?',
+      opts:['하원 — 대통령의 모든 인사를 단독으로 확정한다',
+            '상원 — 대통령이 지명한 고위직이 자리에 앉으려면 거쳐야 하는 관문이다',
+            '하원 — 조약을 거부하면 곧바로 폐기된다',
+            '상원 — 예산안을 단독으로 편성한다'],
+      answer:1,
+      explain:'<b>상원</b>은 고위 인사·조약 승인 관문이야. 상원까지 뺏기면 인사에서도 대통령 뜻대로 안 돼.' },
+  ]},
+  { id:'swing', variants:[
+    { q:'중간선거가 대통령 소속 정당에 불리하게 나오는 경향을 두고 가장 알맞게 설명한 것은?',
+      opts:['대통령이 바뀌면 의원도 자동으로 모두 바뀌기 때문',
+            '중간선거는 대통령 임기 중간에 치러져, 현 정부에 대한 평가 성격이 강해지기 때문',
+            '중간선거에서는 야당만 후보를 낼 수 있기 때문',
+            '대통령 소속 정당은 투표소에서 의석 배정이 줄어들기 때문'],
+      answer:1,
+      explain:'중간선거는 대통령 이름이 후보 명단에 없어도 <b>대통령 성적표</b> 성격을 띠어.' },
+    { q:'상·하원의 다수당이 동시에 바뀐 이번 결과가 시장에 주는 신호로 가장 알맞은 것은?',
+      opts:['정책 방향의 불확실성이 커져 변동성이 확대될 수 있다는 신호',
+            '모든 관세가 즉시 폐지된다는 신호',
+            '미국 금리가 자동으로 하락한다는 신호',
+            '환율이 고정된다는 신호'],
+      answer:0,
+      explain:'정책을 누가 정하는지 불분명해지면 <b>불확실성</b>이 커져서 환율·증시가 출렁일 수 있어. 어느 쪽으로 가는지는 아직 몰라.' },
+  ]},
+  { id:'fix', variants:[
+    { q:'어제 배운 \'기금\'이 일반 예산과 갈리는 점으로 가장 알맞은 것은?',
+      opts:['기금은 국회 승인이 필요 없다',
+            '기금은 목적만 정해 여러 해에 걸쳐 쓰는 통장이라 운용 재량이 넓다',
+            '기금은 그 해에 전액 써야 한다',
+            '기금은 지방정부만 쓸 수 있다'],
+      answer:1,
+      explain:'기금은 <b>목적 단위·여러 해</b>, 예산은 <b>항목 단위·한 해</b>야.' },
+    { q:'재원은 몇 년 뒤 끊기는데 한번 생기면 줄이기 어려운 지출을 가리키는 말은?',
+      opts:['경직성 지출','탄력 지출','일회성 지출','이전 지출'],
+      answer:0,
+      explain:'<b>경직성 지출</b> — 시작하면 깎기 어려워서 나중 예산을 미리 잡아 두는 셈이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'대통령 거부권을 뒤집으려면 상·하원 각각 몇 분의 몇 이상 찬성이 필요할까? (예: 2분의 1)',
+    accept:['3분의 2','삼분의 이','3분의2','2/3'],
+    explain:'정답은 <b>3분의 2</b>. 과반(2분의 1)과는 문턱이 달라.' },
+  { q:'고위 인사·조약을 승인하는 권한이 있는, 미국 의회의 두 院 중 한 곳은? (두 글자)',
+    accept:['상원'],
+    explain:'정답은 <b>상원</b>. 상원까지 뺏기면 인사에서도 견제를 받아.' },
+  { q:'복습: 시작하면 줄이기 어려운 지출을 \'______성 지출\'이라 한다. (두 글자)',
+    accept:['경직'],
+    explain:'정답은 <b>경직</b>. 기금으로 시작한 현금성 지원이 대표적이야.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
