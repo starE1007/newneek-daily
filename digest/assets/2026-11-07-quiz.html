@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.07</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.07 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 보기 길이도 서로 비슷하게 맞췄다. 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'goodnews', variants:[
+    { q:'미국 고용이 예상보다 크게 늘었는데 주가가 빠진 이유로 가장 알맞은 것은?',
+      opts:['고용이 늘면 기업이 주식을 팔아 인건비를 마련하기 때문',
+            '탄탄한 고용이 금리 인상 가능성을 키워 성장주의 가치를 깎기 때문',
+            '고용 통계가 나오면 해당 월 증시 거래가 자동으로 제한되기 때문',
+            '일자리가 늘면 외국인이 한국 주식을 의무적으로 줄여야 하기 때문'],
+      answer:1,
+      explain:'고용↑ → 임금·물가 부담 → <b>금리 인상 기대</b> → 미래 이익의 값이 깎여. 좋은 지표가 금리 신호로 읽힌 거야.' },
+    { q:'"좋은 경제지표가 오히려 악재가 되는" 국면의 공통 조건으로 가장 알맞은 것은?',
+      opts:['시장이 물가 부담 때문에 금리 인상을 걱정하고 있을 때',
+            '중앙은행이 금리를 이미 최저로 내려둔 상태일 때',
+            '정부가 증시 거래세를 한시적으로 면제했을 때',
+            '환율이 하루 사이 10원 넘게 내렸을 때'],
+      answer:0,
+      explain:'금리 인상이 걱정되는 때엔 경기 호조 = <b>긴축 신호</b>로 읽혀. 반대로 금리 인하를 기다릴 땐 나쁜 지표가 호재가 되기도 해.' },
+  ]},
+  { id:'discount', variants:[
+    { q:'금리가 오르면 이익이 먼 미래에 몰린 성장주가 특히 크게 흔들리는 이유로 가장 알맞은 것은?',
+      opts:['성장주는 금리 인상 때 배당을 의무적으로 늘려야 하기 때문',
+            '금리가 오르면 성장주 기업의 매출이 즉시 줄어들기 때문',
+            '미래 이익을 현재 가치로 환산할 때 깎이는 폭이 먼 이익일수록 커지기 때문',
+            '금리 인상은 성장주에만 세금을 더 매기기 때문'],
+      answer:2,
+      explain:'이익을 현재 가치로 바꾸는 <b>할인율</b>이 오르면 먼 미래의 이익일수록 더 많이 깎여. 반도체·AI가 앞줄에 서는 이유야.' },
+  ]},
+  { id:'cb', variants:[
+    { q:'6일 코스피가 장중 서킷브레이커가 걸렸는데 종가는 −6%였던 것을 가장 잘 설명한 것은?',
+      opts:['서킷브레이커가 걸리면 지수가 정해진 하락폭까지 되돌려지기 때문',
+            '발동 후 거래가 재개되며 저가 매수가 들어와 낙폭이 줄었기 때문',
+            '종가는 장중 최저가와 최고가의 평균으로 계산되기 때문',
+            '서킷브레이커 발동일엔 종가가 전날 종가로 고정되기 때문'],
+      answer:1,
+      explain:'1단계는 지수가 <b>8% 이상</b> 빠진 채 1분 유지될 때 걸려. 장중 바닥은 −8%대였고 이후 저가 매수로 −6%까지 되돌렸어.' },
+    { q:'서킷브레이커와 사이드카의 차이로 가장 알맞은 것은?',
+      opts:['서킷브레이커는 프로그램 매매만, 사이드카는 모든 거래를 멈춘다',
+            '서킷브레이커는 외국인만, 사이드카는 개인만 제한한다',
+            '서킷브레이커는 모든 거래를 20분 멈추고, 사이드카는 프로그램 매매만 5분 멈춘다',
+            '둘 다 거래를 멈추되 발동 시각만 다르다'],
+      answer:2,
+      explain:'사이드카가 더 가벼운 1차 제동이고, 서킷브레이커는 시장 전체를 <b>20분</b> 세우는 강한 제동이야.' },
+  ]},
+  { id:'chain', variants:[
+    { q:'미국 금리 인상 기대가 한국 반도체 주가를 흔드는 경로로 가장 알맞은 것은?',
+      opts:['금리↑ → 미국 성장주 가치 하락 → 외국인 위험자산 축소 → 한국 반도체 매도',
+            '금리↑ → 한국 반도체 수출 관세 인상 → 이익 감소',
+            '금리↑ → 삼성전자 공장 가동 중단 → 공급 감소',
+            '금리↑ → 한국 정부의 반도체 보조금 즉시 폐지'],
+      answer:0,
+      explain:'금리 부담이 미국 성장주를 먼저 누르고, 위험을 줄이는 <b>외국인 매도</b>가 한국 반도체로 번져.' },
+  ]},
+  { id:'bond', variants:[
+    { q:'10년물 국채금리가 4.8%대로 오르는 것이 주식시장에 부담이 되는 이유로 가장 알맞은 것은?',
+      opts:['국채금리가 오르면 정부가 주식 매입을 중단하기 때문',
+            '국채가 안전하게 더 높은 이자를 주니 위험한 주식을 굳이 들고 있을 이유가 줄기 때문',
+            '국채금리는 주식 배당금과 자동으로 같아지기 때문',
+            '국채금리가 오르면 기업 공시가 금지되기 때문'],
+      answer:1,
+      explain:'안전자산 수익이 오르면 주식이 줘야 하는 <b>위험 보상</b>도 커져야 해서 주가가 눌려.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'지수가 8% 이상 빠진 채 1분간 유지되면 모든 거래를 20분 멈추는 제도의 이름은?',
+    accept:['서킷브레이커','서킷 브레이커','circuit breaker'],
+    explain:'정답은 <b>서킷브레이커</b>. 6일 오전 9시 3분 올해 11번째로 발동됐어.' },
+  { q:'미국 중앙은행인 연준의 정책회의 영어 약자는? (네 글자)',
+    accept:['FOMC','fomc'],
+    explain:'정답은 <b>FOMC</b>. 12월 회의에서 금리 인상 여부가 갈려.' },
+  { q:'미래에 벌 이익을 현재 가치로 바꿀 때 쓰는 비율을 뭐라고 해? (세 글자)',
+    accept:['할인율'],
+    explain:'정답은 <b>할인율</b>. 금리가 오르면 높아져서 먼 미래 이익일수록 많이 깎여.' },
+  { q:'좋은 경제지표가 금리 인상 기대를 키워 주가에 악재가 되는 것은, 지표가 ______ 신호로 읽히기 때문이야. (두 글자)',
+    accept:['긴축','인상'],
+    explain:'정답은 <b>긴축</b>. 경기 호조가 곧 금리를 올릴 이유로 읽힌 거야.' },
+  { q:'복습: 주가는 지금 실적보다 다음 ______에 대한 기대를 먼저 반영한다. (두 글자)',
+    accept:['주문'],
+    explain:'정답은 <b>주문</b>. 기대가 깎이면 숫자가 나오기 전에 주가가 먼저 빠져.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

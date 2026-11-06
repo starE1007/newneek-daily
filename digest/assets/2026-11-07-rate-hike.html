@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>좋은 고용지표가 왜 주가 악재일까</title>
+<style>
+  :root{--text:#2C2C2B;--text2:#7D7A75;--canvas:#FFFFFF;--soft:#F9F8F7;--border:#E6E5E3;--blue:#2783DE;--blue-soft:#E5F2FC;--orange:#D5803B;--orange-soft:#FBEBDE;--red:#E56458;--red-soft:#FCE9E7;--green:#46A171;--green-soft:#E8F1EC}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13.5px}
+  .row .lb{flex:0 0 120px;color:var(--text2)}
+  .bar{height:22px;border-radius:6px;color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;padding-left:8px}
+  .b1{background:var(--blue)} .b2{background:var(--red)} .b3{background:var(--orange)}
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}h1{font-size:21px}.row .lb{flex-basis:90px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.07 데일리 뉴스 · 시각자료</div>
+  <h1>📉 좋은 고용지표가 왜 주가 악재일까</h1>
+  <div class="sub">미국 일자리 호조 → 금리 인상 기대 → 코스피 −6%까지, 연결고리 한 장으로 보기</div>
+
+  <div class="section-title">6일 숫자 3개</div>
+  <div class="bars">
+    <div class="row"><span class="lb">고용 증가(예상 약 6만)</span><div class="bar b1" style="width:100%;max-width:280px">+16.5만 명</div></div>
+    <div class="row"><span class="lb">12월 인상 확률</span><div class="bar b3" style="width:75%;max-width:210px">약 67% → 75~77%</div></div>
+    <div class="row"><span class="lb">코스피 하루</span><div class="bar b2" style="width:60%;max-width:170px">−6.02%</div></div>
+  </div>
+
+  <div class="section-title">'좋은 소식 = 악재' 메커니즘</div>
+  <div class="mech">
+    <div class="mstep"><div class="mnum">1</div><div class="mtxt"><b>미국 일자리 예상의 2.8배</b><span class="mdesc">실업률 4.1%, 노동시장 탄탄</span></div></div>
+    <div class="mstep"><div class="mnum">2</div><div class="mtxt"><b>임금·물가 부담 → 연준 12월 금리 인상 기대 ↑</b><span class="mdesc">10년물 국채금리 4.86%</span></div></div>
+    <div class="mstep"><div class="mnum">3</div><div class="mtxt"><b>할인율 ↑ → 먼 미래 이익의 현재 가치 ↓</b><span class="mdesc">이익이 앞으로 몰린 AI·반도체 성장주가 가장 크게 깎임</span></div></div>
+    <div class="mstep hot"><div class="mnum">4</div><div class="mtxt"><b>외국인 매도 → 코스피 −6%, 서킷브레이커</b><span class="mdesc">SK하이닉스 −10.44%, 삼성전자 −6.35%</span></div></div>
+    <div class="paradox"><b>⚠️ 지표의 역설</b>금리 인상이 걱정될 땐 경기 호조가 곧 긴축 신호 — 반대로 인하를 기다릴 땐 나쁜 지표가 호재가 되기도 해.</div>
+  </div>
+
+  <div class="section-title">서킷브레이커는 어떻게 걸렸나 (6일)</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">전날(5일)</div><div class="what">코스피 −5.28%, 나스닥 5%대 급락</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9:03</div><div class="what">지수 −8% 1분 유지 → <b>서킷브레이커</b>(20분 중단)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">9:34</div><div class="what">매도 사이드카</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">마감</div><div class="what">저가 매수로 −6.02%, 5,059.69</div></div>
+  </div>
+  <div class="foot">※ 개략도 · 2026.11.07 딥다이브 내용 기반 (수치는 보도 집계 차이 있음)</div>
+</div>
+</body>
+</html>
