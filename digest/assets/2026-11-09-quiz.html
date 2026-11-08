@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.09</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.09 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'lev', variants:[
+    { q:'레버리지 ETF(2배)가 "지수의 일간 수익률 2배"를 따라가도록 설계됐다는 말의 정확한 뜻은?',
+      opts:['투자 기간이 길어져도 누적 수익률이 항상 지수의 정확히 2배가 된다',
+            '하루 단위 등락률에 2배를 곱해 추종하고, 그 결과가 매일 이어붙어 누적된다',
+            '지수가 오르는 날에만 2배로 반영하고 내리는 날은 반영하지 않는다',
+            '지수가 하루 10% 넘게 움직이면 운용이 자동으로 멈춘다'],
+      answer:1,
+      explain:'2배는 <b>하루 기준</b>이야. 그 일간 수익률이 복리처럼 곱해져 쌓이니까 기간이 길수록 지수 2배와 어긋나.' },
+    { q:'다음 중 레버리지 ETF의 "일간 2배" 구조에 대한 설명으로 가장 알맞은 것은?',
+      opts:['장기 보유 성과는 지수의 누적 수익률 2배와 달라질 수 있다',
+            '보유 기간과 무관하게 지수와 항상 같은 방향·같은 배율이다',
+            '지수가 횡보하면 레버리지 ETF도 반드시 제자리다',
+            '하락장에서는 손실이 지수보다 작아지도록 설계돼 있다'],
+      answer:0,
+      explain:'매일 새로 2배를 맞추는 구조라 <b>경로(오르내림 순서)</b>에 따라 누적 결과가 달라져.' },
+  ]},
+  { id:'decay', variants:[
+    { q:'지수가 −10% 후 +10%로 돌아와 99가 됐다. 2배 레버리지 ETF(100에서 시작)는 대략 얼마일까?',
+      opts:['98','96','100','99'],
+      answer:1,
+      explain:'100 → (−20%) 80 → (+20%) <b>96</b>. 지수는 −1%인데 레버리지는 −4%야. 이게 변동성 잠식이야.' },
+    { q:'변동성이 큰 횡보장에서 레버리지 ETF가 지수보다 손해를 보기 쉬운 가장 큰 이유는?',
+      opts:['운용사가 손실분을 의도적으로 더 크게 반영해서',
+            '내린 뒤 같은 비율로 올라도 원래 값으로 돌아오지 않는 곱셈 구조가 2배로 증폭돼서',
+            '레버리지 상품은 배당을 전혀 받지 못해서',
+            '지수보다 거래 시간이 짧아서'],
+      answer:1,
+      explain:'−20% 뒤 +20%는 원점이 아니라 <b>96%</b>. 오르내림이 클수록 이 틈이 커져 — 변동성 잠식(decay)이라 불러.' },
+  ]},
+  { id:'down', variants:[
+    { q:'지수가 연속 이틀 −10%씩 빠졌다. 2배 레버리지 ETF의 누적 하락률은 대략?',
+      opts:['−19%','−36%','−40%','−20%'],
+      answer:1,
+      explain:'하루 −20%씩: 100→80→<b>64</b>, 즉 −36%. 지수는 −19%니까 단순 2배(−38%)와도 달라 — 일간 기준이라 그래.' },
+  ]},
+  { id:'cpi', variants:[
+    { q:'복습 관련: CPI 발표에서 시장 반응을 가르는 것은 숫자 자체보다 무엇일까?',
+      opts:['시장이 미리 반영해 둔 예상치와의 차이',
+            '발표 숫자의 소수점 자릿수',
+            '직전 달 숫자의 반올림 값',
+            '발표 요일'],
+      answer:0,
+      explain:'예상은 이미 가격에 반영돼 있어서 <b>예상과의 차이(서프라이즈)</b>가 새 정보야.' },
+  ]},
+  { id:'who', variants:[
+    { q:'급락 직후 레버리지 베팅이 위험한 이유를 가장 잘 설명한 것은?',
+      opts:['급락 뒤에는 변동성이 커서, 반등해도 잠식과 추가 하락이 겹치면 지수 반등보다 덜 회복될 수 있어서',
+            '급락장에서는 레버리지 ETF 거래가 금지돼서',
+            '레버리지는 반등 구간에서 수익이 나지 않게 설계돼서',
+            '지수가 반등하는 날에는 레버리지 ETF가 오히려 지수보다 덜 오르도록 설계돼서'],
+      answer:0,
+      explain:'급락 뒤엔 변동성이 크고, 곱셈 구조상 <b>떨어진 만큼 올라도 원점 회복이 안 돼</b>. 방향을 맞혀도 경로에서 깎여.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'레버리지 ETF가 매일 지수 등락을 2배로 곱해 쌓다 보니 오르내림이 클수록 손해가 생기는 현상을 뭐라고 해? (네 글자)',
+    accept:['변동성잠식','변동성 잠식'],
+    explain:'정답은 <b>변동성 잠식</b>. 곱셈 구조라 −20%·+20%가 원점(100)이 아니라 96이 돼.' },
+  { q:'2배 레버리지 ETF가 따라가는 건 지수의 ______ 수익률 2배야. (두 글자)',
+    accept:['일간','하루'],
+    explain:'정답은 <b>일간</b>(하루). 기간 누적 2배가 아니라 하루 기준이야.' },
+  { q:'복습: 식품·에너지를 뺀 물가지수를 뭐라고 해? (두 글자)',
+    accept:['근원'],
+    explain:'정답은 <b>근원</b>(근원 CPI).' },
+  { q:'복습: 금리가 오르면 미래 이익을 현재 가치로 깎는 비율이 커지는데, 이 비율은? (세 글자)',
+    accept:['할인율'],
+    explain:'정답은 <b>할인율</b>.' },
+];
+
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
