@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>네오클라우드 — 빚으로 GPU를 사는 구조</title>
+<style>
+  :root{--text:#2C2C2B;--text2:#7D7A75;--canvas:#FFFFFF;--soft:#F9F8F7;--surface2:#F0EFED;--border:#E6E5E3;--blue:#2783DE;--blue-soft:#E5F2FC;--orange:#D5803B;--orange-soft:#FBEBDE;--red:#E56458;--red-soft:#FCE9E7;--green:#46A171;--green-soft:#E8F1EC}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .case{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.late{background:var(--orange-soft);color:#B06426}
+  .badge.now{background:var(--red-soft);color:#C6493E}
+  .badge.ok{background:var(--green-soft);color:#2F7A52}
+  .case h3{font-size:15.5px;margin-bottom:6px}
+  .case p{font-size:13.5px;color:var(--text2)}
+  .case p b{color:var(--text)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+  th{background:var(--surface2);font-size:13px;color:var(--text2);font-weight:600}
+  tr:last-child td{border-bottom:none}
+  td b{color:#C6493E}
+  .note{margin-top:10px;font-size:13.5px;color:var(--text2)}
+  .note b{color:var(--text)}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 140px;min-width:132px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--orange-soft);color:#9A5620}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.last{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}.grid{grid-template-columns:1fr}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.09 데일리 뉴스 · 시각자료</div>
+  <h1>🧊 네오클라우드 — 빚으로 GPU를 사는 구조</h1>
+  <div class="sub">왜 '착공이 늦어진다'는 뉴스 하나가 삼전닉스 주가까지 끌어내리는지 한 장으로 보기</div>
+
+  <div class="section-title">① 네오클라우드는 이렇게 돈을 번다</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>큰 회사와 장기 임대 계약을 먼저 맺어</b><span class="mdesc">마이크로소프트·아마존 같은 데가 "GPU 빌려 쓸게" 하고 약속 — 아직 돈은 안 들어옴</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>그 계약을 담보로 빚을 내 GPU·데이터센터를 산다</b><span class="mdesc">나갈 돈은 전부 먼저 나감 — 매출은 아직 0원</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>센터가 돌아가면 사용료가 들어오고, 그걸로 빚을 갚아</b><span class="mdesc">즉 '가동 시점'이 곧 '상환 능력'이야</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">② 규제가 끼어들면 두 시계가 어긋난다</div>
+  <div class="grid">
+    <div class="case">
+      <span class="badge late">들어올 돈 — 밀린다</span>
+      <h3>인허가·착공이 늦어짐</h3>
+      <p>센터가 안 돌면 사용료 유입 시점이 <b>뒤로 밀려</b>. 계약은 살아 있지만 매출은 안 생겨.</p>
+    </div>
+    <div class="case">
+      <span class="badge now">나갈 돈 — 안 밀린다</span>
+      <h3>이자는 날짜대로 그대로</h3>
+      <p>대출·회사채 이자는 <b>공사 진행과 무관</b>하게 나가. 이 차이가 벌어지는 게 자금난이야.</p>
+    </div>
+  </div>
+
+  <div class="section-title">③ 채권값이 주가보다 먼저 말했어</div>
+  <table>
+    <tr><th>코어위브 2032년 만기 회사채</th><th>수치</th></tr>
+    <tr><td>처음 정해진 이자(표면금리)</td><td>연 9.625%</td></tr>
+    <tr><td>지금 시장에서 거래되는 수익률</td><td><b>14.8%</b></td></tr>
+    <tr><td>채권 가격 (액면 100달러 기준)</td><td><b>80달러 아래</b></td></tr>
+  </table>
+  <div class="note"><b>읽는 법.</b> 채권은 가격이 내리면 수익률(금리)이 오르는 시소야. 싸게 사서 같은 이자를 받으니까. 그래서 <b>가격 80달러 · 수익률 14.8%</b>는 "이 회사가 못 갚을 수도 있다"고 시장이 값을 깎아 둔 상태라는 뜻이야.</div>
+
+  <div class="section-title">④ 그래서 내 주식까지 오는 길</div>
+  <div class="flow">
+    <div class="step s1">민주당 의회 장악<small>데이터센터 규제 쪽</small></div><div class="arrow">→</div>
+    <div class="step">인허가·착공 지연</div><div class="arrow">→</div>
+    <div class="step">네오클라우드<small>매출 지연 + 이자 부담</small></div><div class="arrow">→</div>
+    <div class="step">자금난 · 계약 축소<small>MS, 일부 사업 철수 검토</small></div><div class="arrow">→</div>
+    <div class="step">GPU·HBM 주문 축소</div><div class="arrow">→</div>
+    <div class="step last">삼전닉스 · 코스피</div>
+  </div>
+
+  <div class="section-title">⑤ 반대쪽 주장도 있어</div>
+  <div class="case">
+    <span class="badge ok">과하게 겁먹었다는 쪽</span>
+    <h3>규제가 세져도 공사가 멈추는 건 아니야</h3>
+    <p>내년 미국 신규 전력 용량의 <b>약 4분의 3</b>은 이미 건설 중이고, AI 서비스 수요 자체는 계속 늘고 있어. 지연이 곧 수요 소멸은 아니라는 반론이야.</p>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 회사채 수치는 2026.10.15 보도 기준이라 지금 값은 달라질 수 있어</div>
+</div>
+</body>
+</html>
