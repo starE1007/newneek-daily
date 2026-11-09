@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>청해부대 작전범위가 두 배 — 한눈에 보는 지도</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:4px}
+
+  .choke-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .choke{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .choke .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.before{background:var(--surface2);color:#5F5C58}
+  .badge.after{background:var(--orange-soft);color:#B06426}
+  .choke h3{font-size:16px;margin-bottom:6px}
+  .choke p{font-size:14px;color:var(--text2)}
+  .choke p b{color:var(--text)}
+  .choke p + p{margin-top:8px}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:142px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85;display:block}
+  .step.s1{background:var(--blue-soft);color:#1B6BB8}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .note{border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:8px;background:var(--orange-soft);padding:12px 14px;font-size:13.5px;color:#8C4F1C;margin-top:12px}
+  .note b{color:#6E3D14}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .choke-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.10 데일리 · 지도</div>
+  <h1>⚓ 청해부대가 지키는 선이 북쪽으로 올라갔어</h1>
+  <div class="sub">인원(+75명)보다 중요한 건 <b>어디까지 가느냐</b>야. 아덴만에서 오만 두쿰항 남단까지 — 호르무즈 해협 <b>650km</b> 앞이야.</div>
+
+  <div class="section-title">① 어디야 — 아라비아반도 둘레 개략 지도</div>
+  <div class="card">
+    <div class="map-scroll">
+      <svg viewBox="0 0 760 470" role="img" aria-label="아덴만·오만 두쿰·호르무즈 해협 개략 지도와 청해부대 작전범위">
+        <!-- 바다 배경 -->
+        <rect x="0" y="0" width="760" height="470" fill="#EAF4FC"/>
+
+        <!-- 이란 (북동) -->
+        <path d="M470,0 L760,0 L760,96 L690,104 L600,96 L540,78 L492,52 Z" fill="#EDEBE8" stroke="#D9D7D3" stroke-width="1.5"/>
+        <text x="645" y="42" font-size="17" font-weight="700" fill="#7D7A75">이란</text>
+
+        <!-- 아라비아반도 (사우디 + 예멘 + 오만) -->
+        <path d="M0,40 L300,30 L430,60 L470,110 L520,120 L545,150 L560,210 L545,262 L512,300 L430,330 L330,352 L240,356 L150,344 L60,330 L0,322 Z"
+              fill="#EDEBE8" stroke="#D9D7D3" stroke-width="1.5"/>
+        <text x="200" y="150" font-size="19" font-weight="700" fill="#7D7A75">사우디아라비아</text>
+        <text x="175" y="318" font-size="16" font-weight="700" fill="#7D7A75">예멘</text>
+        <text x="492" y="196" font-size="16" font-weight="700" fill="#7D7A75">오만</text>
+
+        <!-- 아프리카 (소말리아) -->
+        <path d="M0,470 L0,384 L120,392 L220,404 L250,432 L236,470 Z" fill="#EDEBE8" stroke="#D9D7D3" stroke-width="1.5"/>
+        <text x="96" y="440" font-size="15" font-weight="700" fill="#7D7A75">소말리아</text>
+
+        <!-- 호르무즈 해협 (북쪽 좁은 목) -->
+        <circle cx="516" cy="104" r="19" fill="#FCE9E7" stroke="#E56458" stroke-width="3"/>
+        <text x="516" y="110" font-size="17" font-weight="700" fill="#C6493E" text-anchor="middle">⊘</text>
+        <text x="548" y="92" font-size="13" font-weight="700" fill="#C6493E">호르무즈 해협</text>
+        <text x="548" y="108" font-size="11.5" fill="#B2564C">아직 막혀 있는 상태 — 오늘 작전범위 바깥</text>
+
+        <!-- 페르시아만 -->
+        <text x="398" y="36" font-size="13" font-weight="700" fill="#5B9BD0">페르시아만</text>
+
+        <!-- 오만만 -->
+        <text x="600" y="130" font-size="12.5" font-weight="700" fill="#5B9BD0">오만만</text>
+
+        <!-- 아라비아해 -->
+        <text x="650" y="250" font-size="18" font-weight="700" fill="#5B9BD0">아라비아해</text>
+        <text x="650" y="270" font-size="12" fill="#86AFD0">→ 인도양 · 아시아로</text>
+
+        <!-- 아덴만 -->
+        <text x="150" y="378" font-size="15" font-weight="700" fill="#5B9BD0">아덴만</text>
+        <text x="150" y="396" font-size="11.5" fill="#86AFD0">예멘과 소말리아 사이 · 홍해↔인도양 길목</text>
+
+        <!-- 기존 작전구역 (아덴만 일대) -->
+        <ellipse cx="200" cy="392" rx="178" ry="56" fill="#2783DE" fill-opacity="0.16" stroke="#2783DE" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="200" y="440" font-size="12.5" font-weight="700" fill="#1B6BB8" text-anchor="middle">기존 작전구역 (아덴만 일대)</text>
+
+        <!-- 확대된 구역 (두쿰 남단까지) -->
+        <path d="M330,404 C410,392 470,352 512,300 C534,272 546,250 552,228 L596,240 C586,276 566,312 536,346 C486,402 408,436 336,444 Z"
+              fill="#D5803B" fill-opacity="0.18" stroke="#D5803B" stroke-width="2.5"/>
+        <text x="468" y="400" font-size="12.5" font-weight="700" fill="#9A5620">← 이번에 늘어난 구역</text>
+        <text x="468" y="417" font-size="11.5" fill="#A9682F">(약 두 배로 확대)</text>
+
+        <!-- 두쿰항 -->
+        <circle cx="548" cy="236" r="6" fill="#2C2C2B"/>
+        <text x="562" y="226" font-size="13" font-weight="700" fill="#2C2C2B">두쿰항 (오만)</text>
+        <text x="562" y="242" font-size="11.5" fill="#7D7A75">새 작전범위의 북쪽 끝 — 이 남단까지</text>
+
+        <!-- 650km 거리 표시 -->
+        <path d="M530,126 L530,222" stroke="#E56458" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+        <path d="M524,132 L530,122 L536,132" fill="#E56458"/>
+        <path d="M524,216 L530,226 L536,216" fill="#E56458"/>
+        <rect x="388" y="160" width="134" height="30" rx="8" fill="#FFFFFF" stroke="#E56458" stroke-width="1.5"/>
+        <text x="455" y="180" font-size="13" font-weight="700" fill="#C6493E" text-anchor="middle">약 650km 앞</text>
+
+        <!-- 항로 화살표 -->
+        <path d="M60,430 C180,418 300,392 420,330 C488,294 528,262 556,232"
+              stroke="#5B9BD0" stroke-width="3" stroke-dasharray="9 6" fill="none" marker-end="url(#seaArrow)"/>
+        <text x="300" y="366" font-size="11.5" font-weight="600" fill="#4A86B8">상선이 지나는 길</text>
+
+        <defs>
+          <marker id="seaArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5B9BD0"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="swatch" style="background:rgba(39,131,222,.25);border:1px solid #2783DE"></span> 기존 작전구역</span>
+      <span class="item"><span class="swatch" style="background:rgba(213,128,59,.28);border:1px solid #D5803B"></span> 이번에 늘어난 구역</span>
+      <span class="item">⊘ 아직 막혀 있는 호르무즈 (작전범위 밖)</span>
+    </div>
+  </div>
+
+  <div class="section-title">② 전·후 비교 — 뭐가 달라졌어</div>
+  <div class="choke-grid">
+    <div class="choke">
+      <span class="badge before">이전</span>
+      <h3>아덴만 해적 대응</h3>
+      <p>인원 <b>320명</b>. 작전 범위는 <b>아덴만 일대</b>로, 소말리아 해적으로부터 상선을 지키는 게 본업이었어.</p>
+      <p>임무 성격이 <b>치안·호송</b>에 가까웠어.</p>
+    </div>
+    <div class="choke">
+      <span class="badge after">이번 동의안</span>
+      <h3>두쿰 남단까지 · 기뢰 장비까지</h3>
+      <p>인원 <b>395명</b>(+75, 내년 상반기 합류). 범위가 <b>오만 두쿰항 남단</b>까지 약 두 배.</p>
+      <p>해상초계기 1대, <b>기뢰 탐지·제거 부대(EOD 30명)</b>, 무인 소해 장비가 붙고 임무에 <b>"국제 해상교통로상 항행의 자유 회복 지원"</b>이 추가됐어.</p>
+    </div>
+  </div>
+  <div class="note"><b>왜 '기뢰'가 신호냐면.</b> 해적은 배를 타고 올라오지만, 기뢰는 물속에 깔아 두는 폭탄이야. 해적 대응엔 기뢰 제거 장비가 필요 없어. 호르무즈에서 유조선이 흡착 기뢰에 피격된 게 지난달 일이니까, <b>기름길을 다시 여는 작업</b>에 대비한 사전 포석이라는 평가가 나오는 거야.</div>
+
+  <div class="section-title">③ 쟁점은 '선을 어디까지 긋나'야</div>
+  <div class="flow">
+    <div class="step s1">11/5 차관회의 의결<small>파병 연장 동의안</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">11/10 국무회의<small>오늘 심의</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">국회 제출·동의<small>야당 일부 "우회 참전" 반대</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">기뢰 제거 실제 투입<small>정부: 별도 국회 동의를 다시 받겠다</small></div>
+  </div>
+
+  <div class="foot">자체 제작 · 2026.11.10 데일리 뉴스레터 — 지도는 위치 관계만 보여주는 개략도야(해안선·거리는 정확하지 않아). 실제 위치는 본문의 구글맵 핀으로 확인해.</div>
+</div>
+</body>
+</html>
