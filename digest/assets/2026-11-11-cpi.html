@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미 10월 CPI — 예상을 넘은 숫자가 금리를 어디로 밀었나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 예상 vs 실제 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .brow{margin-bottom:18px}
+  .brow:last-child{margin-bottom:0}
+  .blabel{font-size:14.5px;font-weight:700;margin-bottom:8px}
+  .blabel span{font-weight:500;font-size:13px;color:var(--text2);margin-left:6px}
+  .bline{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .bname{flex:0 0 52px;font-size:12.5px;color:var(--text2);text-align:right}
+  .btrack{flex:1 1 auto;height:26px;background:var(--surface2);border-radius:6px;overflow:hidden}
+  .bfill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:9px;font-size:12.5px;font-weight:700;color:#fff}
+  .bfill.exp{background:#B9B6B1}
+  .bfill.act{background:var(--red)}
+  .bgap{margin-top:10px;background:var(--red-soft);border-radius:8px;padding:9px 13px;font-size:13.5px;color:#B23F34}
+  .bgap b{font-weight:700}
+
+  /* 3개월 연속 */
+  .streak{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .sbox{flex:1 1 90px;border:1px solid #F0C9C3;border-radius:10px;padding:10px 12px;background:var(--red-soft);text-align:center}
+  .sbox .sm{font-size:12px;color:#B23F34;font-weight:600}
+  .sbox .sv{font-size:19px;font-weight:700;color:#B23F34;margin-top:2px}
+
+  /* 품목 */
+  .items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .item{border:1px solid var(--border);border-radius:10px;padding:13px 14px;background:var(--soft)}
+  .item .iname{font-size:13px;color:var(--text2);font-weight:600}
+  .item .ival{font-size:20px;font-weight:700;margin-top:3px}
+  .item .idesc{font-size:12.5px;color:var(--text2);margin-top:4px;line-height:1.45}
+  .item.key{background:var(--orange-soft);border-color:#F0D6BC}
+  .item.key .ival{color:#9A5620}
+
+  /* 단계 흐름도 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 2년물 vs 10년물 */
+  .yl-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .yl{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .yl .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.big{background:var(--red-soft);color:#C6493E}
+  .badge.mid{background:var(--orange-soft);color:#B06426}
+  .yl h3{font-size:15.5px;margin-bottom:4px}
+  .yl .move{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .yl p{font-size:13.5px;color:var(--text2)}
+  .yl p b{color:var(--text)}
+  .reads{margin-top:14px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .reads b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.done{opacity:.72}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .items{grid-template-columns:1fr}
+    .yl-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.11 데일리 뉴스 · 시각자료</div>
+  <h1>🔥 예상을 0.1%p 넘었는데, 금리가 5%를 뚫었어</h1>
+  <div class="sub">미국 10월 소비자물가(CPI) — 작은 차이가 왜 큰 반응이 됐는지, 숫자와 경로로 보기</div>
+
+  <div class="section-title">① 예상 vs 실제 — 둘 다 0.1%p 위로</div>
+  <div class="bars">
+    <div class="brow">
+      <div class="blabel">헤드라인 CPI <span>전월 대비 · 9월은 +0.6%</span></div>
+      <div class="bline"><div class="bname">예상</div><div class="btrack"><div class="bfill exp" style="width:75%">+0.3%</div></div></div>
+      <div class="bline"><div class="bname">실제</div><div class="btrack"><div class="bfill act" style="width:100%">+0.4%</div></div></div>
+    </div>
+    <div class="brow">
+      <div class="blabel">근원 CPI <span>식품·에너지 제외 — 연준이 더 보는 쪽</span></div>
+      <div class="bline"><div class="bname">예상</div><div class="btrack"><div class="bfill exp" style="width:50%">+0.2%</div></div></div>
+      <div class="bline"><div class="bname">실제</div><div class="btrack"><div class="bfill act" style="width:75%">+0.3%</div></div></div>
+    </div>
+    <div class="bgap">⚠️ <b>차이는 0.1%p씩.</b> 그런데 이 0.1%p가 "연준이 12월에 올린다"를 거의 확정으로 바꿨어 — 왜인지는 ③에.</div>
+  </div>
+
+  <div class="section-title">② 근원이 석 달째 같은 자리 — 이게 더 무서운 숫자야</div>
+  <div class="streak">
+    <div class="sbox"><div class="sm">8월 근원</div><div class="sv">+0.3%</div></div>
+    <div class="sbox"><div class="sm">9월 근원</div><div class="sv">+0.3%</div></div>
+    <div class="sbox"><div class="sm">10월 근원</div><div class="sv">+0.3%</div></div>
+  </div>
+  <div class="paradox" style="background:var(--red-soft);color:#B23F34"><b>한 달은 사고, 석 달은 흐름</b>월 0.3%가 1년 이어지면 연 3.6% 수준이야. 연준 목표는 2% — 즉 "일시적 튐"으로 넘길 수 없는 속도가 석 달 연속 찍혔어.</div>
+
+  <div class="section-title">③ 뭐가 올랐나 — 주거비가 비중으로 이겼어</div>
+  <div class="items">
+    <div class="item"><div class="iname">에너지</div><div class="ival">+0.7%</div><div class="idesc">상승률은 가장 높지만 바구니에서 차지하는 몫이 작아</div></div>
+    <div class="item"><div class="iname">식품</div><div class="ival">+0.5%</div><div class="idesc">체감은 크지만 근원 CPI에서는 빠지는 항목</div></div>
+    <div class="item key"><div class="iname">주거비</div><div class="ival">+0.3%</div><div class="idesc">상승률은 제일 낮은데 <b>전체 상승분의 30% 이상</b>을 혼자 만들었어 — 비중이 그만큼 커</div></div>
+  </div>
+
+  <div class="section-title">④ 주거비는 왜 금리를 올려도 바로 안 꺾여?</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>시장 임대료가 먼저 움직인다</b><span class="mdesc">새로 계약하는 집의 월세가 오르거나 내림 — 여기는 금리·수요에 빠르게 반응해</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>그런데 계약은 1~2년에 한 번만 갱신된다</b><span class="mdesc">이미 사는 사람 월세는 갱신 날이 와야 바뀜 — 대부분의 가구는 '옛 가격'에 머물러 있어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>CPI 주거비는 '지금 시장가'가 아니라 '갱신된 계약들의 평균'</b><span class="mdesc">통계는 사는 집 전체를 재니까, 시장이 식어도 숫자는 과거 계약을 천천히 반영해</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>그래서 주거비는 늦게 오르고, 늦게 내린다</b><span class="mdesc">금리를 올린 효과가 주거비에 닿기까지 1년 넘게 걸릴 수 있어</span></div>
+    </div>
+    <div class="paradox"><b>⏳ 시차의 함정</b>연준이 "덜 올렸나" 싶을 때 주거비는 아직 과거를 반영하는 중이고, "이제 됐나" 싶을 때도 한참 더 간다. 물가의 가장 큰 덩어리가 제일 느리게 움직이는 것 — 이게 긴축이 길어지는 구조적 이유야.</div>
+  </div>
+
+  <div class="section-title">⑤ 어느 쪽 금리가 더 뛰었나 — 여기에 시장의 해석이 있어</div>
+  <div class="yl-grid">
+    <div class="yl">
+      <span class="badge big">더 많이 뛴 쪽</span>
+      <h3>2년물 국채금리</h3>
+      <div class="move">하루 +0.17%p (2025년 4월 이후 최대)</div>
+      <p>앞으로 <b>2년간 정책금리가 어디쯤일까</b>의 평균이야. 연준의 '다음 몇 번'을 거의 그대로 비춰.</p>
+    </div>
+    <div class="yl">
+      <span class="badge mid">같이 뛴 쪽</span>
+      <h3>10년물 국채금리</h3>
+      <div class="move">4.88% → 5.01% (5% 돌파)</div>
+      <p>10년의 <b>성장·물가 기대</b>가 담겨. 주택담보대출·기업 차입 금리의 기준이 되는 자리야.</p>
+    </div>
+  </div>
+  <div class="reads"><b>📖 읽는 법</b>짧은 쪽(2년물)이 더 세게 뛰었다는 건, 시장이 '먼 미래의 물가'를 고친 게 아니라 <b>'연준이 당장 몇 번 더 올리나'</b>를 고쳐 썼다는 뜻이야. 물가 전망이 아니라 정책 일정이 바뀐 거지.</div>
+
+  <div class="section-title">⑥ 다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item done"><div class="when">11/10 (화)</div><div class="what">미 10월 CPI — <b>예상 상회</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11/13 (금)</div><div class="what">미 10월 PPI (생산자물가)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11/26 (목)</div><div class="what">한은 금통위</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">12월</div><div class="what"><b>미 FOMC</b> — 0.25%p냐 0.5%p냐</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.11 딥다이브 내용 기반. 나스닥 하락폭·12월 인상 확률은 집계처마다 달라 본문에 범위로 적었어.</div>
+</div>
+</body>
+</html>
