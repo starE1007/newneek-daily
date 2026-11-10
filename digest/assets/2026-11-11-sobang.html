@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국가직 소방관인데 월급은 담뱃세에서 나온다</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 돈이 오는 길 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--surface2);color:#5E5B57}
+  .step.s2{background:var(--blue-soft);color:#1B6BB8}
+  .step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--orange-soft);color:#9A5620}
+  .step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 누가 내나 */
+  .bar-wrap{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .bar-label{display:flex;justify-content:space-between;font-size:13.5px;color:var(--text2);margin-bottom:6px}
+  .bar-label b{color:var(--text);font-size:14.5px}
+  .bar{display:flex;height:34px;border-radius:8px;overflow:hidden;background:var(--surface2)}
+  .bar .seg{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap}
+  .bar .nat{width:8.4%;background:var(--blue)}
+  .bar .loc{width:91.6%;background:var(--orange)}
+  .bar-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .bar-note b{color:var(--text)}
+
+  /* 전→후 */
+  .ba{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+  .ba-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--soft);text-align:center}
+  .ba-box .yr{font-size:12.5px;color:var(--text2);margin-bottom:4px}
+  .ba-box .amt{font-size:21px;font-weight:700}
+  .ba-box.after{background:var(--red-soft);border-color:#F3CFC9}
+  .ba-box.after .amt{color:#B23F34}
+  .ba-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+
+  .split{margin-top:12px;border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .split h4{font-size:14px;margin-bottom:10px}
+  .srow{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13.5px}
+  .srow:last-child{margin-bottom:0}
+  .sbar{height:14px;border-radius:4px}
+  .sbar.base{width:150px;background:#C9C6C1}
+  .sbar.real{width:51px;background:var(--red)}
+  .srow span{color:var(--text2)}
+  .srow b{color:var(--text)}
+
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 대립 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.a{background:var(--green-soft);color:#2F7A52}
+  .badge.b{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .sbar.base{width:110px} .sbar.real{width:37px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.11 데일리 뉴스 · 시각자료</div>
+  <h1>🚒 국가직인데, 월급은 담뱃세에서 나와</h1>
+  <div class="sub">소방관은 2020년 국가직이 됐는데 돈은 왜 지자체가 대는지, 그 돈줄이 왜 줄어드는지 한 장으로 보기</div>
+
+  <div class="section-title">① 소방 예산이 오는 길</div>
+  <div class="flow">
+    <div class="step s1">담배 한 갑 판매<small>한 갑에 세금 여러 개가 붙어</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">개별소비세<small>담배에 붙는 국세</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">그중 45%<small>= 소방안전교부세<br>2020년 20%→45%로 올림</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">정부가 지자체로 내려보냄<small>교부세 = 나라가 주는 몫</small></div>
+    <div class="arrow">→</div>
+    <div class="step s5">소방관 인건비·장비<small>부족분은 지자체가 자기 돈으로</small></div>
+  </div>
+
+  <div class="section-title">② 그래서 월급은 누가 내나 — 인건비 6조 5,129억 원</div>
+  <div class="bar-wrap">
+    <div class="bar-label"><span>부담 주체</span><b>국가 8.4% vs 지자체 91.6%</b></div>
+    <div class="bar">
+      <div class="seg nat">8.4%</div>
+      <div class="seg loc">지자체 91.6%</div>
+    </div>
+    <div class="bar-note">신분은 국가 공무원인데 돈은 지자체가 대는 구조라 <b>'무늬만 국가직'</b>이라는 말이 나와. 재정이 빠듯한 지자체는 월급 주고 나면 장비·안전 투자 몫이 남지 않아서, <b>사는 동네에 따라 장비와 처우가 달라져.</b></div>
+  </div>
+
+  <div class="section-title">③ 내년 교부세는 2,897억 줄어 (−27.6%)</div>
+  <div class="ba">
+    <div class="ba-box"><div class="yr">올해</div><div class="amt">1조 500억</div></div>
+    <div class="ba-op">→</div>
+    <div class="ba-box after"><div class="yr">내년(정부안)</div><div class="amt">7,605억</div></div>
+  </div>
+  <div class="split">
+    <h4>그런데 그 2,897억을 뜯어보면 — 전부 '담배를 덜 피워서'는 아니야</h4>
+    <div class="srow"><div class="sbar base"></div><b>약 2,160억</b><span>지난 세금 정산을 바로잡는 과정에서 생긴 기저효과(= 작년 수치가 부풀어 있던 것)</span></div>
+    <div class="srow"><div class="sbar real"></div><b>약 737억</b><span>실제 담배 세수 전망이 줄어든 몫</span></div>
+  </div>
+  <div class="paradox"><b>⚠️ 구조의 역설</b>금연이 성공할수록 담배 세수는 줄고, 안전 예산도 같이 줄어. 올해 삭감폭은 정산 착시가 더 컸지만, <b>줄어드는 세원에 안전 예산을 묶어 둔 설계</b> 자체는 해마다 같은 문제를 다시 만들어.</div>
+
+  <div class="section-title">④ 2조 원을 어디서 꺼내나 — 여야 모두 "나라가 더 내야" 하지만</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge a">정부·여당</span>
+      <h3>미래대응기금에서 2조</h3>
+      <p>기금은 이미 쌓인 돈에서 꺼내니 <b>당장 집행이 빠르다</b>는 장점. 대신 기금은 해마다 보장되는 돈이 아니야.</p>
+    </div>
+    <div class="vs">
+      <span class="badge b">국민의힘</span>
+      <h3>정규 예산에 2조 편성</h3>
+      <p>"기금 말고 본예산에 넣어야 <b>매년 꾸준히</b> 쓴다"는 주장. 대신 본예산은 다른 항목을 깎아야 자리가 생겨.</p>
+    </div>
+  </div>
+  <div class="bar-note" style="margin-top:12px">제3안 — 올해 말 없어지는 <b>담배소비세분 지방교육세</b>를 소방 재원으로 돌리면 연 최대 1조 5,000억. 다만 정부가 이 돈을 주거복지에 쓰는 법안을 이미 내놔서 조정이 필요해.</div>
+
+  <div class="section-title">⑤ 다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">11/8</div><div class="what">정부·여당 2조 지원 계획 발표, 국민의힘도 2조 증액 제시</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">12/2까지</div><div class="what"><b>국회 예산 심사</b> — 소방 예산이 얼마나, 어느 주머니에서 늘어나는지</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.11 딥다이브 내용 기반 (인건비·교부세 수치는 정부안·국회 자료 기준)</div>
+</div>
+</body>
+</html>
