@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>'조작기소 특검법' — 임명 구조가 왜 문제야?</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 특검 30초 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+
+  /* 임명 구조 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 쟁점 vs 반론 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--red-soft);color:#C6493E}
+  .badge.wait{background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.10 데일리 뉴스 · 시각자료</div>
+  <h1>⚖️ '조작기소 특검법' — 임명 구조가 왜 문제야?</h1>
+  <div class="sub">특검이 뭔지, 누가 뽑는지, 왜 삼권분립 얘기까지 나오는지 한 장으로 보기</div>
+
+  <div class="section-title">특검 30초 정리</div>
+  <div class="tax-row">
+    <div class="tax-box"><b>평소 수사</b><span>검찰·경찰이 담당 — 둘 다 행정부 소속</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box"><b>수사 대상이 권력 핵심이면?</b><span>"행정부가 행정부를 수사"라 못 믿겠다는 말이 나옴</span></div>
+    <div class="tax-op">→</div>
+    <div class="tax-box result"><b>특검(특별검사)</b><span>국회가 법을 만들어 세우는 <b>독립 검사</b> — 이번이 이재명 정부 7번째</span></div>
+  </div>
+  <div class="tax-note">'조작기소 특검'의 임무: 윤석열 정부 때 검찰·국정원·감사원이 정치적 반대편을 겨눠 수사·기소를 조작했는지 규명 (12개 사건, 최장 200일).</div>
+
+  <div class="section-title">임명 구조 — 화살표가 한 바퀴 돈다</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>국회가 특검법 통과 (11/6)</b><span class="mdesc">수사 대상 12개 사건을 법으로 지정 — 대장동·대북송금, 통계 조작 의혹 등</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>민주당·국민의힘·조국혁신당이 후보 1명씩 추천</b><span class="mdesc">추천은 3당이 나눠서</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>대통령이 그중 1명을 최종 임명</b><span class="mdesc">임명권은 대통령 한 사람에게</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>그 특검의 수사 대상 안에 대통령 본인이 기소된 사건이 포함</b><span class="mdesc">대장동 개발 비리·쌍방울 대북송금</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 이해충돌 루프</b>수사받을 사람이 수사할 사람을 고르는 모양 — 결과가 '조작 맞다'든 '아니다'든 공정성 시비가 남는다. 이게 "삼권분립 훼손" 반발의 출발점이야.</div>
+  </div>
+
+  <div class="section-title">쟁점 vs 반론</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">쟁점</span>
+      <h3>진행 중 재판에 끼어드나</h3>
+      <p>수사 대상 상당수가 지금 <b>재판 중</b>. 특검이 "기소가 조작"이라 결론 내면 법원 판단에 사실상 압력이 될 수 있다 — 행정이 사법을 흔드는 모양.</p>
+    </div>
+    <div class="vs">
+      <span class="badge push">쟁점</span>
+      <h3>검수완박 자기모순</h3>
+      <p>수사·기소를 분리하겠다며 <b>검찰청 폐지</b>까지 간 민주당이, 이번 특검에선 <b>파견 검사의 수사권</b>을 되살렸다는 비판.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">반론</span>
+      <h3>판결은 결국 법원 몫</h3>
+      <p>특검 결론이 재판 결과를 <b>직접 바꾸지는 못해</b>. 수사 대상인 대통령이 특검을 임명한 전례도 과거에 있었어.</p>
+    </div>
+    <div class="vs">
+      <span class="badge wait">반론</span>
+      <h3>제일 센 조항은 뺐어</h3>
+      <p>특검이 <b>공소를 취소</b>(재판 자체를 거둬들임)할 수 있다는 조항은 논란 끝에 <b>삭제</b>됐어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">다음 확인 포인트</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">11/6</div><div class="what">국회 본회의 통과 (찬성 167)</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11/10</div><div class="what">국민의힘, 청와대 앞 의총 — <b>거부권 행사 요구</b></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">12/2 · 12월</div><div class="what"><b>예산안 법정 기한</b>(심사 파행 중) · 특검팀 출범 전망</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.10 오늘의 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
