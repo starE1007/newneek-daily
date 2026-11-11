@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.12</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.12 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'denominator', variants:[
+    { q:'같은 달 통계에서 실업률은 10월 기준 역대 최저인데, 청년 고용률은 6년 만에 최저로 나올 수 있는 이유로 가장 알맞은 것은?',
+      opts:['실업률은 청년만, 고용률은 전 연령을 대상으로 조사하기 때문에',
+            '실업률의 분모는 구직활동을 한 사람까지만 세고, 고용률의 분모는 인구 전체이기 때문에',
+            '실업률은 매달 조사하고 고용률은 분기마다 조사해 기준 시점이 다르기 때문에',
+            '실업률은 계절조정 수치를 쓰고 고용률은 원자료를 쓰기 때문에'],
+      answer:1,
+      explain:'실업률 = 실업자 ÷ <b>경제활동인구</b>(취업자＋실업자), 고용률 = 취업자 ÷ <b>15세 이상 인구</b>야. 분모가 다르니 두 지표가 반대로 움직일 수 있어.' },
+    { q:'구직을 단념하고 \'쉬었음\'으로 넘어간 사람이 늘 때 지표에 생기는 변화로 가장 알맞은 것은?',
+      opts:['실업자에서 빠져 실업률은 내려가고, 고용률은 분모가 그대로라 내려간다',
+            '실업자로 계속 잡혀서 실업률과 고용률이 함께 올라간다',
+            '취업자로 분류돼 고용률이 올라간다',
+            '조사 대상에서 제외돼 두 지표 모두 움직이지 않는다'],
+      answer:0,
+      explain:'구직을 접으면 <b>비경제활동인구</b>로 가서 실업률 분모·분자에서 동시에 빠져 — 실업률은 오히려 좋아 보여. 반면 고용률 분모(인구 전체)에는 그대로 남아 고용률은 내려가.' },
+  ]},
+  { id:'youthrate', variants:[
+    { q:'청년 인구가 1년 새 14만 1,000명 줄었는데도 청년 고용률이 떨어진 이유를 가장 정확하게 설명한 것은?',
+      opts:['청년 인구 감소는 고용률 계산에 반영되지 않기 때문',
+            '청년 실업자가 늘어 고용률의 분모가 커졌기 때문',
+            '청년 취업자가 19만 6,000명 줄어, 분모인 인구보다 분자가 더 빨리 줄었기 때문',
+            '청년 기준이 15~29세에서 15~34세로 바뀌었기 때문'],
+      answer:2,
+      explain:'인구(분모)는 −14.1만, 취업자(분자)는 −19.6만이야. <b>분자가 더 빨리 줄면</b> 비율은 내려가. 그래서 42.9%까지 떨어진 거야.' },
+    { q:'\'청년 인구가 줄고 있으니 고용률은 저절로 올라간다\'는 말이 틀릴 수 있는 이유로 가장 알맞은 것은?',
+      opts:['고용률은 인구가 아니라 가구 수를 분모로 쓰기 때문',
+            '취업자가 인구보다 더 빠른 속도로 줄면 비율은 오히려 내려가기 때문',
+            '인구 감소분은 이듬해 통계에만 반영되기 때문',
+            '고용률에는 상한이 정해져 있어 일정 수준을 넘지 못하기 때문'],
+      answer:1,
+      explain:'분모가 줄어도 <b>분자가 더 빨리 줄면</b> 비율은 떨어져. 청년 고용률이 30개월 연속 내린 게 그 경우야.' },
+  ]},
+  { id:'jobmix', variants:[
+    { q:'취업자가 13만 9,000명 늘었는데도 \'체감은 다르다\'는 말이 나오는 근거로 가장 알맞은 것은?',
+      opts:['늘어난 일자리가 모두 해외 취업으로 집계됐기 때문',
+            '취업자 집계에 자영업자가 빠져 있기 때문',
+            '증가분이 전부 제조업 대기업에서 나왔기 때문',
+            '증가분 대부분이 보건·사회복지와 60세 이상에서 나왔고, 20대와 숙박·음식점업에서는 줄었기 때문'],
+      answer:3,
+      explain:'보건·사회복지 <b>＋24.9만</b>이 증가분을 거의 혼자 만들었고, 숙박·음식점업은 <b>−13.7만</b>, 20대는 <b>−20.3만</b>이야. 총합은 늘었어도 <b>자리의 주인이 바뀌는 중</b>이라 체감이 갈려.' },
+    { q:'숙박·음식점업 취업자 13만 7,000명 감소가 청년 지표에 특히 크게 비치는 이유는?',
+      opts:['이 업종이 청년 고용률 계산에서 별도의 가중치를 받기 때문',
+            '청년이 가장 많이 일하는 업종 중 하나라, 이 업종이 줄면 청년 일자리가 함께 줄기 때문',
+            '이 업종 종사자는 실업자로 분류되지 않기 때문',
+            '이 업종만 계절조정 없이 발표되기 때문'],
+      answer:1,
+      explain:'가중치 같은 장치가 아니라 <b>실제로 청년이 몰려 있는 업종</b>이라서야. 그래서 내수가 식으면 청년 고용률부터 먼저 찍혀.' },
+  ]},
+  { id:'seasonal', variants:[
+    { q:'전년 동월비 취업자는 13만 9,000명 늘었는데 계절조정 취업자는 전월보다 5만 명 줄었어. 이 둘을 함께 읽는 법으로 가장 알맞은 것은?',
+      opts:['둘 중 하나는 집계 오류라서 곧 정정된다',
+            '1년 전과 비교하면 나아졌지만, 최근 몇 달의 흐름은 꺾이고 있다',
+            '계절조정을 하면 증가폭은 언제나 작아진다',
+            '계절조정 수치는 고용률 계산에만 쓰이는 보조 지표다'],
+      answer:1,
+      explain:'전년 동월비는 <b>1년 전과의 비교</b>, 계절조정 전월비는 <b>바로 직전 달과의 비교</b>야. 비교 상대가 다르니 방향이 갈릴 수 있고, 최근 흐름은 뒤쪽이 더 민감하게 보여줘.' },
+    { q:'고용 통계에서 \'계절조정\'을 하는 이유로 가장 알맞은 것은?',
+      opts:['농번기·방학처럼 해마다 같은 시기에 반복되는 변동을 걷어내 달과 달을 비교하려고',
+            '조사에 응하지 않은 사람의 답을 추정해 채워 넣으려고',
+            '물가 변동분을 빼고 실질 기준으로 바꾸려고',
+            '지역별 표본 수의 차이를 맞추려고'],
+      answer:0,
+      explain:'계절조정은 <b>해마다 반복되는 달력 효과</b>를 걷어내는 작업이야. 그래야 \'지난달보다\'라는 비교가 뜻을 가져.' },
+  ]},
+  { id:'aiequity', variants:[
+    { q:'AI 투자 자금이 회사채(빚)에서 기업공개(주식)로 옮겨갈 때 위험의 성격이 어떻게 바뀌는지 가장 잘 설명한 것은?',
+      opts:['갚을 의무가 새로 생겨 부도 위험이 더 커진다',
+            '위험 자체가 사라져 손실을 볼 사람이 없어진다',
+            '갚을 의무가 없어 부도 위험은 줄지만, 손실이 주가를 통해 주주에게 간다',
+            '중앙은행이 손실을 대신 떠안는 구조로 바뀐다'],
+      answer:2,
+      explain:'빚은 <b>갚지 못하면 부도</b>지만 주식은 <b>값이 떨어질 뿐</b>이야. 그래서 자금줄이 증시로 옮겨가면 충격이 터지는 자리도 채권시장에서 <b>개인 계좌</b> 쪽으로 옮겨와.' },
+    { q:'앤트로픽 상장 추진이 \'AI 투자 과열\' 논쟁에서 갖는 의미로 가장 알맞은 것은?',
+      opts:['AI 기업이 더는 외부 자금을 필요로 하지 않게 됐다는 뜻이다',
+            '설비 자금을 대는 창구가 사모·부채에서 공개 주식시장으로 넓어졌다는 뜻이다',
+            'AI 기업의 수익성이 이미 검증됐다는 공식 인증이다',
+            '상장 이후에는 기업가치가 더 이상 흔들리지 않는다는 뜻이다'],
+      answer:1,
+      explain:'상장은 <b>돈을 받는 창구가 넓어지는 일</b>이지 수익성 보증이 아니야. 지난주 네오클라우드 편이 \'빚으로 GPU를 사는\' 단계였다면, 이번은 그 자금이 공개 시장으로 넘어오는 단계야.' },
+  ]},
+  { id:'ratesmarket', variants:[
+    { q:'미국 금리가 급등한 다음 날 코스피가 2.6% 오른 상황을 읽는 법으로 가장 알맞은 것은?',
+      opts:['금리와 주가 사이에는 원래 아무 관계가 없다',
+            '한국 증시는 미국 금리의 영향을 받지 않는다',
+            '환율이 올랐기 때문에 주가도 따라 올랐다',
+            '금리는 끌어내리는 힘, AI 실적·상장 기대는 끌어올리는 힘인데 그날은 뒤쪽이 더 셌다'],
+      answer:3,
+      explain:'시장에는 <b>반대 방향으로 당기는 힘이 동시에</b> 걸려 있어. 한쪽 재료만 보고 방향을 단정하면 틀리는 이유야(환율은 오히려 3.9원 내렸어).' },
+    { q:'복습: 2년물 국채금리가 하루 18.9bp 뛴 것이 10년물 움직임보다 더 큰 신호로 읽히는 이유는?',
+      opts:['2년물은 거래량이 적어 가격이 쉽게 흔들리기 때문',
+            '2년물은 앞으로 몇 년간의 정책금리 전망을 담고 있어, 연준의 다음 행보가 바뀌었다는 뜻이기 때문',
+            '2년물 금리가 주택담보대출 금리와 직접 연동돼 있기 때문',
+            '2년물은 물가 전망만 반영하고 정책금리는 반영하지 않기 때문'],
+      answer:1,
+      explain:'짧은 만기 금리는 \'<b>연준이 앞으로 몇 번 어떻게 움직일까</b>\'의 평균이야. 짧은 쪽이 더 뛰었다는 건 먼 미래가 아니라 <b>당장의 금리 경로</b>를 고쳐 썼다는 뜻.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'실업률을 계산할 때 분모가 되는 건 15세 이상 인구 전체가 아니라, 취업자와 실업자를 합친 ______인구야. (네 글자)',
+    accept:['경제활동','경제활동인구'],
+    explain:'정답은 <b>경제활동</b>(경제활동인구). 구직활동을 한 사람까지만 포함돼서, 구직을 접으면 이 분모에서 빠져.' },
+  { q:'일할 뜻이 있어도 구직활동을 하지 않아 실업자로 잡히지 않는 사람들이 들어가는 분류는? (\'쉬었음\'이 여기 들어가)',
+    accept:['비경제활동인구','비경제활동'],
+    explain:'정답은 <b>비경제활동인구</b>. 여기로 넘어가면 실업률 분모·분자에서 동시에 빠져서 실업률이 오히려 낮아져.' },
+  { q:'10월 취업자 증가분(13.9만 명)을 거의 혼자 만든 업종은 보건업 및 ______서비스업이야. (네 글자)',
+    accept:['사회복지','사회복지서비스','복지'],
+    explain:'정답은 <b>사회복지</b>. 여기서만 +24.9만이야 — 고령화와 정부 재정이 받치는 쪽이라, 민간 내수 업종과는 결이 달라.' },
+  { q:'해마다 같은 시기에 반복되는 변동(농번기·방학 등)을 걷어내 전달과 비교할 수 있게 만든 수치를 ______ 수치라고 해. (네 글자)',
+    accept:['계절조정','계절 조정'],
+    explain:'정답은 <b>계절조정</b>. 10월 계절조정 취업자는 전월보다 5만 명 줄어서, 전년 동월비(+13.9만)와 방향이 갈렸어.' },
+  { q:'10월 청년(15~29세) 고용률은 몇 %였어? (숫자만, 소수점 한 자리까지)',
+    accept:['42.9','42.9%'],
+    explain:'정답은 <b>42.9%</b>. 1년 전보다 1.7%p 낮고, 10월 기준으로는 2020년(42.3%) 이후 6년 만에 최저야.' },
+  { q:'AI 기업이 빚이 아니라 주식을 팔아 자금을 모으며 증시에 처음 상장하는 걸 영문 세 글자로 뭐라고 해?',
+    accept:['IPO','기업공개'],
+    explain:'정답은 <b>IPO</b>(기업공개). 앤트로픽이 19일 상장을 추진하면서 AI 자금줄이 부채에서 공개 주식시장으로 넓어지는 중이야.' },
+  { q:'금리를 올릴지 내릴지 정하는 한국은행 회의인 금융통화위원회를 줄여서 뭐라고 불러? (세 글자)',
+    accept:['금통위'],
+    explain:'정답은 <b>금통위</b>. 다음 회의는 <b>11월 26일</b> — 물가·환율과 내수·고용 중 어느 쪽에 무게를 두는지가 대출 이자로 돌아와.' },
+  { q:'복습: 소방안전교부세는 담배에 붙는 ______세의 45%로 정해져 있어. (네 글자)',
+    accept:['개별소비','개별소비세'],
+    explain:'정답은 <b>개별소비</b>(개별소비세). 세율이 아니라 <b>고정 비율</b>이라, 담배가 덜 팔리면 소방 예산도 같이 줄어.' },
+  { q:'복습: 비교 대상인 작년 숫자가 특이해서 올해 변화율이 과장돼 보이는 현상을 뭐라고 해? (네 글자)',
+    accept:['기저효과','기저 효과'],
+    explain:'정답은 <b>기저효과</b>. 숫자의 변화율을 볼 땐 \'<b>비교 상대</b>\'가 정상이었는지부터 확인해야 해.' },
+  { q:'복습: 연준이 기준금리를 한 번에 0.5%p 움직이는 것을 뭐라고 불러? (영어 표기도 인정)',
+    accept:['빅스텝','big step','빅 스텝'],
+    explain:'정답은 <b>빅스텝</b>. 10월 CPI가 예상을 웃돌면서 12월 인상 확률은 선물시장에서 사실상 100%까지 올라갔어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

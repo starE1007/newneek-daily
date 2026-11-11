@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>취업자는 늘었는데 왜 청년만 나빠져 — 한 장으로 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .note b{color:var(--text)}
+
+  /* 숫자 카드 */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{border:1px solid var(--border);border-radius:12px;padding:14px 14px;background:var(--soft)}
+  .stat .label{font-size:12.5px;color:var(--text2);margin-bottom:6px}
+  .stat .big{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .stat .tag{display:inline-block;margin-top:7px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .tag.good{background:var(--green-soft);color:#2F7A52}
+  .tag.bad{background:var(--red-soft);color:#C6493E}
+  .stat.alarm{background:var(--red-soft);border-color:#F3D3CF}
+  .stat.alarm .big{color:#C6493E}
+
+  /* 분모 도식 */
+  .denom{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .pop-bar{display:flex;gap:6px;align-items:stretch;margin-bottom:6px}
+  .pop{border-radius:9px;padding:11px 12px;font-size:13.5px;font-weight:700;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .pop small{font-weight:500;font-size:12px;opacity:.9}
+  .pop.emp{flex:4 1 0;background:var(--blue-soft);color:#1B6BB8}
+  .pop.unemp{flex:1 1 0;background:var(--orange-soft);color:#9A5620}
+  .pop.out{flex:3 1 0;background:var(--surface2);color:var(--text2)}
+  .brace{display:flex;gap:6px;font-size:11.5px;color:var(--text2);margin-bottom:16px}
+  .brace .b1{flex:5 1 0;text-align:center;border-top:2px solid var(--orange);padding-top:4px}
+  .brace .b2{flex:3 1 0;text-align:center;border-top:2px solid #CFCCC7;padding-top:4px}
+  .formula{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+  .fml{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft);font-size:13.5px}
+  .fml b{display:block;font-size:14.5px;margin-bottom:4px}
+  .fml .f{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text2);margin-top:4px}
+  .fml.hi{background:var(--orange-soft);border-color:#F0D9C3}
+  .punch{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .punch>b:first-child{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-name{flex:0 0 112px;text-align:right;color:var(--text2)}
+  .bar-track{flex:1 1 auto;position:relative;height:22px;background:var(--surface2);border-radius:5px;overflow:hidden}
+  .bar-fill{position:absolute;top:0;bottom:0;border-radius:5px}
+  .bar-fill.up{background:var(--blue);left:50%}
+  .bar-fill.down{background:var(--red);right:50%}
+  .bar-zero{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#C9C6C1}
+  .bar-val{flex:0 0 76px;font-weight:700;font-size:13px}
+  .bar-val.up{color:#1B6BB8}
+  .bar-val.down{color:#C6493E}
+  .bars-cap{font-size:12.5px;color:var(--text2);margin:2px 0 10px}
+
+  /* 속도 비교 */
+  .race{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .race-box{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .race-box .t{font-size:13px;color:var(--text2);margin-bottom:4px}
+  .race-box .v{font-size:20px;font-weight:700}
+  .race-box.slow .v{color:var(--text2)}
+  .race-box.fast{background:var(--red-soft);border-color:#F3D3CF}
+  .race-box.fast .v{color:#C6493E}
+  .race-box .d{font-size:12.5px;color:var(--text2);margin-top:5px}
+
+  /* 흐름 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 160px;min-width:150px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3{background:var(--orange-soft);color:#9A5620}
+  .step.s4{background:var(--blue-soft);color:#1B6BB8}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:22px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:720px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .stat-grid{grid-template-columns:1fr 1fr}
+    .formula,.race{grid-template-columns:1fr}
+    .bar-name{flex:0 0 86px;font-size:12.5px}
+    .bar-val{flex:0 0 66px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.12 데일리 뉴스 · 시각자료</div>
+  <h1>🧑‍💼 취업자는 늘었는데, 왜 청년만 나빠져?</h1>
+  <div class="sub">10월 고용동향(국가데이터처, 11/11 발표) — 역대 최고와 6년 최저가 같은 표에 있는 이유</div>
+
+  <div class="section-title">같은 날 나온 숫자 네 개</div>
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="label">취업자 (전년 동월비)</div>
+      <div class="big">+13.9만</div>
+      <span class="tag good">넉 달째 10만 명대</span>
+    </div>
+    <div class="stat">
+      <div class="label">15~64세 고용률</div>
+      <div class="big">70.4%</div>
+      <span class="tag good">10월 기준 역대 최고</span>
+    </div>
+    <div class="stat">
+      <div class="label">실업률</div>
+      <div class="big">2.0%</div>
+      <span class="tag good">10월 기준 역대 최저</span>
+    </div>
+    <div class="stat alarm">
+      <div class="label">청년(15~29세) 고용률</div>
+      <div class="big">42.9%</div>
+      <span class="tag bad">−1.7%p · 30개월째 ↓</span>
+    </div>
+  </div>
+  <div class="note">앞의 셋만 보면 역대급 호황, 넷째만 보면 한파야. <b>셋 다 사실</b>이고, 재는 자가 서로 다를 뿐이야.</div>
+
+  <div class="section-title">① 실업률이 좋아 보이는 건 '분모'가 달라서야</div>
+  <div class="denom">
+    <div class="pop-bar">
+      <div class="pop emp">취업자<small>일을 하고 있음</small></div>
+      <div class="pop unemp">실업자<small>구직활동 중</small></div>
+      <div class="pop out">비경제활동인구<small>'쉬었음' · 구직단념 · 학업 등</small></div>
+    </div>
+    <div class="brace">
+      <div class="b1">경제활동인구 ＝ 실업률의 분모</div>
+      <div class="b2">여기로 가면 실업률 계산에서 빠짐</div>
+    </div>
+    <div class="formula">
+      <div class="fml hi">
+        <b>실업률</b>일하고 싶다고 <u>신고한 사람</u> 중 못 구한 비율
+        <div class="f">실업자 ÷ (취업자＋실업자)</div>
+      </div>
+      <div class="fml">
+        <b>고용률</b>인구 전체 중 실제로 일하는 사람 비율
+        <div class="f">취업자 ÷ 15세 이상 인구</div>
+      </div>
+    </div>
+    <div class="punch"><b>⚠️ 그래서 생기는 착시</b>구직을 포기하고 '쉬었음'으로 넘어가면 실업자에서 빠져 <b>분모와 분자가 같이 줄어</b> — 실업률은 오히려 더 낮게 찍혀. 고용률은 분모가 인구 전체라 이 사람들이 그대로 남아 있어서, 두 지표가 반대로 움직일 수 있어.</div>
+  </div>
+
+  <div class="section-title">② 청년 고용률 계산 — 분모보다 분자가 더 빨리 줄었어</div>
+  <div class="race">
+    <div class="race-box slow">
+      <div class="t">분모 · 청년 인구</div>
+      <div class="v">−14.1만</div>
+      <div class="d">저출생으로 청년 수 자체가 줄어드는 중</div>
+    </div>
+    <div class="race-box fast">
+      <div class="t">분자 · 청년 취업자</div>
+      <div class="v">−19.6만</div>
+      <div class="d">48개월 연속 감소 — 인구가 주는 속도보다 빠름</div>
+    </div>
+  </div>
+  <div class="note">인구가 줄면 취업자도 줄어드는 게 정상이야. 그런데 <b>줄어드는 속도가 더 빠르면</b> 비율(고용률)이 떨어져. 이번에 42.9%까지 내려가 <b>2020년 10월 이후 6년 만에 최저</b>가 된 이유야.</div>
+
+  <div class="section-title">③ 늘어난 자리와 사라진 자리</div>
+  <div class="bars">
+    <div class="bars-cap">업종별 취업자 증감 (전년 동월비)</div>
+    <div class="bar-row">
+      <div class="bar-name">보건·사회복지</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill up" style="width:50%"></div></div>
+      <div class="bar-val up">+24.9만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">숙박·음식점</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill down" style="width:27.5%"></div></div>
+      <div class="bar-val down">−13.7만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">농림어업</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill down" style="width:20.3%"></div></div>
+      <div class="bar-val down">−10.1만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">건설업</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill down" style="width:8.4%"></div></div>
+      <div class="bar-val down">−4.2만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">제조업</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill down" style="width:1.4%"></div></div>
+      <div class="bar-val down">−0.7만</div>
+    </div>
+    <div class="bars-cap" style="margin-top:16px">연령별 취업자 증감 (전년 동월비)</div>
+    <div class="bar-row">
+      <div class="bar-name">60세 이상</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill up" style="width:48.3%"></div></div>
+      <div class="bar-val up">+19.6만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">30대</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill up" style="width:31.5%"></div></div>
+      <div class="bar-val up">+12.8만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">50대</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill up" style="width:10.3%"></div></div>
+      <div class="bar-val up">+4.2만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">40대</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill down" style="width:7.9%"></div></div>
+      <div class="bar-val down">−3.2만</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-name">20대</div>
+      <div class="bar-track"><div class="bar-zero"></div><div class="bar-fill down" style="width:50%"></div></div>
+      <div class="bar-val down">−20.3만</div>
+    </div>
+  </div>
+  <div class="note">증가분을 거의 혼자 만든 건 <b>보건·사회복지(+24.9만)</b> — 고령화와 정부 재정이 받치는 쪽이야. 반대로 줄어든 숙박·음식점업은 <b>청년이 가장 많이 일하는 업종</b>이고, 연령으로 보면 늘어난 건 60세 이상, 사라진 건 20대야. 같은 13.9만 명 안에서 <b>자리의 주인이 바뀌고 있는 것</b>.</div>
+
+  <div class="section-title">나한테 오는 영향</div>
+  <div class="flow">
+    <div class="step s1">청년·숙박음식<br>고용 부진</div>
+    <div class="arrow">→</div>
+    <div class="step s2">가계 소득·소비<br>회복이 더뎌짐<small>계절조정 취업자 전월비 −5만</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">내수 지표 둔화<small>3분기 GDP도 민간소비만 감소</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">11/26 금통위의 저울<small>물가·환율은 '올려', 내수·고용은 '내려'</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 수치는 국가데이터처 2026년 10월 고용동향(11/11 발표) 보도 기준 · 막대 길이는 비교용 상대값</div>
+</div>
+</body>
+</html>
