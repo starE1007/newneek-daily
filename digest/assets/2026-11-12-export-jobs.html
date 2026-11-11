@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>같은 날 나온 두 숫자 — 수출 신기록과 청년 고용 최저</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 두 숫자 대비 */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .num{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .num .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.up{background:var(--green-soft);color:#2F7A52}
+  .badge.down{background:var(--red-soft);color:#C6493E}
+  .num .big{font-size:30px;font-weight:800;line-height:1.15;margin-bottom:2px}
+  .num.a .big{color:#2F7A52}
+  .num.b .big{color:#C6493E}
+  .num .label{font-size:14px;font-weight:600;margin-bottom:6px}
+  .num p{font-size:13.5px;color:var(--text2)}
+  .num p b{color:var(--text)}
+
+  /* 비중 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-of-type{margin-bottom:0}
+  .bar-label{flex:0 0 96px;font-size:13.5px;font-weight:600;color:var(--text2)}
+  .bar-track{flex:1;height:30px;background:var(--surface2);border-radius:7px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:13px;font-weight:700;color:#fff}
+  .bar-fill.past{width:24.4%;background:#B9CBD9}
+  .bar-fill.now{width:49.7%;background:var(--blue)}
+  .bars .note{margin-top:12px;font-size:13px;color:var(--text2)}
+  .bars .note b{color:var(--text)}
+
+  /* 두 갈래 흐름도 */
+  .root{border:1px solid var(--border);border-radius:12px;background:var(--canvas);padding:18px 20px}
+  .root-chip{margin:0 auto 6px;width:max-content;background:var(--orange-soft);color:#9A5620;font-weight:700;font-size:14.5px;padding:8px 18px;border-radius:99px}
+  .root-sub{text-align:center;font-size:13px;color:var(--text2);margin-bottom:6px}
+  .split{text-align:center;color:#B9B6B1;font-size:16px;font-weight:700;margin-bottom:10px}
+  .lanes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .lane{border-radius:10px;padding:14px 14px 16px}
+  .lane.good{background:var(--green-soft)}
+  .lane.bad{background:var(--red-soft)}
+  .lane h3{font-size:14.5px;margin-bottom:10px;text-align:center}
+  .lane.good h3{color:#2F7A52}
+  .lane.bad h3{color:#B23F34}
+  .st{background:var(--canvas);border-radius:8px;padding:9px 11px;font-size:13.5px;font-weight:600;text-align:center}
+  .st small{display:block;font-weight:500;font-size:12px;color:var(--text2);margin-top:2px}
+  .down{text-align:center;color:#B9B6B1;font-size:14px;font-weight:700;line-height:1.1;margin:5px 0}
+  .st.last{font-weight:800}
+  .lane.good .st.last{color:#2F7A52}
+  .lane.bad .st.last{color:#B23F34}
+
+  /* 엇갈린 신호 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.hold{background:var(--orange-soft);color:#B06426}
+  .badge.cut{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .closing{margin-top:14px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .closing b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .two,.lanes,.vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 72px;font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.12 데일리 뉴스 · 시각자료</div>
+  <h1>📊 같은 날 나온 두 숫자</h1>
+  <div class="sub">수출은 역대 최대, 청년 고용은 6년 만에 최저 — 두 숫자가 왜 같은 뿌리에서 나왔는지 한 장으로 보기</div>
+
+  <div class="section-title">11월 11일, 나란히 발표된 두 지표</div>
+  <div class="two">
+    <div class="num a">
+      <span class="badge up">역대 최대</span>
+      <div class="big">335억 달러</div>
+      <div class="label">11월 1~10일 수출 · 전년 대비 +111.9%</div>
+      <p>조업일수(7.0→7.5일)를 보정한 <b>일평균도 +97.7%</b>. 올해 누적 9,637억 달러로, <b>이달 20일 전후 사상 첫 연 1조 달러</b>가 유력해.</p>
+    </div>
+    <div class="num b">
+      <span class="badge down">6년 만에 최저</span>
+      <div class="big">42.9%</div>
+      <div class="label">10월 청년(15~29세) 고용률 · 전년 대비 −1.7%p</div>
+      <p>청년 취업자는 <b>19만 6천 명</b> 줄어 <b>48개월 연속 감소</b>. 전체 취업자는 13만 9천 명 늘었는데 20대만 20만 3천 명 빠졌어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">수출의 절반이 한 품목이야</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">작년 11월 초</div>
+      <div class="bar-track"><div class="bar-fill past">24.4%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">올해 11월 초</div>
+      <div class="bar-track"><div class="bar-fill now">49.7%</div></div>
+    </div>
+    <div class="note">전체 수출에서 <b>반도체</b>가 차지하는 비중. 1년 만에 두 배가 됐고, 반도체 수출액 자체는 <b>166억 달러(+331.2%)</b>야. 수출이 두 배로 뛴 게 아니라 <b>반도체 한 칸이 네 배로 뛴 것</b>에 가까워.</div>
+  </div>
+
+  <div class="section-title">두 숫자의 뿌리는 같아</div>
+  <div class="root">
+    <div class="root-chip">🤖 AI 투자 붐</div>
+    <div class="root-sub">데이터센터·AI 서버에 돈이 몰리는 같은 흐름이</div>
+    <div class="split">▼ 두 갈래로 갈려 ▼</div>
+    <div class="lanes">
+      <div class="lane good">
+        <h3>① 수출 쪽 — 밀어 올린다</h3>
+        <div class="st">AI 서버용 메모리 수요 급증</div>
+        <div class="down">▼</div>
+        <div class="st">D램 가격 상승<small>물량보다 '단가'가 먼저 뛰어</small></div>
+        <div class="down">▼</div>
+        <div class="st">같은 물량도 수출액이 커짐</div>
+        <div class="down">▼</div>
+        <div class="st last">수출 335억 달러 · 역대 최대</div>
+      </div>
+      <div class="lane bad">
+        <h3>② 고용 쪽 — 깎아낸다</h3>
+        <div class="st">기업의 AI 도입 확산</div>
+        <div class="down">▼</div>
+        <div class="st">신입이 맡던 초급 업무 대체<small>정부도 이 가능성을 공식 언급</small></div>
+        <div class="down">▼</div>
+        <div class="st">신입 채용 축소 · 경력직 선호</div>
+        <div class="down">▼</div>
+        <div class="st last">청년 고용률 42.9% · 6년 만에 최저</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="closing"><b>👉 그래서 핵심은 '평균'이 아니라 '쏠림'</b>나라 전체 숫자는 신기록인데 내 일자리·내 지갑은 반대로 가는 구간이야. 수출 절반이 한 품목에 묶여 있어서, AI 투자가 식으면 1조 달러도 같이 흔들려.</div>
+
+  <div class="foot">※ 수치는 관세청 11월 1~10일 수출입 현황(잠정치)과 국가데이터처 10월 고용동향 기준 · 2026.11.12 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
