@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기름값에 씌운 뚜껑 — 석유 최고가격제 한 장으로 보기</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 가격 세 칸 */
+  .prices{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .pr{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft);position:relative}
+  .pr .tag{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px}
+  .pr .big{font-size:25px;font-weight:800;line-height:1.15}
+  .pr .unit{font-size:13px;font-weight:600;color:var(--text2);margin-left:2px}
+  .pr p{font-size:12.5px;color:var(--text2);margin-top:6px}
+  .pr.cap{background:var(--orange-soft);border-color:#E8C9AC}
+  .pr.cap .big{color:#9A5620}
+  .pr.cap .tag{color:#9A5620}
+
+  /* 메커니즘 흐름도 */
+  .mech{border:1px solid var(--border);border-radius:12px;background:var(--canvas);padding:18px 20px}
+  .st{background:var(--soft);border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-size:14px;font-weight:600;text-align:center}
+  .st small{display:block;font-weight:500;font-size:12.5px;color:var(--text2);margin-top:3px}
+  .st.capbox{background:var(--orange-soft);border-color:#E8C9AC;color:#9A5620;font-weight:800}
+  .down{text-align:center;color:#B9B6B1;font-size:15px;font-weight:700;line-height:1.1;margin:6px 0}
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .branch{border-radius:10px;padding:13px 14px 15px}
+  .branch.b1{background:var(--green-soft)}
+  .branch.b2{background:var(--red-soft)}
+  .branch h3{font-size:14px;margin-bottom:9px;text-align:center}
+  .branch.b1 h3{color:#2F7A52}
+  .branch.b2 h3{color:#B23F34}
+  .branch .st{background:var(--canvas);border-color:transparent}
+  .branch .st.last{font-weight:800}
+  .branch.b1 .st.last{color:#2F7A52}
+  .branch.b2 .st.last{color:#B23F34}
+
+  /* 청구서 막대 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-of-type{margin-bottom:0}
+  .bar-label{flex:0 0 108px;font-size:13px;font-weight:600;color:var(--text2);line-height:1.35}
+  .bar-track{flex:1;height:34px;background:var(--surface2);border-radius:7px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:13px;font-weight:700;color:#fff;white-space:nowrap}
+  .bar-fill.gov{width:73.6%;background:var(--blue)}
+  .bar-fill.ind{width:100%;background:var(--red)}
+  .bars .note{margin-top:13px;font-size:13px;color:var(--text2)}
+  .bars .note b{color:var(--text)}
+
+  /* 타임라인 */
+  .tl{border:1px solid var(--border);border-radius:12px;background:var(--canvas);padding:6px 20px 14px}
+  .tl-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+  .tl-item:last-child{border-bottom:none}
+  .tl-date{flex:0 0 92px;font-size:13px;font-weight:700;color:var(--text2);padding-top:1px}
+  .tl-body{font-size:14px}
+  .tl-body small{display:block;font-size:12.5px;color:var(--text2);font-weight:500;margin-top:2px}
+  .tl-item.now .tl-date{color:var(--orange)}
+  .tl-item.now .tl-body{font-weight:700}
+  .tl-item.next .tl-date{color:var(--blue)}
+
+  .closing{margin-top:14px;background:var(--blue-soft);border-radius:10px;padding:13px 16px;font-size:14px;color:#1B6BB8}
+  .closing b{display:block;margin-bottom:3px;font-size:14.5px}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .prices,.fork{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 86px;font-size:12px}
+    .tl-date{flex:0 0 76px;font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.13 데일리 뉴스 · 시각자료</div>
+  <h1>⛽ 기름값에 씌운 '뚜껑'</h1>
+  <div class="sub">석유 최고가격제는 주유소 가격표를 누르는 제도가 아니야 — 어디에 뚜껑이 씌워져 있고, 그 차액은 누가 내는지 한 장으로 보기</div>
+
+  <div class="section-title">지금 세 자리의 가격</div>
+  <div class="prices">
+    <div class="pr">
+      <div class="tag">① 원유 (국제시세)</div>
+      <div class="big">92<span class="unit">달러대 / 배럴</span></div>
+      <p>브렌트유. 10일 장중 <b>89.16달러</b>로 8월 이후 처음 90달러를 깼어. 10월 30일 117.64달러 대비 −20%대.</p>
+    </div>
+    <div class="pr cap">
+      <div class="tag">② 정유사 도매가 ← 뚜껑은 여기</div>
+      <div class="big">1,784<span class="unit">원 / L</span></div>
+      <p>보통휘발유 공급가 상한(경유 1,773원·등유 1,380원). 6월 27일 150원 내린 뒤 11차까지 쭉 동결.</p>
+    </div>
+    <div class="pr">
+      <div class="tag">③ 주유소 판매가 (전국 평균)</div>
+      <div class="big">1,855.4<span class="unit">원 / L</span></div>
+      <p>11월 첫째 주 휘발유(경유 1,842.0원). 여기엔 유통비·주유소 마진·세금이 더 붙어 있어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">뚜껑 아래로 판 차액은 어디로 갈까</div>
+  <div class="mech">
+    <div class="st">국제유가가 올라 원래 도매가가 뚜껑 위로 올라감</div>
+    <div class="down">▼</div>
+    <div class="st capbox">🧢 최고가격 1,784원에서 강제로 잘림<small>정유사는 이 값 위로는 못 넘겨</small></div>
+    <div class="down">▼ 잘려나간 차액은 사라지지 않고 두 갈래로 ▼</div>
+    <div class="fork">
+      <div class="branch b1">
+        <h3>① 당장 — 내 지갑은 덜 나가</h3>
+        <div class="st">주유소 가격 상승이 눌림</div>
+        <div class="down">▼</div>
+        <div class="st">보통휘발유가 규제 밖 고급휘발유보다<small>산업연구원 추정, L당 최대 239원 덜 올랐어</small></div>
+        <div class="down">▼</div>
+        <div class="st last">주유할 때 체감 부담 ↓</div>
+      </div>
+      <div class="branch b2">
+        <h3>② 나중에 — 세금으로 돌아와</h3>
+        <div class="st">정유사 손실로 쌓임</div>
+        <div class="down">▼</div>
+        <div class="st">정부가 사후 보전<small>올해 목적예비비 4조 2,000억 원에서</small></div>
+        <div class="down">▼</div>
+        <div class="st last">결국 나라 곳간 = 세금</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">첫 청구서 — 기준이 다르면 금액도 달라져</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">정부가 잡아둔 돈<br>(올해 목적예비비)</div>
+      <div class="bar-track"><div class="bar-fill gov">4조 2,000억 원</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">업계 기준 손실<br>(3/13~6/30분 추정)</div>
+      <div class="bar-track"><div class="bar-fill ind">5조 7,100억 원</div></div>
+    </div>
+    <div class="note">기준이 갈려. 정부는 <b>원가＋적정마진</b>만 메우면 된다는 쪽, 정유업계는 <b>싱가포르 국제가(MOPS)와 공급가의 차액</b>에 수출로 팔았으면 벌었을 몫까지 쳐야 한다는 쪽이야. 같은 기간인데 숫자가 1조 5,000억 원 넘게 벌어져 — 넉 달 치만 그래.</div>
+  </div>
+
+  <div class="section-title">8개월의 시간표</div>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-date">3월 13일</div>
+      <div class="tl-body">최고가격제 도입<small>중동 전쟁으로 유가가 뛰자 정유사 도매가에 상한을 씌웠어</small></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">6월 27일</div>
+      <div class="tl-body">상한 150원 인하<small>이후 11차까지 1,784원에서 계속 동결</small></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">10월 17일</div>
+      <div class="tl-body">11차 — 또 동결<small>당시 브렌트유 105달러대, 호르무즈 긴장이 이유였어</small></div>
+    </div>
+    <div class="tl-item now">
+      <div class="tl-date">11월 13일<br>오늘 18시</div>
+      <div class="tl-body">12차 발표 (14일 0시 적용)<small>유가가 90달러 안팎으로 내려와, 8개월 만에 처음 '푸느냐'를 따지는 회차</small></div>
+    </div>
+    <div class="tl-item next">
+      <div class="tl-date">11월 하순</div>
+      <div class="tl-body">1차 정산액 통보<small>3/13~6/30분. 20일 전후 윤곽이 드러나고, 업계 이의신청이 예상돼</small></div>
+    </div>
+    <div class="tl-item next">
+      <div class="tl-date">내년 1월 31일</div>
+      <div class="tl-body">유류세 인하 종료 예정<small>11일 회의에서 2개월 연장 확정 — 휘발유 15%·경유 25%</small></div>
+    </div>
+  </div>
+
+  <div class="closing"><b>👉 그래서 핵심은 "싸진 게 아니라 미뤄진 것"</b>가격 상한은 가격을 없애는 게 아니라 <b>내는 사람과 내는 시점</b>을 바꿔. 뚜껑을 벗기는 순간 눌러둔 만큼 한 번에 올라오고, 유류세 인하까지 같은 시점에 끝나면 두 번 튀어 — 전문가들이 '단계적'을 말하는 이유야.</div>
+
+  <div class="foot">※ 유가는 11월 10~12일 보도 기준, 주유소 평균가는 11월 첫째 주, 정산 기준 논쟁의 금액은 업계 추정치(확정 전) · 2026.11.13 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
