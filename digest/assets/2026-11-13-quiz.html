@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.13</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.13 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'samegroup', variants:[
+    { q:'공정위가 진에어·에어부산·에어서울 합병을 "경쟁제한성이 없는 것으로 추정"하며 승인한 이유로 가장 알맞은 것은?',
+      opts:['LCC는 운임이 낮아 기업결합 심사 대상에서 빠지기 때문에',
+            '세 회사가 이미 같은 기업집단(한진) 계열이라 합쳐도 경쟁자가 새로 사라지지 않기 때문에',
+            '통합 후에도 제주항공·티웨이가 남아 점유율이 과반을 넘지 않기 때문에',
+            '국토부가 먼저 인가하면 공정위 심사는 형식 절차로 바뀌기 때문에'],
+      answer:1,
+      explain:'기업결합 심사는 <b>경쟁자가 줄어드는지</b>를 봐. 3사는 2024년 대한항공–아시아나 결합 때 이미 한 울타리에 들어왔으니, 이번 합병은 점유율을 새로 바꾸는 게 아니라 법인을 하나로 정리하는 절차야.' },
+    { q:'\'이번 승인으로 독과점 심사가 끝났다\'는 말이 정확하지 않은 이유는?',
+      opts:['독과점 심사는 출범 이후에만 할 수 있기 때문',
+            '국토부에는 독과점을 심사할 권한이 아예 없기 때문',
+            '독과점 심사는 2024년 대한항공–아시아나 결합 때 이미 끝났고, 이번 조건은 안전·보고 같은 절차 쪽이기 때문',
+            '공정위가 심사를 2027년 출범 시점으로 미뤘기 때문'],
+      answer:2,
+      explain:'이번 인가 조건은 <b>안전운항체계 변경검사·해외 당국 인허가·소비자 보호 계획 월별 보고</b>야. 값과 좌석을 묶는 조건은 2년 전 결합 때 이미 걸렸어.' },
+  ]},
+  { id:'lock', variants:[
+    { q:'2024년 기업결합 조건이 운임에 건 상한으로 알맞은 것은?',
+      opts:['2019년 평균 운임에 물가상승률을 더한 수준',
+            '직전 연도 평균 운임을 한 푼도 넘지 않는 수준',
+            '경쟁 LCC 중 최저가를 넘지 않는 수준',
+            '국토부가 매년 고시하는 표준운임'],
+      answer:0,
+      explain:'기준점은 <b>2019년</b>(코로나 이전)이고, 물가가 오른 만큼은 반영해줘. 대상은 5개사 <b>40개 노선</b>, 기간은 2024년 말~<b>2034년 말 10년</b>이야.' },
+    { q:'결합 조건이 운임뿐 아니라 \'공급 좌석 90% 이상 유지\'까지 함께 건 이유로 가장 알맞은 것은?',
+      opts:['항공기 안전 점검 주기를 맞추기 위해',
+            '값을 묶어도 좌석을 줄이면 비싼 표만 남아 사실상 값이 오르기 때문',
+            '좌석 수가 많아야 공항 슬롯을 배정받을 수 있기 때문',
+            '국제항공운송협회가 회원사에 요구하는 기준이기 때문'],
+      answer:1,
+      explain:'값만 묶으면 <b>공급을 줄여</b> 싼 표를 없애는 길이 남아. 그래서 가격 상한과 공급 하한을 한 쌍으로 걸어둔 거야.' },
+  ]},
+  { id:'average', variants:[
+    { q:'운임 조건이 노선별 \'평균\'을 기준으로 재는 데서 생기는 빈틈으로 가장 알맞은 것은?',
+      opts:['평균을 쓰면 노선별 운임을 공개하지 않아도 되는 점',
+            '평균이 올라가면 조건이 자동으로 완화되는 점',
+            '성수기·인기 시간대를 올리고 비수기 표를 내려 평균을 맞추면 조건을 지킨 것으로 집계되는 점',
+            '평균은 매년 새로 계산돼 2019년 기준이 사라지는 점'],
+      answer:2,
+      explain:'감시 기준이 <b>평균</b>이면 평균 안쪽 분포는 자유로워. 통계상으론 지켰는데 내가 사는 시간대의 표는 비싸질 수 있어.' },
+    { q:'\'평균 운임은 규정대로인데 체감 항공료는 올랐다\'는 말이 동시에 성립할 수 있는 조건은?',
+      opts:['내가 주로 타는 시간대·시즌의 운임이 올랐고, 그 몫을 다른 시간대 인하로 상쇄했을 때',
+            '항공사가 평균 계산에서 국제선을 뺐을 때만',
+            '물가상승률이 운임 상승률보다 높았을 때만',
+            '좌석 공급이 2019년보다 늘어났을 때만'],
+      answer:0,
+      explain:'평균은 <b>분포를 감춰</b>. 그래서 수치를 볼 땐 "무엇의 평균인지, 평균 안이 고른지"를 같이 봐야 해.' },
+  ]},
+  { id:'enforce', variants:[
+    { q:'아시아나가 결합 조건의 운임 한도를 최대 28% 넘겨 받은 제재로 알맞은 것은?',
+      opts:['해당 노선 운수권 전면 회수',
+            '121억 원 이행강제금과 검찰 고발',
+            '기업결합 승인 취소와 분할 명령',
+            '국토부의 신규 노선 허가 영구 정지'],
+      answer:1,
+      explain:'4년간 쌓인 과태료는 <b>186억 원</b>이야. 어겨도 돌아오는 건 <b>돈</b>이지 합병을 되돌리는 조치가 아니라는 게 이 구조의 약한 고리야.' },
+    { q:'결합 조건의 실효성을 따질 때 \'제재가 금전에 그친다\'는 점이 중요한 이유로 가장 알맞은 것은?',
+      opts:['과태료는 소비자에게 직접 환급되기 때문',
+            '금전 제재는 공정위가 아니라 법원이 정하기 때문',
+            '위반으로 번 돈이 제재액보다 크면 어기는 쪽이 이익이 될 수 있기 때문',
+            '금전 제재를 받으면 조건 적용 기간이 자동 연장되기 때문'],
+      answer:2,
+      explain:'조건을 지키게 만드는 힘은 <b>제재의 크기와 위반 이익의 비교</b>에서 나와. 그래서 괌 노선 좌석 의무를 90%→70%로 낮춰 달라는 요청이 기각된 것도 같은 맥락이야.' },
+  ]},
+  { id:'routes', variants:[
+    { q:'통합 LCC 출범이 소비자 선택지에 주는 영향을 가장 정확하게 설명한 것은?',
+      opts:['김해 국제선 운항 횟수는 늘지만, 3사가 겹쳐 날던 구간은 한 회사 몫으로 합쳐져 같은 목적지의 선택지는 줄 수 있다',
+            '노선과 운항 횟수가 모두 줄어 지방 출발이 어려워진다',
+            '노선 수가 늘어나므로 모든 구간에서 선택지가 함께 늘어난다',
+            '국내선만 통합되고 국제선은 3사 체제가 그대로 유지된다'],
+      answer:0,
+      explain:'김해 국제선은 <b>28개 노선 주 281회 → 33개 노선 주 339회</b>로 늘어. 다만 \'노선 수\'와 \'한 노선 안의 경쟁자 수\'는 다른 얘기야.' },
+    { q:'통합 진에어가 국내 LCC 1위가 된다고 보는 근거로 알맞은 것은?',
+      opts:['정부가 LCC 1위 사업자를 지정해 발표했기 때문',
+            '기단이 58대로 늘어 티웨이(48대)·제주항공(44대)을 앞서기 때문',
+            '국내선 운임을 가장 낮게 책정했기 때문',
+            '유일하게 장거리 노선을 운항하는 LCC가 되기 때문'],
+      answer:1,
+      explain:'기단 <b>58대</b>·국제선 <b>70여 개 노선</b>이 돼. 다만 이건 3사 합산 <b>예정치</b>라 노선 조정에 따라 달라질 수 있어.' },
+  ]},
+  { id:'bigstep', variants:[
+    { q:'시장의 관심이 \'연준이 금리를 올리나\'에서 \'얼마나 올리나\'로 옮겨간 이유로 가장 알맞은 것은?',
+      opts:['10월 CPI가 전월 대비 +0.4%로 예상(0.3%)을 넘겨 물가 둔화 기대가 꺾였기 때문',
+            '연준이 금리 인상을 사전에 공식 발표했기 때문',
+            '미 국채 2년물 금리가 하락 전환했기 때문',
+            '달러 가치가 급락해 수입 물가가 내려갔기 때문'],
+      answer:0,
+      explain:'예상보다 높은 물가가 나오자 질문이 <b>방향</b>에서 <b>폭</b>으로 넘어갔어 — 한 번에 0.5%p 올리는 <b>빅스텝</b>까지 거론되는 중이야.' },
+    { q:'미국이 빅스텝으로 금리를 올릴 때 한국은행의 선택지가 좁아지는 경로로 알맞은 것은?',
+      opts:['미 금리 인상 → 한미 금리차 확대 → 원화 약세·자금 유출 압력 → 한은이 금리를 낮추기 어려워짐',
+            '미 금리 인상 → 달러 약세 → 수입 물가 하락 → 한은이 금리를 올려야 함',
+            '미 금리 인상 → 국내 수출 감소 → 물가 하락 → 한은이 금리를 동결해야 함',
+            '미 금리 인상 → 국내 예금 금리 자동 연동 → 한은의 결정이 무의미해짐'],
+      answer:0,
+      explain:'금리차가 벌어지면 <b>돈이 이자 높은 쪽</b>으로 움직여 환율에 상방 압력이 생겨. 그래서 11월 26일 금통위의 운신 폭이 줄어드는 거야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'기업결합 심사에서 \'합치면 경쟁이 줄어드나\'를 따지는 성질을 ______성이라고 해. (네 글자)',
+    accept:['경쟁제한','경쟁 제한','경쟁제한성'],
+    explain:'정답은 <b>경쟁제한</b>(경쟁제한성). 같은 기업집단 계열끼리는 이미 경쟁자로 세지 않아서 \'없음\'으로 추정돼.' },
+  { q:'진에어·에어부산·에어서울이 모두 속해 있는 기업집단 이름은? (두 글자)',
+    accept:['한진'],
+    explain:'정답은 <b>한진</b>. 2024년 대한항공이 아시아나를 품으면서 그 자회사였던 에어부산·에어서울도 같은 울타리에 들어왔어.' },
+  { q:'결합 조건에서 운임 상한의 기준이 되는 연도는? (숫자 네 자리)',
+    accept:['2019','2019년'],
+    explain:'정답은 <b>2019년</b>. 코로나 이전 평균 운임에 물가상승률을 더한 수준이 천장이고, 조건은 <b>2034년 말</b>까지 이어져.' },
+  { q:'결합 조건상 공급 좌석은 2019년의 몇 % 이상을 유지해야 해? (숫자만)',
+    accept:['90','90%'],
+    explain:'정답은 <b>90%</b>. 값만 묶고 좌석을 줄이면 싼 표가 사라지니까, 가격 상한과 공급 하한을 한 쌍으로 건 거야.' },
+  { q:'시정권고나 의무를 안 지킬 때 지킬 때까지 반복해서 물리는 돈을 ______금이라고 해. (네 글자)',
+    accept:['이행강제','이행 강제','이행강제금'],
+    explain:'정답은 <b>이행강제</b>(이행강제금). 아시아나는 운임 한도를 넘겨 <b>121억 원</b>을 물고 검찰에 고발됐어.' },
+  { q:'통합 진에어 출범 예정일은 2027년 몇 월 며칠이야? (예: 3월 17일)',
+    accept:['3월 17일','3.17','317','3월17일'],
+    explain:'정답은 <b>3월 17일</b>. 그에 앞서 <b>2026년 12월 17일</b>에는 대한항공–아시아나 통합 FSC가 먼저 떠.' },
+  { q:'노선 전체의 ______만 기준선 안에 들면 시간대·시즌별로는 값을 올릴 수 있어서 체감과 통계가 갈려. (두 글자)',
+    accept:['평균'],
+    explain:'정답은 <b>평균</b>. 감시 기준이 평균이면 그 안의 분포는 자유로워 — 수치를 볼 땐 \'무엇의 평균인지\'를 같이 봐야 해.' },
+  { q:'연준이 기준금리를 한 번에 0.5%p 올리는 걸 뭐라고 불러? (영어 표기도 인정)',
+    accept:['빅스텝','big step','빅 스텝'],
+    explain:'정답은 <b>빅스텝</b>. 10월 CPI가 +0.4%로 예상을 넘으면서 인상 폭 논쟁이 붙었어.' },
+  { q:'복습: 수출액은 물량 × ______라서, 같은 물량을 팔아도 값이 오르면 금액이 불어나. (두 글자)',
+    accept:['단가','가격'],
+    explain:'정답은 <b>단가</b>(가격). 증가율이 튀면 \'얼마나 팔았나\'와 \'얼마에 팔았나\'를 갈라 봐야 해.' },
+  { q:'복습: 실업률의 분모는 인구 전체가 아니라 취업자와 실업자를 합친 ______인구야. (네 글자)',
+    accept:['경제활동','경제활동인구'],
+    explain:'정답은 <b>경제활동</b>. 구직을 접으면 이 분모에서 빠져서 실업률이 오히려 낮게 찍혀.' },
+  { q:'복습: 비교 대상인 작년 숫자가 특이해 올해 변화율이 과장돼 보이는 현상은? (네 글자)',
+    accept:['기저효과','기저 효과'],
+    explain:'정답은 <b>기저효과</b>. 변화율을 볼 땐 <b>비교 상대</b>가 정상이었는지부터 확인해야 해.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
