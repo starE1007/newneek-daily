@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>잠자는 카드 포인트 2.1조, 그 돈은 어디서 와서 어디로 가나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 숫자 타일 */
+  .stat-row{display:flex;gap:10px;flex-wrap:wrap}
+  .stat{flex:1 1 170px;border:1px solid var(--border);border-radius:10px;padding:13px 15px;background:var(--soft)}
+  .stat .label{font-size:12.5px;color:var(--text2);margin-bottom:3px}
+  .stat .val{font-size:21px;font-weight:700;letter-spacing:-.01em}
+  .stat .note{font-size:12.5px;color:var(--text2);margin-top:3px}
+  .stat.hot{background:var(--red-soft);border-color:#F4D4D0}
+  .stat.hot .val{color:#C6493E}
+  .stat.key{background:var(--blue-soft);border-color:#CBE3F8}
+  .stat.key .val{color:#1B6BB8}
+
+  /* 단계 흐름도 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--surface2);color:#55524E}
+  .step small{font-weight:500;font-size:12px;opacity:.85;display:block}
+  .step.s-me{background:var(--blue-soft);color:#1B6BB8}
+  .step.s-end{background:var(--orange-soft);color:#9A5620}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 두 갈래 */
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .lane{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .lane .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.now{background:var(--red-soft);color:#C6493E}
+  .badge.next{background:var(--green-soft);color:#2F7A52}
+  .lane h3{font-size:15.5px;margin-bottom:8px}
+  .chain{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .chain div{font-size:13.5px;background:var(--canvas);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+  .chain div b{color:var(--text)}
+  .chain .last{border-color:#F4D4D0;background:var(--red-soft);color:#B23F34;font-weight:600}
+  .chain .last.good{border-color:#CDE4D7;background:var(--green-soft);color:#2F7A52}
+  .lane p{font-size:13px;color:var(--text2)}
+
+  /* 회계 전환 */
+  .ledger{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--canvas)}
+  .lbox{flex:1 1 200px;border-radius:10px;padding:12px 14px}
+  .lbox .t{font-size:12.5px;font-weight:700;margin-bottom:3px}
+  .lbox .d{font-size:13.5px;color:var(--text2)}
+  .lbox.debt{background:var(--blue-soft)}
+  .lbox.debt .t{color:#1B6BB8}
+  .lbox.profit{background:var(--orange-soft)}
+  .lbox.profit .t{color:#9A5620}
+  .lop{font-size:20px;font-weight:700;color:#B9B6B1}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .paradox{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .fork{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.16 데일리 뉴스 · 시각자료</div>
+  <h1>💳 잠자는 포인트 2조 1,000억, 원래 누구 돈이야?</h1>
+  <div class="sub">포인트가 어디서 생겨서 어디로 사라지는지, 그리고 정부가 그 길을 어디로 틀려는 건지 한 장으로 보기</div>
+
+  <div class="section-title">숫자 세 개</div>
+  <div class="stat-row">
+    <div class="stat key"><div class="label">지금 쌓여서 안 쓰이는 포인트</div><div class="val">2조 1,000억 원</div><div class="note">전업 카드사 기준 잔액</div></div>
+    <div class="stat hot"><div class="label">해마다 그냥 사라지는 포인트</div><div class="val">연 1,003억 원</div><div class="note">2021~2025년 평균</div></div>
+    <div class="stat"><div class="label">5년간 소멸 합계</div><div class="val">5,018억 원</div><div class="note">카드사 8곳 합산</div></div>
+  </div>
+
+  <div class="section-title">① 포인트는 하늘에서 떨어진 공짜가 아니야</div>
+  <div class="flow">
+    <div class="step s-me">내가 카드로 결제<small>예: 10만 원</small></div>
+    <div class="arrow">→</div>
+    <div class="step">가맹점이 카드사에 수수료 지급<small>결제액의 일부</small></div>
+    <div class="arrow">→</div>
+    <div class="step">카드사가 그중 일부를 떼어 적립<small>회계상 '판촉비'</small></div>
+    <div class="arrow">→</div>
+    <div class="step s-end">내 포인트로 기록<small>카드사 장부엔 '나중에 내줄 빚'</small></div>
+  </div>
+  <div class="paradox"><b>⚠️ 여기가 핵심</b>포인트는 카드사가 선심 써서 주는 돈이 아니라, 내 결제에서 떼어내 <b>나중에 돌려주기로 약속한 몫</b>이야. 그래서 회계장부에도 카드사의 <b>부채</b>로 적혀 있어.</div>
+
+  <div class="section-title">② 안 쓰면 그 '빚'은 사라지는 게 아니라 옮겨가</div>
+  <div class="ledger">
+    <div class="lbox debt"><div class="t">적립됐을 때 — 카드사 장부의 부채</div><div class="d">언젠가 고객이 찾아갈 돈이라 빚으로 잡아둬</div></div>
+    <div class="lop">→</div>
+    <div class="lbox debt"><div class="t">유효기간 5년 경과</div><div class="d">안 찾아간 포인트는 자동 소멸</div></div>
+    <div class="lop">→</div>
+    <div class="lbox profit"><div class="t">내줄 일이 없어진 빚 = 카드사 이익</div><div class="d">이렇게 굴러 들어온 돈을 '낙전수입'이라고 불러</div></div>
+  </div>
+
+  <div class="section-title">③ 지금의 길 vs 내년 5월부터 열리는 길</div>
+  <div class="fork">
+    <div class="lane">
+      <span class="badge now">지금</span>
+      <h3>흩어져 있다가 타이머가 끝나는 길</h3>
+      <div class="chain">
+        <div>카드사마다 <b>따로</b> 쌓임 — 한 곳당 몇천 원씩</div>
+        <div>쓸 곳이 카드사 쇼핑몰·제휴처로 제한</div>
+        <div>찾아가지 않은 채 <b>5년 경과</b></div>
+        <div class="last">소멸 → 카드사 이익으로</div>
+      </div>
+      <p>2021년부터 1원 단위 현금화가 가능해졌는데도 2.1조가 남아 있어 — 길이 없어서가 아니라 <b>안 찾아가서</b>야.</p>
+    </div>
+    <div class="lane">
+      <span class="badge next">2027년 5월~</span>
+      <h3>지역화폐라는 좁은 통로로 흘려보내는 길</h3>
+      <div class="chain">
+        <div>카드사 · <b>금융결제원</b> · 지역화폐 사업자 전산 연결</div>
+        <div>흩어진 포인트를 한자리에서 전환 신청</div>
+        <div>지역화폐로 바뀜 — 쓸 수 있는 가게가 <b>소상공인 중심</b></div>
+        <div class="last good">골목상권 소비로 흘러감</div>
+      </div>
+      <p>현금이 아니라 굳이 지역화폐인 이유가 여기 있어. 현금이면 대형마트·온라인으로 새지만, 지역화폐는 <b>쓸 수 있는 자리가 정해져</b> 있어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">④ 시간표</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">2021년 1월</div><div class="what">카드 포인트 통합조회·현금화 서비스 개시</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">2026년 6월 말</div><div class="what">국무회의에서 포인트 전환 방안 검토 지시</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">2026년 11월 13일</div><div class="what">국가정책조정회의 — 전환 추진 공식 발표</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">2027년 5월</div><div class="what"><b>전환 서비스 시작</b> — 이후 공공·민간 포인트로 확대</div></div>
+  </div>
+
+  <div class="foot">※ 포인트 잔액·소멸액은 금융당국·국회 제출 자료 보도 기준 · 2026.11.16 딥다이브 내용 기반</div>
+</div>
+</body>
+</html>
