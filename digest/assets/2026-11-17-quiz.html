@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.17</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.17 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+
+const MC_BANK = [
+  { id:'fairvalue', variants:[
+    { q:'앤트로픽의 9개월 순손실 1,040억 달러 가운데 943억 달러가 \'전환사채·SAFE 공정가치 변동\'이야. 이 금액의 성격으로 가장 알맞은 것은?',
+      opts:['투자자에게 현금으로 돌려준 환불금이다',
+            '아직 주식이 아닌 투자 약속의 값을 회사 몸값에 맞춰 다시 매긴 결과다',
+            '설비를 사는 데 실제로 쓴 돈이다',
+            '직원 급여와 연구비로 지출한 금액이다'],
+      answer:1,
+      explain:'전환사채·SAFE는 "나중에 주식으로 바꿔주겠다"는 <b>약속</b>이야. 회계는 이걸 빚으로 잡고 분기마다 시세로 다시 매기는데, 그때 늘어난 값이 손실로 찍혀. 현금이 나간 게 아니야.' },
+    { q:'비상장 회사의 몸값이 오를 때 장부상 순손실이 오히려 커질 수 있는 이유로 가장 알맞은 것은?',
+      opts:['몸값이 오르면 내야 할 법인세가 먼저 손실로 잡히기 때문에',
+            '몸값이 오르면 주식으로 바꿔주기로 한 약속의 값도 같이 올라 그 증가분이 비용으로 기록되기 때문에',
+            '몸값이 오를수록 매출을 적게 잡도록 회계 기준이 정해져 있기 때문에',
+            '투자자가 몸값 상승분만큼 배당을 요구할 수 있기 때문에'],
+      answer:1,
+      explain:'내줄 의무(빚)의 값이 커지면 그 증가분이 평가손실이 돼. 그래서 <b>잘 되는 게 장부엔 적자로 보여.</b> 상장해서 약속이 진짜 주식이 되면 이 항목은 사라져.' },
+  ]},
+  { id:'twoloss', variants:[
+    { q:'같은 기간 앤트로픽의 순손실은 1,040억 달러, 영업손실은 12.6억 달러야. 사업이 실제로 어떻게 굴러가는지 보려면 어느 쪽을 봐야 할까?',
+      opts:['순손실 — 모든 항목이 들어간 최종 숫자라서',
+            '영업손실 — 장사해서 남거나 밑진 몫만 따로 뽑은 숫자라서',
+            '둘의 평균 — 한쪽만 보면 치우치니까',
+            '순손실에서 매출을 뺀 값 — 실제 부담을 보여주니까'],
+      answer:1,
+      explain:'영업손실은 <b>파는 일 자체</b>의 성적이야. 전년 같은 기간 52억 달러에서 12.6억 달러로 줄었어. 순손실에는 영업과 무관한 평가 항목이 섞여 있어.' },
+    { q:'영업손실이 전년 52억 달러에서 12.6억 달러로 줄었는데도 순손실은 1,000억 달러를 넘었어. 이 상황을 가장 정확하게 읽은 것은?',
+      opts:['장사는 나아졌지만 투자 약속을 다시 매긴 금액이 장부를 덮었다',
+            '매출이 줄어서 손실이 커졌다',
+            '설비 투자를 갑자기 늘려 현금이 그만큼 빠져나갔다',
+            '회계 기준이 바뀌어 과거 실적이 모두 손실로 바뀌었다'],
+      answer:0,
+      explain:'9개월 매출은 332억 달러로 오히려 커졌어. 순손실을 키운 건 <b>공정가치 재평가</b>라는, 현금이 움직이지 않는 항목이야.' },
+  ]},
+  { id:'commitment', variants:[
+    { q:'평가손실 943억 달러와 구매약정·리스 8,954억 달러의 가장 큰 차이는?',
+      opts:['평가손실은 세금이 붙고 구매약정은 안 붙는다',
+            '평가손실은 현금이 움직이지 않지만 구매약정은 앞으로 실제로 돈이 나간다',
+            '평가손실은 미래의 일이고 구매약정은 이미 끝난 일이다',
+            '평가손실은 투자자가 부담하고 구매약정은 고객이 부담한다'],
+      answer:1,
+      explain:'구매약정은 주로 계산 설비(컴퓨트)를 <b>사기로 서명한 금액</b>이야. 9개월 매출 332억 달러의 약 27배라, 진짜 부담은 이쪽에 있어.' },
+    { q:'상장으로 당기는 돈이 최대 904억 달러인데 구매약정은 8,954억 달러야. 여기서 따라오는 질문으로 가장 알맞은 것은?',
+      opts:['상장 자금만으로 약정을 모두 갚을 수 있느냐',
+            '남은 간격을 매출 성장으로 메울 수 있느냐',
+            '약정을 취소하면 투자자에게 배당이 돌아가느냐',
+            '공모가를 올리면 약정 금액이 줄어드느냐'],
+      answer:1,
+      explain:'조달액은 약정의 10분의 1 수준이야. 그래서 시장이 보는 건 금액 자체가 아니라 <b>매출이 그만큼 계속 커질 수 있는가</b>야.' },
+  ]},
+  { id:'transmission', variants:[
+    { q:'미국에서 \'AI 값이 비싸다\'는 말이 나오면 한국 코스피가 먼저 흔들리는 이유로 가장 알맞은 것은?',
+      opts:['한국 투자자 상당수가 미국 AI 기업 주식을 직접 들고 있기 때문에',
+            '지수에서 비중이 큰 반도체 기업들의 실적 기대가 AI 설비 투자에 묶여 있기 때문에',
+            '원화 환율이 미국 기술주 가격에 연동돼 있기 때문에',
+            '한국거래소가 미국 지수 등락에 맞춰 가격 제한폭을 조정하기 때문에'],
+      answer:1,
+      explain:'AI 설비 투자가 줄면 HBM 같은 주문 기대가 먼저 깎여. 주문이 실제로 줄기 전에 <b>기대</b>가 먼저 가격에 반영되는 자리야.' },
+    { q:'연준 금융안정보고서가 AI 인프라 투자 관련 \'부채\'를 취약 요인으로 짚은 게 시장에 부담이 된 이유는?',
+      opts:['설비 투자를 빚으로 당겨 썼다면 수익이 늦어질 때 갚는 쪽이 먼저 흔들리기 때문에',
+            '연준이 AI 기업에 대한 대출을 즉시 금지했기 때문에',
+            '보고서가 나오면 해당 기업의 신용등급이 자동으로 내려가기 때문에',
+            'AI 설비의 실제 수요가 줄었다는 통계가 함께 공개됐기 때문에'],
+      answer:0,
+      explain:'빚으로 지은 설비는 <b>수익이 늦어도 이자는 제때</b> 나가. 그래서 \'기대가 늦어진다\'는 신호만으로도 값이 먼저 깎여. 수요가 줄었다는 통계가 나온 건 아니야.' },
+  ]},
+  { id:'ipoprice', variants:[
+    { q:'앤트로픽 공모가가 희망 범위 상단(78달러)에서 정해지느냐, 아래로 깎이느냐가 중요한 이유로 가장 알맞은 것은?',
+      opts:['공모가가 낮아지면 회사의 영업손실이 그만큼 커지기 때문에',
+            'AI 모델을 만드는 회사의 값을 시장이 직접 매기는 첫 기준점이 되기 때문에',
+            '공모가에 따라 나스닥 상장 여부가 결정되기 때문에',
+            '공모가가 높을수록 구매약정 금액이 줄어들기 때문에'],
+      answer:1,
+      explain:'지금까지 AI 거품 논쟁은 주로 <b>설비·반도체</b> 쪽이었어. 이번엔 모델을 만드는 회사 자체에 값이 붙는 자리라, 그 숫자가 다음 비교의 잣대가 돼.' },
+    { q:'상장이 이뤄지면 장부에서 전환사채·SAFE 관련 평가손실 항목에 일어나는 변화로 알맞은 것은?',
+      opts:['약속이 실제 주식으로 바뀌면서 그 항목이 장부에서 사라진다',
+            '손실이 그대로 남아 매년 같은 금액이 반복해서 잡힌다',
+            '손실이 매출로 바뀌어 실적이 좋아진다',
+            '손실만큼 현금을 투자자에게 돌려줘야 한다'],
+      answer:0,
+      explain:'\'나중에 주식으로\'라는 약속이 이행되면 더 이상 다시 매길 빚이 없어져. 그래서 상장 뒤 손익계산서는 <b>영업 쪽 숫자가 그대로 드러나</b>.' },
+  ]},
+  { id:'oilcap', variants:[
+    { q:'석유 최고가격제가 12월 11일까지 또 4주 연장됐어. 이 제도가 물가에 작동하는 방식으로 가장 알맞은 것은?',
+      opts:['정유사의 생산 원가 자체를 낮춰 값이 내려간다',
+            '소비자가 내는 값에 뚜껑을 씌우고 그 차액을 재정으로 메워, 내는 사람과 시점이 바뀐다',
+            '수입 원유의 국제 시세를 정부가 직접 정한다',
+            '주유소가 자발적으로 마진을 줄이도록 권고만 한다'],
+      answer:1,
+      explain:'값이 싸진 게 아니라 <b>누가 언제 내느냐</b>가 바뀐 거야. KDI 추산으로 3~10월 소비자물가를 월평균 0.6%p 낮췄지만, 그만큼 재정이 나갔어.' },
+    { q:'산업장관이 "언제까지 지속할 수는 없다"면서도 연장이 불가피하다고 한 배경으로 가장 알맞은 것은?',
+      opts:['국제 유가가 이미 충분히 안정돼 제도가 의미를 잃었기 때문에',
+            '중동 정세와 유가가 다시 악화될 여지가 남아 있어 지금 풀면 체감 부담이 커지기 때문에',
+            '제도를 풀면 정유사가 생산을 중단하기로 했기 때문에',
+            '연장해도 재정이 전혀 들지 않기 때문에'],
+      answer:1,
+      explain:'유가가 내려왔다가 다시 튀는 흐름이라 \'풀 타이밍\'을 못 잡고 있어. 재정이 들어가 시장 가격 기능을 제한한다는 건 정부도 인정한 대목이야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'투자 약속(전환사채·SAFE)의 값을 분기마다 시세로 다시 매겨 손익에 반영하는 회계 방식을 \'______ 평가\'라고 해. (네 글자)',
+    accept:['공정가치','공정 가치'],
+    explain:'정답은 <b>공정가치</b>. 몸값이 오르면 내줄 의무의 값도 올라서, 그 증가분이 평가손실로 찍혀.' },
+  { q:'앤트로픽의 9개월 영업손실은 약 몇 억 달러야? (숫자만, 소수점 한 자리)',
+    accept:['12.6'],
+    explain:'정답은 <b>12.6억 달러</b>. 순손실 1,040억 달러와 달리, 이쪽이 <b>장사해서 밑진 몫</b>이야. 전년 동기 52억에서 줄었어.' },
+  { q:'앞으로 계산 설비 등을 사기로 서명해 실제로 돈이 나갈 금액(8,954억 달러)을 가리키는 말은 \'______·리스 총액\'이야. (네 글자)',
+    accept:['구매약정','구매 약정','약정'],
+    explain:'정답은 <b>구매약정</b>. 평가손실과 달리 현금이 실제로 나가는 쪽이라, 진짜 부담은 여기 있어.' },
+  { q:'19일 나스닥에 상장하는 앤트로픽의 종목코드(티커)는? (영문 세 글자)',
+    accept:['ANT','ant'],
+    explain:'정답은 <b>ANT</b>. 18일 공모가가 정해지고 19일부터 거래돼.' },
+  { q:'코스피가 미국 AI 논쟁에 먼저 흔들리는 건 지수 비중이 ______ 업종에 쏠려 있기 때문이야. (세 글자)',
+    accept:['반도체'],
+    explain:'정답은 <b>반도체</b>. AI 설비 투자 기대가 깎이면 HBM 주문 기대가 먼저 흔들려.' },
+  { q:'연준이 금융안정보고서에서 AI 인프라 투자의 취약 요인으로 지목한 것은 설비가 아니라 거기 붙은 ______야. (두 글자)',
+    accept:['부채','빚'],
+    explain:'정답은 <b>부채</b>(빚). 수익이 늦어져도 이자는 제때 나가니까, 늦어진다는 신호만으로 값이 깎여.' },
+  { q:'복습: 전세대출을 조였더니 전셋집 값이 아니라 ______ 물가가 올랐어. (두 글자)',
+    accept:['월세'],
+    explain:'정답은 <b>월세</b>. 규제는 수요를 없애지 못하고, 수요가 붙는 <b>자리</b>만 옮겨.' },
+  { q:'복습: 안 쓴 카드 포인트가 소멸하면서 회사 이익으로 남는 돈을 \'______수입\'이라고 해. (두 글자)',
+    accept:['낙전','낙전수입'],
+    explain:'정답은 <b>낙전</b>. 소멸은 사라짐이 아니라 <b>부채가 이익으로 바뀌는 사건</b>이야.' },
+  { q:'복습: 정유사 도매가에 상한을 씌우고 차액을 재정으로 메우는 제도를 \'석유 ______제\'라고 해. (네 글자)',
+    accept:['최고가격','최고가격제'],
+    explain:'정답은 <b>최고가격</b>. 이번에 12월 11일까지 4주 더 연장됐어.' },
+  { q:'11월 16일 코스피 종가는 몇 포인트였어? (숫자만, 소수점 둘째 자리까지)',
+    accept:['5100.50','5,100.50','5100.5'],
+    explain:'정답은 <b>5,100.50</b>(−3.59%). 외국인이 1.4조 원을 순매도했고 코스닥은 −4.86%였어.' },
+];
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
