@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>코스피 절반이 두 종목 — 쏠림이 지수를 흔드는 법</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 시총 막대 */
+  .bar{display:flex;height:60px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .seg{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;text-align:center;line-height:1.25}
+  .seg small{font-weight:600;font-size:12px;opacity:.92}
+  .seg.s1{background:#2783DE;flex:27.8}
+  .seg.s2{background:#5FA7E8;flex:22.3}
+  .seg.s3{background:#D8D6D3;color:#5C5A57;flex:49.9}
+  .bar-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .bar-note b{color:var(--text)}
+  .mini{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .mini .m{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:10px 14px;background:var(--soft);font-size:13.5px;color:var(--text2)}
+  .mini .m b{display:block;font-size:15px;color:var(--text);margin-bottom:2px}
+
+  /* 단계 흐름도 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 양면 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.up{background:var(--green-soft);color:#2F7A52}
+  .badge.down{background:var(--red-soft);color:#C6493E}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs .num{font-size:22px;font-weight:700;margin:6px 0 4px}
+  .vs .num .arw{font-size:16px;color:var(--text2);font-weight:600}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item .what small{display:block;font-size:12.5px;color:var(--text2);margin-top:2px}
+  .t-item.done{opacity:.72}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .seg{font-size:12px}
+    .seg small{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.18 데일리 뉴스 · 시각자료</div>
+  <h1>📉 코스피 절반이 두 종목이야</h1>
+  <div class="sub">미국 AI 뉴스가 왜 우리 지수를 더 크게 흔드는지, 쏠림 구조로 보기</div>
+
+  <div class="section-title">① 코스피 시가총액은 이렇게 생겼어</div>
+  <div class="bar">
+    <div class="seg s1">삼성전자<small>27.8%</small></div>
+    <div class="seg s2">SK하이닉스<small>22.3%</small></div>
+    <div class="seg s3">나머지 전 종목<small>49.9%</small></div>
+  </div>
+  <div class="bar-note">※ 2026년 10월 13일 기준. 코스피는 종목 수를 평균 내는 게 아니라 <b>회사 값(시가총액)이 큰 만큼 더 세게</b> 반영해 — 그래서 나머지가 다 올라도 왼쪽 둘이 빠지면 지수는 내려가.</div>
+  <div class="mini">
+    <div class="m"><b>38% → 50%</b>올해 1월 → 10월, 두 종목 합산 비중</div>
+    <div class="m"><b>−3.30% / −1.96%</b>11월 17일 삼성전자 / SK하이닉스</div>
+    <div class="m"><b>1조 4,430억 원</b>같은 날 외국인 순매도</div>
+  </div>
+
+  <div class="section-title">② 미국 AI 뉴스 → 내 계좌까지, 다섯 단계</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>"AI 설비 투자, 이 속도로 계속 가능해?"</b><span class="mdesc">데이터센터 짓느라 늘어난 빚에 경고가 붙음</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>증설 속도 기대가 깎임</b><span class="mdesc">서버를 덜 지으면 거기 들어갈 메모리도 덜 필요해져</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>HBM·메모리 주문 기대 하향</b><span class="mdesc">한국 반도체 실적은 '앞으로 받을 주문'으로 값이 매겨짐</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>삼성전자·SK하이닉스 하락</b><span class="mdesc">외국인에겐 이 둘이 'AI를 사고파는 가장 쉬운 창구'라 매도가 집중됨</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>지수 절반이 눌리며 코스피 전체가 하락</b><span class="mdesc">11월 17일 종가 4,968.48 (−2.59%) · 9개월여 만의 5,000선 하회</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 쏠림의 양면</b>같은 구조가 오를 때는 지수를 혼자 끌어올렸어. 증폭 장치는 방향을 가리지 않아 — 올릴 때 세게 올린 만큼 내릴 때도 세게 내려.</div>
+  </div>
+
+  <div class="section-title">③ 그런데 같은 반도체가 성장률은 끌어올렸어</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge up">실물 — 이미 번 돈</span>
+      <h3>IMF 한국 성장률 전망</h3>
+      <div class="num">3.3% <span class="arw">→</span> 3.9%</div>
+      <p>한 달 만에 <b>0.6%p 상향</b>. 이유는 반도체 수출 사상 최대와 투자 반등. 내년 전망도 3.3%로 올렸어.</p>
+    </div>
+    <div class="vs">
+      <span class="badge down">증시 — 앞으로 벌 돈</span>
+      <h3>코스피 지수</h3>
+      <div class="num">5,100.50 <span class="arw">→</span> 4,968.48</div>
+      <p>이틀 만에 <b>−132p 추가 하락</b>, 4거래일 연속 내림. 주가는 실적이 아니라 <b>내년 이후 기대</b>를 미리 사 둔 값이라 먼저 의심해.</p>
+    </div>
+  </div>
+
+  <div class="section-title">④ 이번 주 숫자가 나오는 자리</div>
+  <div class="timeline">
+    <div class="t-item done"><div class="when">11/17 (화)</div><div class="what">코스피 4,968.48<small>5,000선 하회</small></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11/18 (수) 새벽</div><div class="what">엔비디아 3분기 실적<small>기대치 매출 1,090억 달러 · EPS 2.48달러</small></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11/18~19</div><div class="what">APEC 미중 정상회담<small>중국 선전</small></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11/19 (목)</div><div class="what">앤트로픽 나스닥 상장<small>수능일 — 국내 증시는 10시 개장</small></div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.18 딥다이브 내용 기반 · 비중은 10월 13일 기준이라 최근 조정으로 다소 낮아졌을 수 있어</div>
+</div>
+</body>
+</html>

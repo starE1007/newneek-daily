@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.18</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.18 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+
+const MC_BANK = [
+  { id:'capweight', variants:[
+    { q:'코스피 상장 종목 900개 가운데 600개가 오른 날인데도 지수는 내렸어. 이런 일이 생기는 이유로 가장 알맞은 것은?',
+      opts:['지수는 오른 종목과 내린 종목의 수를 세서 계산하기 때문에',
+            '지수는 회사 값(시가총액)이 큰 종목일수록 더 세게 반영하기 때문에',
+            '내린 종목의 거래량이 더 많으면 지수가 내리도록 설계돼 있기 때문에',
+            '외국인이 판 날은 지수를 따로 조정해서 발표하기 때문에'],
+      answer:1,
+      explain:'코스피는 <b>시가총액 가중</b> 방식이야. 덩치 순으로 무게를 주니까, 작은 종목 수백 개가 올라도 큰 한둘이 빠지면 지수는 내려가.' },
+    { q:'"지수는 평균이 아니라 덩치 순 평균이다"라는 말의 뜻으로 가장 알맞은 것은?',
+      opts:['종목마다 같은 비중을 주되 거래일 수로 나눠 평균한다는 뜻',
+            '값이 큰 회사의 등락이 지수에 더 큰 몫으로 들어간다는 뜻',
+            '주가가 높은 종목일수록 지수에서 빠진다는 뜻',
+            '지수는 업종별로 하나씩 대표 종목만 골라 계산한다는 뜻'],
+      answer:1,
+      explain:'비중은 <b>주가의 높낮이</b>가 아니라 <b>회사 전체 값</b>으로 정해져. 그래서 시총 1·2위가 움직이면 지수가 따라 움직여.' },
+  ]},
+  { id:'transmit', variants:[
+    { q:'미국에서 나온 "AI 설비 투자가 계속될 수 있나" 하는 의심이 한국 코스피까지 내려오는 경로로 가장 알맞은 것은?',
+      opts:['미국 금리 인상 → 한국 대출 금리 상승 → 소비 위축 → 지수 하락',
+            '데이터센터 증설 기대 하향 → 메모리·HBM 주문 기대 하향 → 반도체 대형주 하락 → 지수 하락',
+            '달러 약세 → 수입 물가 하락 → 기업 이익 감소 → 지수 하락',
+            '미국 증시 거래 정지 → 한국 증시 연동 정지 → 지수 하락'],
+      answer:1,
+      explain:'서버를 덜 지으면 거기 꽂을 메모리도 덜 필요해져. 한국 반도체주의 값은 <b>앞으로 받을 주문</b>으로 매겨지니까, 주문 기대가 깎이면 주가가 먼저 반응해.' },
+    { q:'같은 AI 관련 악재인데 한국 지수가 미국 지수보다 더 크게 출렁이는 이유로 가장 알맞은 것은?',
+      opts:['한국 증시는 지수 비중이 반도체 두 종목에 절반 가까이 쏠려 있어서',
+            '한국 증시가 미국보다 거래 시간이 짧아서',
+            '한국은 상장 종목 수가 미국보다 적어서',
+            '한국 증시에는 하락을 막는 장치가 없어서'],
+      answer:0,
+      explain:'미국 지수는 AI 관련주 말고도 금융·헬스케어 등이 받쳐 줘. 코스피는 <b>쏠림</b>이 커서 같은 뉴스가 더 크게 증폭돼.' },
+  ]},
+  { id:'gapgrowth', variants:[
+    { q:'IMF가 한국 성장률 전망을 반도체 호황을 이유로 3.3%에서 3.9%로 올린 바로 그날, 코스피는 반도체 때문에 하락했어. 이 둘이 동시에 성립하는 이유로 가장 알맞은 것은?',
+      opts:['성장률은 민간 기관이, 지수는 정부가 계산해 기준이 다르기 때문에',
+            '성장률은 이미 벌어들인 실적을 집계한 것이고, 주가는 앞으로의 기대를 미리 사 둔 값이기 때문에',
+            '성장률에는 수출이 빠져 있고 주가에는 수출만 반영되기 때문에',
+            'IMF 전망은 지수에 반영되기까지 1년이 걸리기 때문에'],
+      answer:1,
+      explain:'성장률은 <b>지나간 실적</b>을 모은 숫자야. 주가는 <b>내년 이후</b>를 당겨서 매긴 값이라 의심이 먼저 붙어. 같은 반도체가 두 숫자를 반대 방향으로 움직일 수 있는 거야.' },
+    { q:'"실물 지표는 좋은데 주가는 빠진다"는 상황을 읽는 방법으로 가장 알맞은 것은?',
+      opts:['둘 중 하나는 틀린 숫자이므로 나중에 수정된다',
+            '두 숫자가 보는 시점이 달라서, 주가가 먼저 다음 구간을 의심하고 있는 것이다',
+            '주가는 실물을 항상 1년 뒤에 그대로 따라가므로 곧 오른다',
+            '성장률이 오르면 주가도 반드시 올라야 하므로 매수 신호다'],
+      answer:1,
+      explain:'실적과 기대는 <b>서로 다른 시점</b>을 본다고 생각하면 편해. 한쪽이 틀렸다는 뜻이 아니야.' },
+  ]},
+  { id:'concentration', variants:[
+    { q:'"국내 주식형 ETF를 여러 개 샀으니 분산했다"는 생각이 위험할 수 있는 이유로 가장 알맞은 것은?',
+      opts:['ETF는 수수료가 높아 수익률이 낮아지기 때문에',
+            '코스피를 따라가는 상품은 이름이 달라도 결국 시총 1·2위 비중을 크게 담고 있기 때문에',
+            'ETF는 하루에 한 번만 사고팔 수 있기 때문에',
+            'ETF는 배당을 주지 않기 때문에'],
+      answer:1,
+      explain:'지수를 따라가는 상품은 지수의 쏠림을 그대로 물려받아. 상품 개수가 아니라 <b>안에 든 종목 비중</b>을 봐야 분산이 됐는지 알 수 있어.' },
+    { q:'지수 비중이 특정 업종에 쏠려 있을 때 일어나는 일로 가장 알맞은 것은?',
+      opts:['오를 때만 지수가 크게 움직이고 내릴 때는 완만해진다',
+            '오를 때도 내릴 때도 지수의 움직임이 같이 커진다',
+            '쏠린 업종의 주가가 지수와 반대로 움직인다',
+            '쏠림이 클수록 지수의 하루 변동폭은 작아진다'],
+      answer:1,
+      explain:'쏠림은 <b>증폭 장치</b>라 방향을 가리지 않아. 올릴 때 세게 올린 만큼 내릴 때도 세게 내려.' },
+  ]},
+  { id:'guidance', variants:[
+    { q:'기업이 시장 기대를 넘는 분기 실적을 내놨는데도 주가가 떨어지는 경우가 있어. 가장 흔한 이유는?',
+      opts:['지나간 분기 숫자는 이미 주가에 반영돼 있고, 시장은 회사가 제시한 다음 분기 전망을 보기 때문에',
+            '실적이 좋으면 세금이 늘어 주주 몫이 줄기 때문에',
+            '실적 발표일에는 거래가 제한돼 주가가 내려가기 때문에',
+            '기대를 넘긴 실적은 회계 오류로 간주되기 때문에'],
+      answer:0,
+      explain:'주가에 중요한 건 <b>다음 구간</b>이야. 지난 분기 숫자가 좋아도 회사가 내놓는 전망(가이던스)이 낮으면 기대가 깎여.' },
+    { q:'엔비디아 실적 발표에서 매출 숫자만큼 중요하게 보는 것으로 가장 알맞은 것은?',
+      opts:['지난해 같은 분기의 주가 흐름',
+            '회사가 제시하는 다음 분기 매출 전망과 수요가 이어진다는 근거',
+            '발표 당일의 거래량',
+            '경쟁사의 같은 날 주가 등락률'],
+      answer:1,
+      explain:'이번 발표의 쟁점은 "AI 칩 수요가 계속 가느냐"였어. 그래서 지난 분기 숫자보다 <b>앞을 가리키는 전망</b>이 시장 반응을 가른 거야.' },
+  ]},
+];
+const SA_BANK = [
+  { q:'코스피처럼 회사 값이 큰 종목일수록 지수에 더 세게 반영하는 계산 방식을 \'______ 가중\'이라고 해. (네 글자)',
+    accept:['시가총액','시가 총액'],
+    explain:'정답은 <b>시가총액</b>. 종목 수를 세는 게 아니라 덩치로 무게를 주니까, 큰 둘이 빠지면 나머지가 올라도 지수는 내려가.' },
+  { q:'11월 17일 코스피 종가는 몇 포인트였어? (숫자만, 소수점 둘째 자리까지)',
+    accept:['4968.48','4,968.48'],
+    explain:'정답은 <b>4,968.48</b>(−2.59%). 종가가 5,000선 아래로 간 건 2월 2일 이후 9개월여 만이야.' },
+  { q:'10월 중순 기준, 삼성전자와 SK하이닉스 두 종목이 차지한 코스피 시가총액 비중은 약 몇 %야? (숫자만)',
+    accept:['50','50%','약50'],
+    explain:'정답은 <b>약 50%</b>. 올해 1월 38%에서 빠르게 올라왔어 — 지수의 절반이 두 종목이라는 뜻이야.' },
+  { q:'IMF가 한 달 만에 올린 올해 한국 성장률 전망치는 몇 %야? (숫자만, 소수점 한 자리)',
+    accept:['3.9','3.9%'],
+    explain:'정답은 <b>3.9%</b>. 직전 3.3%에서 0.6%p 올렸고, 이유는 코스피를 흔든 것과 같은 <b>반도체</b>야.' },
+  { q:'기업이 실적을 발표하면서 함께 내놓는 \'다음 분기 전망\'을 영어로 뭐라고 해? (외래어 네 글자)',
+    accept:['가이던스'],
+    explain:'정답은 <b>가이던스</b>. 지난 분기 숫자는 이미 값에 들어가 있어서, 주가는 보통 이쪽에 더 크게 반응해.' },
+  { q:'지수 비중이 한쪽에 몰려 있으면 오를 때도 내릴 때도 움직임이 같이 커져. 이런 성질을 두 글자로 뭐라고 해? (두 글자)',
+    accept:['쏠림','집중'],
+    explain:'정답은 <b>쏠림</b>(집중). 증폭 장치는 방향을 가리지 않아 — 그게 오늘 남길 한 줄이야.' },
+  { q:'복습: 앤트로픽의 9개월 순손실 1,040억 달러 중 943억 달러는 전환사채·SAFE를 다시 매긴 금액이야. 그래서 진짜 사업 성적은 ______손실 쪽에서 봐야 해. (두 글자)',
+    accept:['영업','영업손실'],
+    explain:'정답은 <b>영업</b>. 영업손실은 12.6억 달러로 오히려 줄었어 — <b>장부의 적자와 영업의 적자는 다른 말</b>이야.' },
+  { q:'복습: 투자 약속의 값을 분기마다 시세로 다시 매겨 손익에 반영하는 회계 방식을 \'______ 평가\'라고 해. (네 글자)',
+    accept:['공정가치','공정 가치'],
+    explain:'정답은 <b>공정가치</b>. 몸값이 오르면 내줄 의무의 값도 올라서, 그 증가분이 평가손실로 찍혀.' },
+  { q:'복습: 한 곳이 멈추면 전체가 멈추는 구조를 \'단일 ______점\'이라고 해. (두 글자)',
+    accept:['장애','장애점'],
+    explain:'정답은 <b>장애</b>(단일 장애점). 효율을 위해 한 군데로 모을수록 그 한 점의 고장이 전체 정지가 돼.' },
+  { q:'복습: 안 쓴 카드 포인트가 소멸하면서 회사 이익으로 남는 돈을 \'______수입\'이라고 해. (두 글자)',
+    accept:['낙전','낙전수입'],
+    explain:'정답은 <b>낙전</b>. 소멸은 사라짐이 아니라 <b>부채가 이익으로 바뀌는 사건</b>이야.' },
+  { q:'복습: 전세대출을 조였더니 전셋집 값이 아니라 ______ 물가가 올랐어. (두 글자)',
+    accept:['월세'],
+    explain:'정답은 <b>월세</b>. 규제는 수요를 없애지 못하고, 수요가 붙는 <b>자리</b>만 옮겨.' },
+  { q:'11월 17일 외국인이 코스피에서 순매도한 금액은 약 몇 조 원이야? (숫자만, 소수점 한 자리)',
+    accept:['1.4','1.4조'],
+    explain:'정답은 <b>약 1.4조 원</b>(1조 4,430억). 개인과 기관이 받았지만 지수는 4거래일 연속 내렸어.' },
+];
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
