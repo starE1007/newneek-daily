@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>홍역 퇴치국 — 미국은 왜 잃고 한국은 왜 지켰나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .defbox{border:1px solid #CBE3F8;background:var(--blue-soft);border-radius:12px;padding:16px 18px}
+  .defbox .t{font-size:15px;font-weight:700;color:#1B6BB8;margin-bottom:6px}
+  .defbox p{font-size:14px;color:#1B6BB8}
+  .defbox .no{display:inline-block;background:#fff;border-radius:6px;padding:1px 7px;font-weight:700;margin:0 2px}
+
+  .vs{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+  .lane{flex:1 1 380px;border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .lane .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.keep{background:var(--green-soft);color:#2F7A52}
+  .badge.lost{background:var(--red-soft);color:#C6493E}
+  .lane h3{font-size:16px;margin-bottom:10px}
+  .chain{display:flex;flex-direction:column;gap:6px}
+  .link{background:var(--canvas);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13.5px}
+  .link b{color:var(--text)}
+  .link.good{border-color:#CDE4D7;background:var(--green-soft);color:#2F7A52}
+  .link.bad{border-color:#F4D4D0;background:var(--red-soft);color:#B23F34}
+  .vsarrow{text-align:center;color:#B9B6B1;font-size:13px;font-weight:700;line-height:1}
+
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--canvas);position:relative}
+  .bar-item{margin-bottom:14px}
+  .bar-item:last-child{margin-bottom:0}
+  .bar-head{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:5px}
+  .bar-head .n{font-weight:700;font-size:14.5px}
+  .bar-track{height:20px;background:var(--surface2);border-radius:99px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;border-radius:99px;min-width:3px}
+  .bar-fill.green{background:var(--green)}
+  .bar-fill.red{background:var(--red)}
+  .bar-fill.orange{background:var(--orange)}
+  .threshold{position:absolute;top:-4px;bottom:-4px;width:2px;background:#C6493E}
+  .thlabel{font-size:12px;color:#C6493E;font-weight:700;margin-top:6px}
+  .bar-note{font-size:12.5px;color:var(--text2);margin-top:4px}
+
+  .stat-row{display:flex;gap:10px;flex-wrap:wrap}
+  .stat{flex:1 1 150px;border:1px solid var(--border);border-radius:10px;padding:13px 15px;background:var(--soft)}
+  .stat .label{font-size:12.5px;color:var(--text2);margin-bottom:3px}
+  .stat .val{font-size:20px;font-weight:700;letter-spacing:-.01em}
+  .stat .note{font-size:12.5px;color:var(--text2);margin-top:3px}
+  .stat.hot{background:var(--red-soft);border-color:#F4D4D0}
+  .stat.hot .val{color:#C6493E}
+  .stat.calm{background:var(--green-soft);border-color:#CDE4D7}
+  .stat.calm .val{color:#2F7A52}
+
+  .paradox{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b.t{display:block;margin-bottom:2px;font-size:14.5px}
+  .tip{margin-top:14px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .tip b.t{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .split{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .sp{flex:1 1 150px;border-radius:10px;padding:12px 14px;font-size:13.5px;background:var(--surface2);color:#55524E;text-align:center}
+  .sp .big{display:block;font-size:19px;font-weight:700;margin-bottom:2px}
+  .sp.a{background:var(--orange-soft);color:#9A5620}
+  .sp.b{background:var(--orange-soft);color:#9A5620}
+  .sp.c{background:var(--green-soft);color:#2F7A52}
+  .plus{align-self:center;color:#B9B6B1;font-size:18px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.18 데일리 뉴스 · 시각자료</div>
+  <h1>🦠 같은 날 갈린 두 나라</h1>
+  <div class="sub">미국은 26년 만에 홍역 퇴치국 지위를 잃었고, 한국은 13년째 지켰어. 갈린 지점은 딱 한 줄이야.</div>
+
+  <div class="section-title">먼저, '퇴치'의 뜻부터</div>
+  <div class="defbox">
+    <div class="t">퇴치(elimination) ＝ 환자 <span class="no">0명</span> 이 아니야</div>
+    <p>그 나라에 <b>눌러앉은 바이러스</b>(토착 바이러스)로 생긴 환자가 <b>12개월 넘게</b> 없으면 퇴치국이야. 밖에서 들어온 환자는 있어도 되고, 그 사람한테 옮은 사람이 몇 명 생겨도 괜찮아. 불씨가 <b>들어오는 것</b>은 못 막지만, 들어온 불씨가 <b>꺼지느냐</b>가 기준이야.</p>
+  </div>
+
+  <div class="section-title">① 그래서 두 나라는 이렇게 갈렸어</div>
+  <div class="vs">
+    <div class="lane">
+      <span class="badge keep">🇰🇷 유지 · 13년 연속</span>
+      <h3>한국 — 불씨가 들어와도 꺼졌어</h3>
+      <div class="chain">
+        <div class="link">해외에서 감염된 사람이 들어와 <b>61명</b></div>
+        <div class="vsarrow">▼</div>
+        <div class="link">그들에게 옮은 국내 전파 <b>25명</b> <span style="color:var(--text2)">— 합 86명</span></div>
+        <div class="vsarrow">▼</div>
+        <div class="link">빠른 격리 · 감염경로 규명으로 <b>고리가 끊김</b></div>
+        <div class="vsarrow">▼</div>
+        <div class="link good">토착 전파 <b>0건</b> → 퇴치국 인증 유지</div>
+      </div>
+    </div>
+    <div class="lane">
+      <span class="badge lost">🇺🇸 박탈 · 26년 만</span>
+      <h3>미국 — 들어온 불씨가 안 꺼졌어</h3>
+      <div class="chain">
+        <div class="link">해외 유입 환자로 시작한 건 <b>똑같아</b></div>
+        <div class="vsarrow">▼</div>
+        <div class="link">면역이 빈 집단 안에서 <b>계속 옮겨 다님</b></div>
+        <div class="vsarrow">▼</div>
+        <div class="link">같은 바이러스 전파가 <b>12개월 넘게</b> 안 끊김</div>
+        <div class="vsarrow">▼</div>
+        <div class="link bad">토착 전파로 인정 → <b>지위 박탈</b> (PAHO)</div>
+      </div>
+    </div>
+  </div>
+  <div class="tip"><b class="t">💡 같은 출발, 다른 결말</b>두 나라 다 '유입'은 있었어. 차이는 <b>들어온 다음</b>이야 — 불이 옮겨 붙을 <b>마른 장작</b>(면역 없는 사람)이 얼마나 깔려 있었느냐.</div>
+
+  <div class="section-title">② 마른 장작의 양 = 접종률. 문턱은 95%야</div>
+  <div class="bars">
+    <div class="bar-item">
+      <div class="bar-head"><span>🇰🇷 MMR 1차 접종률 (2025년)</span><span class="n">96.9%</span></div>
+      <div class="bar-track"><div class="bar-fill green" style="width:96.9%"></div><div class="threshold" style="left:95%"></div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-head"><span>🇰🇷 MMR 2차 접종률 (2025년)</span><span class="n">96.7%</span></div>
+      <div class="bar-track"><div class="bar-fill green" style="width:96.7%"></div><div class="threshold" style="left:95%"></div></div>
+      <div class="thlabel">│ 빨간 선 = WHO 집단면역 기준 95%</div>
+      <div class="bar-note">한국은 두 차례 모두 문턱 위. 그래서 불씨가 들어와도 <b>옮겨 붙을 자리가 없어</b> 꺼졌어.</div>
+    </div>
+  </div>
+  <div class="paradox"><b class="t">⚠️ 왜 하필 95%일까</b>홍역은 <b>면역 없는 사람이 환자와 접촉하면 90% 넘게 옮는</b>, 사람 사이에 도는 병 중 전염력이 가장 센 축이야. 전염력이 셀수록 집단면역 문턱도 올라가서, 다른 병보다 유독 높은 95%가 필요해. <b>95%는 '거의 다 맞았다'가 아니라, 5%만 비어도 불이 안 꺼진다는 뜻이야.</b></div>
+
+  <div class="section-title">③ 숫자로 본 미국 — 1년 만에 2.4배</div>
+  <div class="stat-row">
+    <div class="stat"><div class="label">미국 홍역 환자 (2025년)</div><div class="val">2,242명</div><div class="note">작년 한 해 전체</div></div>
+    <div class="stat hot"><div class="label">미국 홍역 환자 (2026년)</div><div class="val">5,412명</div><div class="note">입원 590명 이상 · 사망 6명</div></div>
+    <div class="stat hot"><div class="label">전 세계 (1~10월)</div><div class="val">약 34만 명</div><div class="note">동남아 · 미주에서 급증</div></div>
+    <div class="stat calm"><div class="label">한국 홍역검역관리지역</div><div class="val">107개국</div><div class="note">방문 후 증상 시 Q-CODE 신고</div></div>
+  </div>
+  <div class="bar-note" style="margin-top:10px">캐나다 · 영국 · 스페인도 최근 같은 지위를 잃었어. 미국만의 일이 아니라 <b>선진국 접종률이 같이 내려앉고 있다</b>는 신호에 가까워.</div>
+
+  <div class="section-title">④ 한국의 '86명'을 뜯어보면</div>
+  <div class="split">
+    <div class="sp a"><span class="big">61명</span>해외에서 감염돼 들어옴</div>
+    <div class="plus">＋</div>
+    <div class="sp b"><span class="big">25명</span>그들에게 옮은 2차 전파</div>
+    <div class="plus">＝</div>
+    <div class="sp"><span class="big">86명</span>평가기간 전체 (2025~2026 상반기)</div>
+    <div class="plus">그중</div>
+    <div class="sp c"><span class="big">0건</span>토착 바이러스 전파</div>
+  </div>
+  <div class="tip"><b class="t">💡 읽는 법</b>86이라는 숫자 자체는 중요하지 않아. 중요한 건 마지막 칸의 <b>0</b>이야 — 들어온 불이 <b>두 다리 건너기 전에</b> 꺼졌다는 뜻이니까. 방한객 2,000만 명 시대의 뒷면이 바로 저 61명이야.</div>
+
+  <div class="foot">출처: 질병관리청(11.17 발표, WHO 서태평양지역 홍역퇴치인증위원회 9월 평가), PAHO·CNN(미국 지위 박탈), CDC·CBS(미국 환자 수). 한국 환자 86명은 2025년~2026년 상반기 평가기간 기준.</div>
+</div>
+</body>
+</html>

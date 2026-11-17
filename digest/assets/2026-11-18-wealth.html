@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>역자산효과 — 지수가 깨진 다음에 오는 건 소비야</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .stat-row{display:flex;gap:10px;flex-wrap:wrap}
+  .stat{flex:1 1 160px;border:1px solid var(--border);border-radius:10px;padding:13px 15px;background:var(--soft)}
+  .stat .label{font-size:12.5px;color:var(--text2);margin-bottom:3px}
+  .stat .val{font-size:20px;font-weight:700;letter-spacing:-.01em}
+  .stat .note{font-size:12.5px;color:var(--text2);margin-top:3px}
+  .stat.hot{background:var(--red-soft);border-color:#F4D4D0}
+  .stat.hot .val{color:#C6493E}
+  .stat.key{background:var(--blue-soft);border-color:#CBE3F8}
+  .stat.key .val{color:#1B6BB8}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px;background:var(--surface2);color:#55524E}
+  .step small{font-weight:500;font-size:12px;opacity:.85;display:block}
+  .step.s-start{background:var(--blue-soft);color:#1B6BB8}
+  .step.s-mid{background:var(--orange-soft);color:#9A5620}
+  .step.s-end{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .bars{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--canvas)}
+  .bar-item{margin-bottom:14px}
+  .bar-item:last-child{margin-bottom:0}
+  .bar-head{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:5px}
+  .bar-head .n{font-weight:700;font-size:14.5px}
+  .bar-track{height:18px;background:var(--surface2);border-radius:99px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:99px;min-width:3px}
+  .bar-fill.red{background:var(--red)}
+  .bar-fill.blue{background:var(--blue)}
+  .bar-fill.orange{background:var(--orange)}
+  .bar-note{font-size:12.5px;color:var(--text2);margin-top:4px}
+
+  .paradox{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b.t{display:block;margin-bottom:2px;font-size:14.5px}
+  .tip{margin-top:14px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .tip b.t{display:block;margin-bottom:2px;font-size:14.5px}
+  .caution{margin-top:14px;background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13.5px;color:var(--text2)}
+  .caution b{color:var(--text)}
+
+  .speed{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  .sp{flex:1 1 240px;border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .sp .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
+  .sp .ttl{font-size:15px;font-weight:700;margin-bottom:4px}
+  .sp .desc{font-size:13.5px;color:var(--text2)}
+  .sp.slow .when{color:var(--orange)}
+
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:13.5px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.18 데일리 뉴스 · 시각자료</div>
+  <h1>📉 지수가 깨진 다음에 오는 건 '소비'야</h1>
+  <div class="sub">주식 한 주 없어도 영향이 오는 경로를 한 장으로. 이름은 역(逆)자산효과.</div>
+
+  <div class="section-title">숫자 넷 (2026.11.17 종가 기준)</div>
+  <div class="stat-row">
+    <div class="stat hot"><div class="label">코스피 종가</div><div class="val">4,968.48</div><div class="note">−2.59% · 192거래일 만에 5,000 아래</div></div>
+    <div class="stat hot"><div class="label">11월 한 달</div><div class="val">−13.30%</div><div class="note">2월 2일(4,949.67) 이후 최저 종가</div></div>
+    <div class="stat"><div class="label">6월 고점 대비</div><div class="val">−45.5%</div><div class="note">6/22 최고 9,114.55 → 지금</div></div>
+    <div class="stat key"><div class="label">사라진 시가총액</div><div class="val">3,312조 원</div><div class="note">7,413조(6/22) → 4,101조(11/6)</div></div>
+  </div>
+
+  <div class="section-title">① 역자산효과 — 주가가 소비로 번지는 길</div>
+  <div class="flow">
+    <div class="step s-start">주가가 내려<small>코스피 −45.5%</small></div>
+    <div class="arrow">→</div>
+    <div class="step"><span>내 계좌 <b>평가액</b>이 줄어</span><small>판 것도 아닌데 숫자만 작아짐</small></div>
+    <div class="arrow">→</div>
+    <div class="step s-mid"><span>"나 가난해졌네"</span><small>월급은 그대로인데 체감 재산이 줄어</small></div>
+    <div class="arrow">→</div>
+    <div class="step s-mid">지출을 줄여<small>큰 소비부터 미룸 — 차 · 가전 · 여행</small></div>
+    <div class="arrow">→</div>
+    <div class="step s-end"><span>내수 · 일자리가 식어</span><small>숙박 · 음식점 · 도소매가 먼저</small></div>
+  </div>
+  <div class="paradox"><b class="t">⚠️ 가운데 칸이 핵심</b>실제로 돈을 잃은 사람만 줄이는 게 아니야. <b>팔지 않아도</b> 평가액이 줄면 지출이 줄어. 느낌이 소비를 움직이는 구간이라 '아직 손해 안 봤는데'라는 말이 통하지 않아.</div>
+
+  <div class="section-title">② 속도가 다르다 — 그래서 아직 안 끝났어</div>
+  <div class="speed">
+    <div class="sp"><div class="when">하루 ~ 몇 주</div><div class="ttl">주가는 빨리 빠져</div><div class="desc">6월 고점에서 5개월 만에 반 토막. 숫자는 이미 다 반영됐어 — <b>지난 일</b>이야.</div></div>
+    <div class="sp slow"><div class="when">몇 달 ~ 1년</div><div class="ttl">소비는 천천히 줄어</div><div class="desc">평가액이 줄어도 사람은 바로 안 줄여. 통계로 보이기까지 분기 단위가 걸려 — <b>아직 안 온 일</b>이야.</div></div>
+  </div>
+  <div class="tip"><b class="t">💡 그래서</b>지수가 바닥을 잡고 멈춘 뒤에도 내수 지표는 한참 더 나빠질 수 있어. 지수 반등과 체감 경기가 따로 노는 구간이 와.</div>
+
+  <div class="section-title">③ 문제는 '때린 자리가 이미 약했다'는 것</div>
+  <div class="bars">
+    <div class="bar-item">
+      <div class="bar-head"><span>소매판매 (전 분기 대비)</span><span class="n">3분기 −1.0%</span></div>
+      <div class="bar-track"><div class="bar-fill red" style="width:34%"></div></div>
+      <div class="bar-note"><b>2분기 연속</b> 감소. 증시가 빠지기 <b>전부터</b> 소비는 이미 줄고 있었어.</div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-head"><span>소비자심리지수 (9월 → 10월)</span><span class="n">106.6 → 105.4</span></div>
+      <div class="bar-track"><div class="bar-fill orange" style="width:62%"></div></div>
+      <div class="bar-note">한 달 새 1.2p 하락. 100보다 크면 '그래도 낙관'인데, 방향이 아래로 꺾였어.</div>
+    </div>
+  </div>
+  <div class="caution"><b>단, 과장은 금물.</b> 한국은행 쪽은 미국 가계 자료로 만든 모형을 한국에 그대로 대입하는 건 적절하지 않다고 선을 그어. <b>"코스피가 45% 빠졌으니 소비도 몇 % 준다"</b> 식 계산은 성립하지 않아. 방향은 맞지만 크기는 아직 아무도 몰라.</div>
+
+  <div class="section-title">④ 다음 확인 지점 두 개</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">11월 17일 (지남)</div><div class="what">코스피 4,968.48 — 종가 5,000선 붕괴</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11월 24일</div><div class="what"><b>11월 소비자동향조사</b><br>급락 이후 심리가 실제로 꺾였는지 처음 보이는 숫자</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">11월 26일</div><div class="what"><b>금융통화위원회</b><br>식은 내수가 금리를 내릴 명분이 되는지</div></div>
+  </div>
+
+  <div class="foot">출처: 한국거래소·파이낸셜뉴스(11.17 마감), 청년일보(고점 대비 45.5%), 뉴스핌(시가총액), 아시아투데이 사설(역자산효과), 한국은행(10월 소비자동향조사). 소매판매는 전 분기 대비 기준.</div>
+</div>
+</body>
+</html>
