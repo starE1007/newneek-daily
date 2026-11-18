@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>판매는 줄었는데 이익은 늘었다 — 현대차의 착시</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 양면 비교 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.up{background:var(--green-soft);color:#2F7A52}
+  .badge.down{background:var(--red-soft);color:#C6493E}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs .num{font-size:22px;font-weight:700;margin:6px 0 4px}
+  .vs .num .arw{font-size:16px;color:var(--text2);font-weight:600}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+
+  /* 분해 막대 */
+  .decomp{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .drow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .dlab{flex:0 0 118px;font-size:13.5px;font-weight:600;color:var(--text2)}
+  .dbarwrap{flex:1;display:flex;align-items:center;gap:8px}
+  .dbar{height:26px;border-radius:6px}
+  .dbar.plus{background:#7CBE97}
+  .dbar.big{background:#2783DE}
+  .dbar.minus{background:#E8938A}
+  .dval{font-size:13.5px;font-weight:700;white-space:nowrap}
+  .dnote{margin-top:12px;font-size:13.5px;color:var(--text2)}
+  .dnote b{color:var(--text)}
+
+  /* 압박 3면 */
+  .press{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .pcard{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .pcard .ptag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--orange-soft);color:#B06426;margin-bottom:7px}
+  .pcard h4{font-size:14.5px;margin-bottom:5px}
+  .pcard p{font-size:13px;color:var(--text2)}
+  .pcard p b{color:var(--text)}
+
+  /* 단계 흐름도 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 타임라인 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 190px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item .what small{display:block;font-size:12.5px;color:var(--text2);margin-top:2px}
+  .t-item.done{opacity:.72}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    .press{grid-template-columns:1fr}
+    .dlab{flex:0 0 92px;font-size:12.5px}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.19 데일리 뉴스 · 시각자료</div>
+  <h1>🚗 판매는 줄었는데 이익은 늘었어</h1>
+  <div class="sub">현대차 3분기 숫자가 왜 '좋아 보이는데 위기'인지, 이익을 분해해서 보기</div>
+
+  <div class="section-title">① 같은 분기, 반대로 움직인 두 숫자</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge down">얼마나 팔았나</span>
+      <h3>3분기 글로벌 도매 판매</h3>
+      <div class="num">92만 710대 <span class="arw">(−11.3%)</span></div>
+      <p>국내 <b>−27.2%</b> · 해외 <b>−8.0%</b>. 1~9월 누적 영업이익도 전년 대비 <b>−17.7%</b>야.</p>
+    </div>
+    <div class="vs">
+      <span class="badge up">얼마나 남겼나</span>
+      <h3>3분기 영업이익</h3>
+      <div class="num">2조 6,772억 <span class="arw">(+5.5%)</span></div>
+      <p>영업이익률 <b>5.9%</b>. 덜 팔았는데 더 남긴 분기라, 숫자만 보면 선방으로 읽혀.</p>
+    </div>
+  </div>
+
+  <div class="section-title">② 그 이익을 만든 건 차가 아니라 환율이야</div>
+  <div class="decomp">
+    <div class="drow">
+      <div class="dlab">환율 효과</div>
+      <div class="dbarwrap">
+        <div class="dbar big" style="width:72%"></div>
+        <div class="dval" style="color:#1B6BB8">약 +5,000억 원</div>
+      </div>
+    </div>
+    <div class="drow">
+      <div class="dlab">실제 이익 증가</div>
+      <div class="dbarwrap">
+        <div class="dbar plus" style="width:20%"></div>
+        <div class="dval" style="color:#2F7A52">+1,399억 원</div>
+      </div>
+    </div>
+    <div class="drow">
+      <div class="dlab">차이 (본업 몫)</div>
+      <div class="dbarwrap">
+        <div class="dbar minus" style="width:52%"></div>
+        <div class="dval" style="color:#C6493E">마이너스 구간</div>
+      </div>
+    </div>
+    <div class="dnote">환율이 올려 준 몫이 <b>실제 늘어난 이익보다 훨씬 크다</b>는 건, 차를 팔아 번 쪽은 오히려 줄었다는 뜻이야. 환율은 회사가 고르는 변수가 아니라 <b>빌려 쓰는 순풍</b>이라, 되돌아오면 민낯이 그대로 드러나.</div>
+  </div>
+
+  <div class="section-title">③ 바깥에서 세 방향으로 동시에 밀려</div>
+  <div class="press">
+    <div class="pcard">
+      <span class="ptag">아래에서</span>
+      <h4>중국 전기차 — 가격</h4>
+      <p>국내 승용 전기차 시장의 <b>40% 이상</b>을 중국산이 가져갔어. 세계 시장에서도 평균 성장률을 밑돌아.</p>
+    </div>
+    <div class="pcard">
+      <span class="ptag">위에서</span>
+      <h4>테슬라 — 기술</h4>
+      <p>자율주행 격차에 중국산 저가 물량까지 더해져 <b>모델Y가 국내 판매 1위</b>를 이어가는 중.</p>
+    </div>
+    <div class="pcard">
+      <span class="ptag">밖에서</span>
+      <h4>관세·원자재 — 비용</h4>
+      <p>미국 자동차 관세 <b>15%</b>. 분기당 관세 납부액이 <b>9,000억 원</b> 수준으로 고정비처럼 붙어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">④ 그런데 더 아픈 건 안쪽이야</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>마진을 지키려 기능을 유료 옵션으로 돌림</b><span class="mdesc">기본가는 그대로인데 실제 사는 값(실구매가)이 올라감</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>"이 돈이면 테슬라 사지"</b><span class="mdesc">같은 예산에서 비교 대상이 상위 브랜드로 올라감 — 가격 방어가 수요를 밀어냄</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>소프트웨어 일정도 뒤처짐</b><span class="mdesc">손을 떼도 되는 수준(핸즈오프) 자율주행은 2028년 예상 — 경쟁사는 이미 판매 중</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>판매 감소 → 목표주가 줄하향</b><span class="mdesc">10월 리포트 51건 중 39건이 하향, 평균 인하율 18.5%</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 핵심</b>차를 못 만들어서 밀린 게 아니야. <b>가격표와 소프트웨어 일정</b>에서 밀렸어 — 공장이 아니라 전략에서 난 손해라 고치는 데 시간이 걸려.</div>
+  </div>
+
+  <div class="section-title">⑤ 회사가 내놓은 답과, 남은 시간</div>
+  <div class="timeline">
+    <div class="t-item done"><div class="when">지금</div><div class="what">엔비디아와 자율주행 협력<small>기술 격차 따라잡기</small></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">단기</div><div class="what">하이브리드·EREV로 분산<small>전기차 올인 대신 수익원 다변화</small></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">중기</div><div class="what">중국·인도·베트남 생산 확대<small>관세·생산비 줄이기</small></div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item next"><div class="when">2028년</div><div class="what">핸즈오프 자율주행 출시 예상<small>전문가들: "방향은 맞는데 시간이 없다"</small></div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.19 딥다이브 내용 기반 · 숫자는 현대차 3분기 실적 발표와 증권가 집계 기준(기아 제외)</div>
+</div>
+</body>
+</html>
