@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 뉴스 퀴즈 · 2026.11.19</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.19 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+
+const MC_BANK = [
+  { id:'expect', variants:[
+    { q:'엔비디아는 3분기 매출도 시장 예상을 넘겼고 다음 분기 전망도 예상보다 높게 불렀어. 그런데도 발표 다음 날 주가는 내렸어. 이 상황을 읽는 방법으로 가장 알맞은 것은?',
+      opts:['지난 분기 숫자가 좋으면 주가는 반드시 다음 날 오르게 돼 있어서 집계 오류로 봐야 한다',
+            '전망까지 기대 위로 나왔는데도 빠졌다면, 숫자 자체보다 그 숫자가 어디서 왔는지를 의심한 쪽에 가깝다',
+            '발표 다음 날의 등락은 실적과 무관하게 정해지므로 해석할 수 없다',
+            '예상을 넘긴 폭이 6%로 크지 않아 시장이 하락으로 받아들인 것이다'],
+      answer:1,
+      explain:'호재에 주가가 안 오르면 보통 "<b>이미 값에 들어 있었다</b>"로 설명해. 그런데 이번엔 <b>가이던스까지</b> 기대 위였어. 그러면 남는 건 매출의 <b>질</b>에 대한 의심이야.' },
+    { q:'"주가는 지난 분기 실적이 아니라 앞으로의 기대를 산다"는 말이 실제로 작동하는 방식으로 가장 알맞은 것은?',
+      opts:['발표된 실적은 이미 값에 반영돼 있어, 주가는 전망과 그 전망을 믿을 수 있는지에 더 크게 반응한다',
+            '실적 발표일에는 주가가 움직이지 않다가 다음 분기에 한꺼번에 반영된다',
+            '전망치가 높을수록 주가는 그만큼 비례해서 오른다',
+            '기관 투자자만 전망을 보고, 개인은 발표된 실적만 보고 거래한다'],
+      answer:0,
+      explain:'주가는 <b>앞으로</b>를 당겨 매긴 값이야. 그래서 같은 발표가 "좋은 실적"이면서 동시에 "주가 하락"일 수 있어.' },
+  ]},
+  { id:'circular', variants:[
+    { q:"'순환 금융'이라고 부른 구조의 설명으로 가장 알맞은 것은?",
+      opts:['칩을 만드는 회사가 원재료 공급사의 지분을 사서 가격을 낮추는 것',
+            '칩을 파는 회사가 고객사의 주식을 사 주거나 빚보증을 서 주고, 그 고객이 그 힘으로 자기 칩을 사면 다시 매출로 잡히는 것',
+            '고객에게 할부로 칩을 팔고 이자를 받아 추가 수익을 내는 것',
+            '분기마다 매출을 나눠 여러 분기에 걸쳐 인식하는 회계 처리'],
+      answer:1,
+      explain:'돈이 <b>한 바퀴 돌아 제자리</b>로 오는 구조야. 거래 자체가 불법이라는 뜻이 아니라, 매출 가운데 바깥에서 새로 들어온 몫이 얼마인지 따져 봐야 한다는 뜻이야.' },
+    { q:'순환 금융 구조가 있을 때 투자자가 매출 숫자에 대해 던지게 되는 질문으로 가장 알맞은 것은?',
+      opts:['매출이 전년 대비 몇 % 늘었는가',
+            '매출 가운데 회사가 직접 대준 자금을 거쳐 돌아온 몫이 얼마인가',
+            '매출이 어느 분기에 인식됐는가',
+            '매출총이익률이 업계 평균보다 높은가'],
+      answer:1,
+      explain:'성장률·인식 시점·마진은 모두 매출의 <b>크기와 모양</b>을 보는 질문이야. 순환 금융에서 문제가 되는 건 매출의 <b>출처</b>야.' },
+  ]},
+  { id:'capital', variants:[
+    { q:'새 임시 CEO가 돈 쓸 순서를 ①자사주 매입 ②공급사 선급금 ③선별 투자 ④고객 금융으로 매겼어. 고객 금융을 꼴찌로 내린 것이 보내는 신호로 가장 알맞은 것은?',
+      opts:['고객사 수를 줄여 매출을 집중시키겠다는 신호',
+            '순환 금융에서 발을 빼겠다는 신호이고, 대신 고객의 증설 속도는 느려질 수 있다는 뜻',
+            '당분간 신규 칩 개발을 중단하겠다는 신호',
+            '자사주를 사서 주가를 올리면 고객 금융이 저절로 필요 없어진다는 뜻'],
+      answer:1,
+      explain:'매출의 질을 지키려는 선택이지만, 돈을 대주던 손을 거두면 <b>고객이 데이터센터를 짓는 속도</b>도 같이 떨어져. 호재와 악재가 한 결정에 같이 들어 있어.' },
+    { q:'회사가 "투자·약정·보증을 엄격히 재평가하겠다"고 말할 때, 이 말이 실제로 가리키는 내용으로 가장 알맞은 것은?',
+      opts:['이미 체결한 계약을 모두 취소하겠다는 뜻',
+            '앞으로 남에게 돈을 대주거나 빚을 보증해 주는 일을 더 까다롭게 고르겠다는 뜻',
+            '회계법인을 바꿔 장부를 다시 작성하겠다는 뜻',
+            '분기 실적 발표 주기를 늘리겠다는 뜻'],
+      answer:1,
+      explain:'약정과 보증은 <b>앞으로 나갈 돈</b>에 대한 약속이야. 재평가한다는 건 그 약속을 새로 맺는 기준을 올리겠다는 말이야.' },
+  ]},
+  { id:'commit', variants:[
+    { q:'엔비디아의 공급·설비 약정은 2,790억 달러에서 3,900억 달러로 늘었고, 늘어난 대부분이 다년 메모리 계약이었어. 이 사실이 한국 반도체에 갖는 의미로 가장 알맞은 것은?',
+      opts:['메모리 가격이 내려가 삼성전자·SK하이닉스 마진이 줄어든다는 뜻',
+            'HBM 같은 메모리 물량이 여러 해에 걸쳐 미리 잡혔다는 뜻이라 매출을 내다보기 쉬워진다는 뜻',
+            '엔비디아가 메모리를 직접 만들기 시작한다는 뜻',
+            '한국 업체가 엔비디아 주식을 사야 주문을 받을 수 있다는 뜻'],
+      answer:1,
+      explain:'약정은 <b>사기로 서명해 둔 돈</b>이야. 주문이 여러 해 단위로 잡히면 설비 투자와 생산 계획을 미리 세울 수 있어.' },
+    { q:"'약정'이라는 항목을 매출·이익과 구분해서 봐야 하는 이유로 가장 알맞은 것은?",
+      opts:['약정은 이미 벌어들인 돈이라 다시 세면 중복 집계가 되기 때문에',
+            '약정은 앞으로 쓰거나 받기로 서명해 둔 돈이라, 지금의 실적이 아니라 앞으로의 부담·물량을 보여주기 때문에',
+            '약정은 세금이 붙지 않는 항목이기 때문에',
+            '약정은 분기마다 시세로 다시 매겨 손익에 반영되기 때문에'],
+      answer:1,
+      explain:'실적은 <b>이미 일어난 일</b>, 약정은 <b>일어나기로 한 일</b>이야. 그래서 같은 발표에서 실적은 좋고 약정은 부담일 수 있어.' },
+  ]},
+  { id:'kdi', variants:[
+    { q:'KDI가 내년 성장률 전망을 3.9%로 올리면서 가장 큰 위험요인으로 미국 AI 데이터센터 건설 지연을 꼽았어. 전망을 올리면서 동시에 그걸 위험으로 짚은 이유로 가장 알맞은 것은?',
+      opts:['성장률 전망은 위험요인을 반영하지 않고 계산하기 때문에',
+            '성장을 끌어올리는 힘과 꺾일 수 있는 지점이 모두 반도체라는 한 곳에 몰려 있기 때문에',
+            '데이터센터 건설이 한국 건설업 성장률에 직접 잡히기 때문에',
+            '미국 경기가 나빠지면 한국 내수가 먼저 줄어들기 때문에'],
+      answer:1,
+      explain:'KDI는 내년 성장의 <b>3분의 2</b>가 반도체에서 나온다고 봤어. 힘의 출처가 한 곳이면 <b>그 한 곳이 위험의 출처</b>이기도 해.' },
+    { q:'성장의 3분의 2가 한 업종에서 나온다는 전망을 읽을 때, 함께 생각해야 할 점으로 가장 알맞은 것은?',
+      opts:['그 업종의 수요가 흔들리면 전체 숫자가 같이 흔들린다는 점',
+            '나머지 업종은 전망에서 제외됐다는 점',
+            '그 업종의 주가가 반드시 같이 오른다는 점',
+            '성장률이 높을수록 금리가 자동으로 내려간다는 점'],
+      answer:0,
+      explain:'집중은 <b>속도</b>를 주는 대신 <b>변동</b>도 같이 줘. 어제 코스피에서 본 쏠림과 같은 성질이 성장률 쪽에도 있는 거야.' },
+  ]},
+  { id:'ipo', variants:[
+    { q:'앤트로픽이 공모 희망가를 70~78달러로 제시했는데 80~85달러로 올리는 방안을 검토한다는 보도가 나왔어. 이런 조정이 뜻하는 바로 가장 알맞은 것은?',
+      opts:['회사가 상장을 미루려 한다는 뜻',
+            '예상보다 사겠다는 수요가 많아 같은 주식 수로 더 많은 돈을 받을 수 있게 됐다는 뜻',
+            '규제 당국이 가격을 올리라고 요구했다는 뜻',
+            '상장 후 주가가 그만큼 오를 것이 확정됐다는 뜻'],
+      answer:1,
+      explain:'공모가는 수요를 받아 보고 정해. 올린다는 건 <b>수요가 몰렸다</b>는 신호지, 상장 후 주가를 보장하는 건 아니야.' },
+    { q:'앤트로픽은 공모(최대 644억 달러)와 별도로 사모로 260억 달러를 더 받기로 했어. 상장 때 공모와 사모를 나눠 쓰는 이유로 가장 알맞은 것은?',
+      opts:['사모로 받은 돈은 갚지 않아도 되기 때문에',
+            '공모만으로 받기 어려운 큰 금액을 특정 투자자와 따로 계약해 같은 가격에 채울 수 있기 때문에',
+            '사모 투자자에게는 공모가의 절반만 받기 때문에',
+            '사모는 상장 심사를 받지 않아도 되기 때문에'],
+      answer:1,
+      explain:'사모는 <b>정해 둔 상대와 따로 맺는 계약</b>이야. 이번엔 구글·엔비디아 같은 전략적 투자자들이 같은 공모가로 들어왔어.' },
+  ]},
+  { id:'skew', variants:[
+    { q:'복습: 코스피 시가총액의 절반을 두 종목이 차지하는 상태가 지수에 갖는 의미로 가장 알맞은 것은?',
+      opts:['지수가 오를 때만 더 크게 움직이고 내릴 때는 완만해진다',
+            '쏠림은 증폭 장치라서 오를 때도 내릴 때도 움직임이 같이 커진다',
+            '종목 수가 많아 분산 효과가 커진다',
+            '두 종목을 빼고 계산한 지수가 공식 지수로 발표된다'],
+      answer:1,
+      explain:'증폭 장치는 <b>방향을 가리지 않아</b>. 올릴 때 세게 올린 구조가 내릴 때도 세게 내려.' },
+    { q:'복습: 국내 주식형 ETF를 여러 개 샀는데도 분산이 안 됐을 수 있는 이유로 가장 알맞은 것은?',
+      opts:['ETF는 종목이 아니라 지수를 사는 상품이라 분산이 불가능해서',
+            '상품 이름이 달라도 안에 든 종목 비중이 같은 대형주에 쏠려 있을 수 있어서',
+            'ETF는 수수료가 높아 수익률이 같아지기 때문에',
+            'ETF는 하루에 한 번만 거래돼서'],
+      answer:1,
+      explain:'개수가 아니라 <b>안에 든 비중</b>이 분산을 정해. 이름이 여러 개여도 속이 같으면 한 종목에 건 것과 비슷해져.' },
+  ]},
+  { id:'wealth', variants:[
+    { q:'복습: 월급이 그대로인데도 주식·집값이 떨어지면 소비가 줄어드는 현상에 대한 설명으로 가장 알맞은 것은?',
+      opts:['자산을 실제로 팔아 손실을 확정해야만 소비가 줄어든다',
+            '팔지 않아도 평가액이 줄면 쓸 수 있다고 느끼는 돈이 줄어 소비가 따라 줄어든다',
+            '소득이 그대로면 소비는 변하지 않는다',
+            '자산 가격 하락은 물가를 내려 오히려 소비를 늘린다'],
+      answer:1,
+      explain:'역자산효과는 <b>장부상 평가액</b>만 바뀌어도 작동해. 그래서 지수 하락이 다음 차례로 소비 지표에 나타나.' },
+    { q:'복습: 지수가 먼저 빠지고 소비 지표가 나중에 따라 내려가는 순서가 생기는 이유로 가장 알맞은 것은?',
+      opts:['소비 통계는 집계와 발표에 시간이 걸리고, 자산값 변화가 씀씀이로 옮겨가는 데도 시간이 걸리기 때문에',
+            '소비는 자산 가격과 아무 관계가 없기 때문에',
+            '정부가 소비 지표 발표를 의도적으로 미루기 때문에',
+            '주가는 실시간이지만 소비는 1년에 한 번만 조사하기 때문에'],
+      answer:0,
+      explain:'가격은 즉시, 행동은 천천히 움직여. 그 <b>시차</b> 때문에 지수 다음에 소비 차례가 와.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'칩을 파는 회사가 고객사에 돈을 대주고, 그 고객이 그 돈으로 다시 자기 칩을 사면서 매출로 잡히는 구조를 \'______ 금융\'이라고 해. (두 글자)',
+    accept:['순환'],
+    explain:'정답은 <b>순환</b>. 돈이 한 바퀴 돌아 제자리로 와. 매출의 크기가 아니라 <b>출처</b>를 따지게 만드는 구조야.' },
+  { q:'기업이 실적을 발표하면서 함께 내놓는 \'다음 분기 전망\'을 영어로 뭐라고 해? (외래어 네 글자)',
+    accept:['가이던스'],
+    explain:'정답은 <b>가이던스</b>. 지난 분기 숫자는 이미 값에 들어 있어서, 주가는 보통 이쪽에 더 크게 반응해.' },
+  { q:'엔비디아의 3분기 매출은 1년 전보다 몇 % 늘었어? (숫자만)',
+    accept:['103','103%'],
+    explain:'정답은 <b>103%</b>(1,158억 달러). 두 배 넘게 늘었는데도 다음 날 주가는 5거래일 연속 하락이었어.' },
+  { q:'AI 계산용 GPU를 대량으로 갖춰 다른 기업에 빌려주는 전문 업체를 뭐라고 불러? (외래어, 코어위브·IREN 등)',
+    accept:['네오클라우드','네오 클라우드'],
+    explain:'정답은 <b>네오클라우드</b>. 종합 클라우드와 달리 AI 연산 전문점이고, 엔비디아의 고객이자 투자 대상이기도 해.' },
+  { q:'임시 CEO가 다시 매긴 돈 쓸 순서에서 꼴찌로 내려간 항목은 \'______ 금융\'이야. (두 글자)',
+    accept:['고객'],
+    explain:'정답은 <b>고객</b>. 순환에서 발을 빼겠다는 신호인데, 그만큼 고객의 증설 속도도 같이 느려져.' },
+  { q:'앞으로 사거나 쓰기로 서명해 둔 돈을 가리키는 회계 항목을 두 글자로 뭐라고 해? (2,790억 → 3,900억 달러로 늘어난 그것)',
+    accept:['약정'],
+    explain:'정답은 <b>약정</b>. 실적은 이미 일어난 일, 약정은 일어나기로 한 일이라 같은 발표에서 방향이 갈릴 수 있어.' },
+  { q:'KDI는 내년 한국 성장의 몇 분의 몇이 반도체에서 나온다고 봤어? (예: 3분의 1 형식)',
+    accept:['3분의 2','삼분의 2','2/3','3분의2'],
+    explain:'정답은 <b>3분의 2</b>. 올해는 절반이었어. 힘의 출처가 한 곳이면 위험의 출처도 같은 곳이야.' },
+  { q:'KDI가 내년 성장의 가장 큰 위험요인으로 꼽은 것은 미국 \'AI ______ 건설 지연·투자 축소\'야. (다섯 글자)',
+    accept:['데이터센터','데이터 센터'],
+    explain:'정답은 <b>데이터센터</b>. 서버를 덜 지으면 거기 꽂을 HBM 주문도 줄어 — 그게 한국 성장률까지 오는 길이야.' },
+  { q:'앤트로픽이 나스닥에서 쓰는 종목코드(티커)는 뭐야? (영문 세 글자)',
+    accept:['ANT','ant'],
+    explain:'정답은 <b>ANT</b>. 현지 19일 상장이라 한국시간으로는 20일 새벽이 첫 거래야.' },
+  { q:'11월 18일 코스피 종가는 몇 포인트였어? (숫자만, 소수점 둘째 자리까지)',
+    accept:['5067.44','5,067.44'],
+    explain:'정답은 <b>5,067.44</b>(＋1.99%). 하루 만에 5,000선을 되찾았어. 환율은 1,333.0원으로 내렸고.' },
+  { q:'복습: 소득이 줄지 않았는데도 보유 자산의 평가액이 떨어져 소비가 줄어드는 현상을 \'______효과\'라고 해. (세 글자)',
+    accept:['역자산','역 자산','역자산효과'],
+    explain:'정답은 <b>역자산</b>. 주식을 팔지 않아도 작동해 — 평가액만 바뀌어도 쓸 수 있다고 느끼는 돈이 줄어들거든.' },
+  { q:'복습: 코스피처럼 회사 값이 큰 종목일수록 지수에 더 세게 반영하는 계산 방식을 \'______ 가중\'이라고 해. (네 글자)',
+    accept:['시가총액','시가 총액'],
+    explain:'정답은 <b>시가총액</b>. 지수의 절반이 두 종목이면, 그 둘이 곧 지수야.' },
+  { q:'복습: 앤트로픽의 9개월 순손실 1,040억 달러 중 943억 달러는 전환사채·SAFE를 다시 매긴 금액이야. 그래서 진짜 사업 성적은 ______손실 쪽에서 봐야 해. (두 글자)',
+    accept:['영업','영업손실'],
+    explain:'정답은 <b>영업</b>. 영업손실은 12.6억 달러로 오히려 줄었어 — <b>장부의 적자와 영업의 적자는 다른 말</b>이야.' },
+  { q:'복습: 지수 비중이 한쪽에 몰려 있으면 오를 때도 내릴 때도 움직임이 같이 커져. 이런 성질을 두 글자로 뭐라고 해?',
+    accept:['쏠림','집중'],
+    explain:'정답은 <b>쏠림</b>(집중). 증폭 장치는 방향을 가리지 않아.' },
+  { q:'국가데이터처 2026 사회조사에서 \'결혼을 해야 한다\'고 답한 비율은 몇 %야? (숫자만, 소수점 한 자리)',
+    accept:['55','55.0','55%'],
+    explain:'정답은 <b>55.0%</b>. 2년 전 52.5%에서 올라 12년 만에 가장 높았어.' },
+];
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
