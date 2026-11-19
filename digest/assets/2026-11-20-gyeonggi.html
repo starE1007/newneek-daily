@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>예산은 2조 늘었는데 쓸 돈은 반토막 난 이유</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 막대 비교 */
+  .bars{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .bargroup{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .bargroup h3{font-size:15.5px;margin-bottom:4px}
+  .bargroup .cap{font-size:13px;color:var(--text2);margin-bottom:12px;min-height:38px}
+  .bar{margin-bottom:10px}
+  .bar .lab{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:4px}
+  .bar .lab b{color:var(--text);font-size:14px}
+  .track{height:16px;border-radius:99px;background:var(--surface2);overflow:hidden}
+  .fill{height:100%;border-radius:99px}
+  .fill.blue{background:var(--blue)}
+  .fill.blue-l{background:#9CC9EE}
+  .fill.red{background:var(--red)}
+  .fill.red-l{background:#F0ADA6}
+  .delta{margin-top:10px;font-size:13.5px;font-weight:700}
+  .delta.up{color:#2F7A52}
+  .delta.down{color:#C6493E}
+
+  /* 단계 흐름 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 메운 돈 */
+  .fundrow{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .fund{flex:1 1 150px;min-width:140px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .fund .n{font-size:15px;font-weight:700;margin-bottom:2px}
+  .fund .d{font-size:12.5px;color:var(--text2)}
+  .fund.warn{background:var(--orange-soft);border-color:#F0D6BD}
+  .fund.warn .n,.fund.warn .d{color:#9A5620}
+
+  /* 깎인 자리 */
+  .cuts{display:flex;flex-wrap:wrap;gap:8px}
+  .cut{border:1px solid var(--border);border-radius:99px;padding:7px 14px;font-size:13.5px;background:var(--soft)}
+  .cut b{color:#C6493E}
+  .cut.keep b{color:#2F7A52}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .bars{grid-template-columns:1fr}
+    .bargroup .cap{min-height:0}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.20 데일리 뉴스 · 시각자료</div>
+  <h1>🏛️ 예산은 2조 늘었는데, 쓸 돈은 반토막</h1>
+  <div class="sub">경기도 2027년 예산안으로 보는 '가용재원'의 뜻과, 두 숫자가 반대로 움직인 이유</div>
+
+  <div class="section-title">같은 예산안, 두 개의 숫자</div>
+  <div class="bars">
+    <div class="bargroup">
+      <h3>전체 예산</h3>
+      <div class="cap">통장에 찍히는 총액</div>
+      <div class="bar">
+        <div class="lab"><span>2026년</span><b>40조 577억</b></div>
+        <div class="track"><div class="fill blue-l" style="width:95%"></div></div>
+      </div>
+      <div class="bar">
+        <div class="lab"><span>2027년</span><b>42조 1,946억</b></div>
+        <div class="track"><div class="fill blue" style="width:100%"></div></div>
+      </div>
+      <div class="delta up">▲ 2조 1,369억 (＋5.3%)</div>
+    </div>
+    <div class="bargroup">
+      <h3>가용재원</h3>
+      <div class="cap">용도가 묶이지 않아 도가 알아서 쓸 수 있는 돈</div>
+      <div class="bar">
+        <div class="lab"><span>2026년</span><b>4조 595억</b></div>
+        <div class="track"><div class="fill red-l" style="width:100%"></div></div>
+      </div>
+      <div class="bar">
+        <div class="lab"><span>2027년</span><b>1조 6,500억</b></div>
+        <div class="track"><div class="fill red" style="width:41%"></div></div>
+      </div>
+      <div class="delta down">▼ 2조 4,095억 (−59.4%)</div>
+    </div>
+  </div>
+
+  <div class="section-title">왜 반대로 움직여?</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>늘어난 돈 대부분이 국고보조사업</b><span class="mdesc">국고보조금 = 정부가 "이건 여기에만 써라"라고 용도를 정해 내려보내는 돈. 총액은 키우지만 지자체가 마음대로 못 써</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>받으려면 지방비도 같이 넣어야 해 (매칭)</b><span class="mdesc">정부가 7을 주면 도가 3을 보태는 식. 보조사업이 늘수록 도 자체 돈이 그만큼 묶여</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>그래서 총예산↑ · 자유로운 돈↓</b><span class="mdesc">상품권으로 받는 월급이 늘고, 그 상품권을 쓰려면 내 현금까지 보태야 하는 상황과 같아</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>필수 지출부터 구멍</b><span class="mdesc">공무원 인건비 3개월분과 일부 법정경비를 본예산에 못 담았어. 광교청사 매각까지 검토했다 접었고</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 예산의 역설</b>"예산이 커졌다"는 발표와 "월급 줄 돈이 없다"는 상황이 동시에 사실일 수 있어 — 총액이 아니라 <b>그중 내가 정할 수 있는 몫</b>을 봐야 하는 이유야.</div>
+  </div>
+
+  <div class="section-title">모자란 자리를 이렇게 메웠어</div>
+  <div class="fundrow">
+    <div class="fund"><div class="n">지방채 2,462억</div><div class="d">빚을 내서 채운 몫</div></div>
+    <div class="fund"><div class="n">통합재정안정화기금 4,100억</div><div class="d">비상금 통장에서 꺼낸 몫</div></div>
+    <div class="fund"><div class="n">지역개발기금 1,000억</div><div class="d">목적 기금에서 끌어온 몫</div></div>
+    <div class="fund warn"><div class="n">나머지는 내년 추경으로</div><div class="d">인건비·법정경비는 미뤄 둔 숙제</div></div>
+  </div>
+
+  <div class="section-title">먼저 깎인 자리</div>
+  <div class="cuts">
+    <span class="cut">기후행동 기회소득 <b>폐지</b></span>
+    <span class="cut">문화 3개 부서 <b>−492억</b></span>
+    <span class="cut">공공기관 계약직 <b>약 1,000명</b> 일자리 위협</span>
+    <span class="cut">도지사 공약 신규 사업 <b>제외</b></span>
+    <span class="cut keep">급식·노인 돌봄·재난 예방은 <b>우선 배정</b></span>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.20 딥다이브 내용 기반 (막대 길이는 비율 표시)</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>금리 올리겠다는 신호, 내 지갑까지 오는 길</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 금리 타임라인 */
+  .rates{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .r{flex:1 1 150px;min-width:140px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .r .when{font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:3px}
+  .r .lvl{font-size:16px;font-weight:700;margin-bottom:2px}
+  .r .what{font-size:12.5px;color:var(--text2)}
+  .r.up{background:var(--red-soft);border-color:#F3CFCA}
+  .r.up .when,.r.up .what{color:#B23F34}
+  .r.up .lvl{color:#B23F34}
+  .r.next{background:var(--orange-soft);border-color:#F0D6BD}
+  .r.next .when,.r.next .what{color:#9A5620}
+  .r.next .lvl{color:#9A5620}
+  .r-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  /* 단계 흐름 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .note{margin-top:16px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .note b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 상쇄 구조 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.push{background:var(--red-soft);color:#C6493E}
+  .badge.pull{background:var(--green-soft);color:#2F7A52}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .balance{margin-top:14px;border:1px dashed var(--border);border-radius:10px;padding:12px 16px;font-size:14px;background:var(--soft)}
+  .balance b{color:var(--text)}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.20 데일리 뉴스 · 시각자료</div>
+  <h1>🏦 "더 올려야 한다" — 내 지갑까지 오는 길</h1>
+  <div class="sub">미국 연준이 금리를 다시 올리는 국면인 이유와, 그게 한국 환율·대출까지 전해지는 경로를 한 장으로</div>
+
+  <div class="section-title">미국 기준금리, 지금 어디쯤이야?</div>
+  <div class="rates">
+    <div class="r">
+      <div class="when">2023.07 ~ 2026.08</div>
+      <div class="lvl">인하 국면</div>
+      <div class="what">물가가 잡히는 동안 내리던 시기</div>
+    </div>
+    <div class="r-arrow">→</div>
+    <div class="r up">
+      <div class="when">2026.09 FOMC</div>
+      <div class="lvl">3.75 ~ 4.00%</div>
+      <div class="what">＋0.25%p · 3년 2개월 만의 인상</div>
+    </div>
+    <div class="r-arrow">→</div>
+    <div class="r">
+      <div class="when">2026.10 FOMC</div>
+      <div class="lvl">동결</div>
+      <div class="what">숫자는 그대로, 속내는 "더 올리자"</div>
+    </div>
+    <div class="r-arrow">→</div>
+    <div class="r next">
+      <div class="when">2026.12 FOMC</div>
+      <div class="lvl">＋0.25%p ?</div>
+      <div class="what">2명은 ＋0.50%p(빅스텝)까지 거론</div>
+    </div>
+  </div>
+
+  <div class="section-title">왜 지금 '내리기'가 아니라 '올리기'야?</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>물가 목표는 2%인데, 근원물가가 2.8%</b><span class="mdesc">근원물가 = 널뛰는 식료품·에너지를 뺀 물가. 체온계에서 잡음을 지운 값이라, 이게 높으면 "진짜로 비싸지는 중"이라는 뜻</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>금리는 물가를 누르는 브레이크</b><span class="mdesc">금리를 올리면 빌리는 값이 비싸져 소비·투자가 줄고, 그만큼 값을 올리기 어려워져</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>그래서 "앞으로 몇 달 안에 더 올려야 한다"에 거의 전원 공감</b><span class="mdesc">10월 회의록에 그대로 적혀 있던 내용. 10월의 동결은 멈춤이 아니라 숨 고르기였던 셈</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>일부는 한 번에 0.5%p — '빅스텝'</b><span class="mdesc">같은 1%를 네 번에 나눠 올리는 것과 두 번에 올리는 것은 다르게 읽혀. 속도 자체가 "이번엔 진심"이라는 메시지라, 사람들의 물가 기대를 꺾는 충격요법으로 쓰여</span></div>
+    </div>
+    <div class="note"><b>기대인플레이션이 뭐길래</b>"내년에도 계속 오르겠지"라고 다들 믿으면 가게는 미리 값을 올리고 노동자는 더 높은 임금을 요구해 — 믿음이 실제 물가를 만들어. 빅스텝은 이 믿음을 끊으려는 카드야.</div>
+  </div>
+
+  <div class="section-title">미국 금리가 한국까지 오는 길</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>미국 4.00% vs 한국 3.00% — 금리차 1.00%p</b><span class="mdesc">같은 돈을 맡겨도 달러 쪽이 더 주면, 돈은 이자가 센 쪽으로 움직여</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>달러 수요 증가 → 원화 약세(환율 상승)</b><span class="mdesc">달러를 사려는 줄이 길어지면 달러 값이 오르고, 그게 곧 '환율이 올랐다'는 말</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>수입 물가 상승</b><span class="mdesc">기름·밀·부품은 달러로 사 와. 같은 물건인데 원화로는 더 비싸져</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>한국은행도 올릴 압력 (11/26 금융통화위원회)</b><span class="mdesc">물가를 눌러야 하고 금리차도 벌어지면 안 되니까 → 올리면 내 대출 이자가 먼저 오르고, 장바구니 물가는 그 뒤에 따라와</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">그런데 왜 환율은 아직 1,330원대야?</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge push">밀어 올리는 힘</span>
+      <h3>연준의 추가 인상 신호</h3>
+      <p>금리차가 벌어질수록 달러가 세져 <b>환율을 위로</b> 밀어. 11월 초엔 1,380원대까지 올라 <b>1,400원</b> 이야기가 나왔어.</p>
+    </div>
+    <div class="vs">
+      <span class="badge pull">끌어내리는 힘</span>
+      <h3>반도체 수출로 들어오는 달러</h3>
+      <p>수출로 받은 달러를 원화로 바꾸는 수요가 커서 <b>환율을 아래로</b> 눌러. 연간 수출 <b>1조 달러</b> 돌파가 그 힘의 크기야.</p>
+    </div>
+  </div>
+  <div class="balance">지금 1,330원 언저리는 두 힘이 맞버틴 결과야. 바꿔 말하면 <b>환율을 떠받치는 건 한국 경제의 체력이 아니라 반도체 한 업종</b> — 그쪽 주문이 흔들리면 눌러 주던 힘부터 빠진다는 뜻이기도 해.</div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.20 딥다이브 내용 기반 (금리는 미국 상단 기준)</div>
+</div>
+</body>
+</html>
