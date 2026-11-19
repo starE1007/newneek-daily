@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026.11.20 오늘의 뉴스 퀴즈</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.20 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+
+const MC_BANK = [
+  { id:'ipogap', variants:[
+    { q:'앤트로픽의 공모가는 83달러였는데 첫 거래가는 111.50달러였어. 이 차이를 읽는 방법으로 가장 알맞은 것은?',
+      opts:['주당 28.5달러만큼은 회사 통장에 들어오지 않고, 공모에서 미리 받은 쪽의 평가이익이 된다',
+            '첫 거래가가 공모가보다 높으면 그 차액만큼 회사가 추가로 자금을 받는다',
+            '공모가는 상장 후 첫 거래가에 맞춰 사후에 다시 정해진다',
+            '첫 거래가가 높다는 건 공모 수요가 적었다는 신호다'],
+      answer:0,
+      explain:'회사가 받는 돈은 <b>공모가 기준</b>이야. 시장이 더 높은 값을 매겼다면 그 차액은 미리 배정받은 쪽에 간 몫 — 흔히 "테이블에 두고 온 돈"이라고 불러.' },
+    { q:'공모 물량의 7배에 달하는 주문이 몰렸다는 사실이 가리키는 바로 가장 알맞은 것은?',
+      opts:['공모가가 시장이 생각한 값보다 낮게 매겨졌을 가능성이 크다',
+            '상장 후 주가가 반드시 공모가 위에서 유지된다는 뜻이다',
+            '회사가 조달할 수 있는 금액이 7배로 늘어난다는 뜻이다',
+            '기관보다 개인 투자자의 참여가 많았다는 뜻이다'],
+      answer:0,
+      explain:'수요가 공급을 크게 넘겼다는 건 <b>값을 더 받을 수 있었다</b>는 신호이기도 해. 그래서 첫날 급등은 흥행인 동시에 가격 책정의 아쉬움으로도 읽혀.' },
+  ]},
+  { id:'dilution', variants:[
+    { q:'같은 날 앤트로픽의 몸값이 1조 5,000억 달러로도, 2조 달러로도 보도된 이유로 가장 알맞은 것은?',
+      opts:['환율을 적용한 시점이 매체마다 달라서',
+            '적용한 주가(공모가/첫 거래가)와 세는 주식 범위(완전희석 여부)가 달라서',
+            '한쪽은 부채를 빼고 계산했기 때문에',
+            '한쪽은 상장된 주식만, 다른 쪽은 자회사 가치까지 더했기 때문에'],
+      answer:1,
+      explain:'시가총액은 <b>주가 × 주식 수</b>야. 어떤 주가를 쓰는지, 아직 주식이 되지 않은 스톡옵션까지 세는지에 따라 답이 달라져.' },
+    { q:"기업 가치를 '완전희석 기준'으로 계산한다는 말의 뜻으로 가장 알맞은 것은?",
+      opts:['기존 주주의 지분을 제외하고 신규 공모 주식만 세는 방식',
+            '주가가 가장 낮았던 시점을 기준으로 보수적으로 계산하는 방식',
+            '스톡옵션처럼 나중에 주식이 될 수 있는 것까지 모두 주식 수에 넣어 계산하는 방식',
+            '배당을 지급한 뒤 남는 가치만 계산하는 방식'],
+      answer:2,
+      explain:'세는 주식이 늘어나니 같은 주가라도 몸값은 커져. 그래서 비교할 땐 <b>같은 기준끼리</b> 놓고 봐야 해.' },
+  ]},
+  { id:'circular', variants:[
+    { q:'앤트로픽 공모와 별도로 진행된 사모 투자에 참여한 7곳이 모두 이 회사에 칩·설비를 공급하는 업체였어. 이 구조를 경계하는 이유로 가장 알맞은 것은?',
+      opts:['공급사가 주주가 되면 납품 단가를 낮춰야 하기 때문에',
+            '투자한 돈이 설비 구매를 거쳐 다시 그 공급사의 매출로 잡혀, 바깥에서 들어온 수요와 구분이 어려워지기 때문에',
+            '같은 회사가 주주이면서 거래처가 되는 것은 법으로 금지돼 있기 때문에',
+            '공급사가 투자한 금액만큼 매출이 회계상 자동 차감되기 때문에'],
+      answer:1,
+      explain:'돈이 한 바퀴 돌아 제자리로 오는 <b>순환 금융</b> 구조야. 매출의 크기보다 <b>출처</b>를 따져야 하는 이유고, 성장이 느려지는 순간 양쪽이 같이 흔들려.' },
+    { q:'순환 금융 구조에서 가장 먼저 문제가 드러나는 시점으로 가장 알맞은 것은?',
+      opts:['돈을 대준 쪽의 주가가 오를 때',
+            '수요 증가 속도가 느려져 바깥에서 들어오는 돈이 줄어들 때',
+            '공급 계약 기간이 길어질 때',
+            '투자받은 회사가 상장에 성공할 때'],
+      answer:1,
+      explain:'안쪽에서 도는 돈은 한계가 있어. <b>바깥 수요가 식는 순간</b> 매출을 떠받치던 고리가 같이 풀려.' },
+  ]},
+  { id:'netassets', variants:[
+    { q:'3분기 순대외금융자산이 역대 최대폭으로 늘어난 가장 큰 이유로 알맞은 것은?',
+      opts:['수출 대금이 한꺼번에 들어와 외환보유액이 급증했기 때문에',
+            '코스피 급락으로 외국인이 보유한 한국 주식의 평가액이 크게 줄었기 때문에',
+            '정부가 해외 자산을 대규모로 사들였기 때문에',
+            '외국인이 보유 주식을 모두 팔고 자금을 회수했기 때문에'],
+      answer:1,
+      explain:'순대외금융자산은 <b>우리 해외자산 − 외국인의 한국자산</b>이야. 뒤쪽이 가격 하락으로 쪼그라들면 내가 더 번 게 없어도 숫자는 커져.' },
+    { q:'"순대외금융자산이 늘었다"는 뉴스를 읽을 때 반드시 함께 확인해야 할 것으로 가장 알맞은 것은?',
+      opts:['그 증감이 실제 거래 때문인지, 보유 자산의 평가액 변동 때문인지',
+            '그해 정부 예산이 늘었는지 줄었는지',
+            '기준금리가 같은 기간에 올랐는지',
+            '해당 분기의 수출액이 사상 최대였는지'],
+      answer:0,
+      explain:'같은 통계라도 <b>거래(실제로 오간 돈)</b>와 <b>평가(가격이 바뀌어 생긴 변화)</b>는 의미가 전혀 달라. 이번 증가는 평가 쪽 영향이 컸어.' },
+  ]},
+  { id:'flip', variants:[
+    { q:'2분기엔 순대외금융자산이 역대 최대폭으로 줄었고 3분기엔 역대 최대폭으로 늘었어. 이 급반전이 알려주는 바로 가장 알맞은 것은?',
+      opts:['한국의 대외 경쟁력이 한 분기 만에 크게 개선됐다는 뜻이다',
+            '통계 작성 기준이 분기마다 달라졌다는 뜻이다',
+            '주가에 따라 부호가 뒤집히는 항목이 있어, 지표의 방향만으로 국가 재무가 좋아졌다고 보기 어렵다는 뜻이다',
+            '외국인 투자자가 한국 시장에서 완전히 빠져나갔다는 뜻이다'],
+      answer:2,
+      explain:'2분기엔 주가 급등으로 줄고 3분기엔 급락으로 늘었어. <b>체감과 거꾸로 읽히는 통계</b>라 제목만 보면 정반대로 이해하게 돼.' },
+    { q:'위기 때 환율을 실제로 받쳐 주는 지표로 가장 알맞은 것은?',
+      opts:['코스피 시가총액',
+            '대외채권에서 대외채무를 뺀 순대외채권',
+            '외국인의 국내 주식 보유 평가액',
+            '거주자의 해외 주식 평가이익'],
+      answer:1,
+      explain:'주식 평가액은 가격 따라 출렁이지만, <b>순대외채권</b>은 받을 돈에서 갚을 돈을 뺀 값이라 위기 때 완충 역할을 해. 3분기 기준 4,168억 달러야.' },
+  ]},
+  { id:'highrate', variants:[
+    { q:'미국 10년물 국채금리가 5%대이고 12월 추가 인상 전망이 우세한 환경에서, 대형 IPO에 수요가 몰린 현상을 읽는 방법으로 가장 알맞은 것은?',
+      opts:['금리가 높을수록 신규 상장 주식의 공모가는 자동으로 낮아진다',
+            '안전한 이자 수익의 매력이 큰 상황에서도 돈이 몰렸다는 점에서, 해당 산업의 성장 기대가 그만큼 크다는 뜻이다',
+            '금리와 주식시장은 서로 영향을 주고받지 않는다',
+            '금리가 높으면 기업은 상장 대신 은행 대출을 택하는 것이 일반적이다'],
+      answer:1,
+      explain:'금리가 높으면 <b>가만히 둬도 이자가 붙는</b> 선택지가 세져. 그걸 포기하고 들어온 돈이라 기대도, 실망했을 때의 반동도 커.' },
+    { q:'금리 상승 국면에서 비트코인 같은 자산이 먼저 밀리는 이유로 가장 알맞은 것은?',
+      opts:['거래소가 금리에 맞춰 수수료를 올리기 때문에',
+            '이자나 배당이 붙지 않는 자산이라, 이자 수익이 커질수록 상대적 매력이 떨어지기 때문에',
+            '채굴 원가가 금리에 연동돼 있기 때문에',
+            '금리가 오르면 거래량 자체가 법으로 제한되기 때문에'],
+      answer:1,
+      explain:'이자가 안 붙는 자산은 <b>기회비용</b>으로 평가돼. 안전한 이자가 커질수록 먼저 팔리는 쪽에 놓여.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'앤트로픽의 공모가는 주당 몇 달러로 정해졌어? (숫자만)',
+    accept:['83','83달러','$83'],
+    explain:'정답은 <b>83달러</b>. 희망 범위 70~78달러보다 높게 정해졌어 — 수요가 그만큼 몰렸다는 뜻이야.' },
+  { q:'앤트로픽의 나스닥 첫 체결가는 몇 달러였어? (숫자만, 소수점 포함)',
+    accept:['111.5','111.50','111.5달러'],
+    explain:'정답은 <b>111.50달러</b>(공모가 대비 ＋34.3%). 장중 115달러까지 갔다가 오후엔 97달러 안팎으로 되밀렸어.' },
+  { q:'스톡옵션처럼 나중에 주식이 될 수 있는 것까지 모두 주식 수에 넣어 기업 가치를 계산하는 방식을 뭐라고 해? (네 글자)',
+    accept:['완전희석','완전 희석','완전희석기준'],
+    explain:'정답은 <b>완전희석</b>. 1.5조와 2조 달러의 차이가 여기서 나와 — 숫자가 아니라 기준이 다른 거야.' },
+  { q:'내가 대준 돈이 고객을 거쳐 다시 내 매출로 돌아오는 구조를 \'______ 금융\'이라고 해. (두 글자)',
+    accept:['순환'],
+    explain:'정답은 <b>순환</b>. 앤트로픽 사모에 참여한 7곳이 모두 칩·설비 공급사라, 상장 명단에도 같은 구조가 들어 있어.' },
+  { q:'3분기 말 한국의 순대외금융자산은 몇 억 달러야? (숫자만, 쉼표 없이)',
+    accept:['3448','3,448','3448억'],
+    explain:'정답은 <b>3,448억 달러</b>. 직전 분기 640억 달러에서 한 분기 만에 5.4배가 됐어.' },
+  { q:'순대외금융자산 = 우리가 가진 해외자산 − 외국인이 가진 ______ 야. (세 글자)',
+    accept:['한국자산','국내자산','한국 자산','국내 자산'],
+    explain:'정답은 <b>한국자산</b>(국내자산). 뺄셈이라 뒤쪽이 줄어도 숫자는 커져 — 이번 증가의 정체가 그거야.' },
+  { q:'3분기 코스피는 몇 % 하락했어? (숫자만, 소수점 한 자리)',
+    accept:['19.3','-19.3','19.3%'],
+    explain:'정답은 <b>19.3%</b> 하락. 이 때문에 외국인 보유 국내 증권 잔액이 1,643억 달러 줄었어.' },
+  { q:'대외채권에서 대외채무를 뺀 값으로, 위기 때 환율을 받쳐 주는 지표를 뭐라고 해? (다섯 글자)',
+    accept:['순대외채권','순 대외채권'],
+    explain:'정답은 <b>순대외채권</b>. 3분기 기준 4,168억 달러로 한 분기 만에 490억 달러 늘었어.' },
+  { q:'2026년 11월 한국은행 금융통화위원회의 기준금리 결정일은 몇 일이야? (숫자만)',
+    accept:['26','26일','11월26일'],
+    explain:'정답은 <b>26일</b>. 현재 기준금리는 연 3.00%이고, 올릴지가 관전 포인트야.' },
+  { q:'중국에서 사실상 기준금리 역할을 하는, 오늘 발표되는 금리의 약자는? (영문 세 글자)',
+    accept:['LPR','lpr'],
+    explain:'정답은 <b>LPR</b>(대출우대금리). 1년물 3.0%·5년물 3.5% 동결 전망이야.' },
+  { q:'복습: 현대차의 3분기 영업이익을 실제로 밀어 올린 건 차가 아니라 ______ 효과였어. (두 글자)',
+    accept:['환율'],
+    explain:'정답은 <b>환율</b>. 늘어난 이익 1,399억 원보다 환율 효과(약 5,000억 원)가 더 컸어 — 본업은 마이너스였다는 뜻이야.' },
+  { q:'복습: 기업이 실적과 함께 내놓는 다음 분기 전망을 외래어로 뭐라고 해? (네 글자)',
+    accept:['가이던스'],
+    explain:'정답은 <b>가이던스</b>. 지난 분기 숫자는 이미 값에 들어 있어서 주가는 보통 이쪽에 더 크게 반응해.' },
+  { q:'복습: 코스피처럼 회사 값이 큰 종목일수록 지수에 더 세게 반영하는 계산 방식을 \'______ 가중\'이라고 해. (네 글자)',
+    accept:['시가총액','시가 총액'],
+    explain:'정답은 <b>시가총액</b>. 지수의 절반이 두 종목이면, 그 둘이 곧 지수야.' },
+  { q:'복습: 소득은 그대로인데 보유 자산의 평가액이 떨어져 소비가 줄어드는 현상을 \'______효과\'라고 해. (세 글자)',
+    accept:['역자산','역 자산','역자산효과'],
+    explain:'정답은 <b>역자산</b>. 주식을 팔지 않아도 작동해 — 평가액만 바뀌어도 쓸 수 있다고 느끼는 돈이 줄거든.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

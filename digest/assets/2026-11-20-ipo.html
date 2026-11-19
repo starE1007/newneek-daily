@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한 회사에 붙은 세 개의 값 — 앤트로픽 상장 첫날</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+  .price-flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .pstep{flex:1 1 180px;border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--soft)}
+  .pstep .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;margin-bottom:8px}
+  .tag.a{background:var(--blue-soft);color:#1B6BB8}
+  .tag.b{background:var(--green-soft);color:#2F7A52}
+  .tag.c{background:var(--red-soft);color:#C6493E}
+  .pstep .val{font-size:23px;font-weight:700;margin-bottom:4px}
+  .pstep p{font-size:13px;color:var(--text2)}
+  .pstep p b{color:var(--text)}
+  .arrow{align-self:center;color:#B9B6B1;font-size:18px;font-weight:700}
+  .gap{margin-top:14px;background:var(--orange-soft);border-radius:10px;padding:13px 16px;font-size:14px;color:#9A5620}
+  .gap b{color:#7E441A}
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs h3{font-size:15px;margin-bottom:6px}
+  .vs .num{font-size:22px;font-weight:700;margin:4px 0}
+  .vs p{font-size:13px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs.hl{background:var(--blue-soft);border-color:#CBE3F8}
+  .note{margin-top:14px;background:var(--red-soft);border-radius:10px;padding:13px 16px;font-size:14px;color:#B23F34}
+  .note > b:first-child{display:block;margin-bottom:2px}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){.wrap{padding:16px 16px 24px}.vs-grid{grid-template-columns:1fr}h1{font-size:21px}.arrow{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.20 데일리 뉴스 · 시각자료</div>
+  <h1>🤖 한 회사에 값이 세 개 붙었어</h1>
+  <div class="sub">앤트로픽 상장 첫날 — 공모가·첫 거래가·시가총액이 왜 다 다른 숫자인지</div>
+
+  <div class="section-title">① 첫날 하루에 지나간 세 개의 값</div>
+  <div class="price-flow">
+    <div class="pstep">
+      <span class="tag a">상장 전</span>
+      <div class="val">83달러</div>
+      <p><b>공모가</b> — 기관에 미리 파는 값. 희망 범위(70~78달러)보다 높게 정해졌고, 회사가 받는 돈은 이 값 기준이야.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="pstep">
+      <span class="tag b">첫 체결</span>
+      <div class="val">111.50달러</div>
+      <p><b>첫 거래가</b> — 시장이 처음 매긴 값. 공모가보다 <b>＋34.3%</b>. 주문이 물량의 <b>7배</b>였어.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="pstep">
+      <span class="tag c">같은 날 오후</span>
+      <div class="val">97달러 안팎</div>
+      <p>장중 <b>115달러</b>까지 갔다가 되밀렸어. 공모가 위이긴 해도 첫 상승분은 대부분 반납.</p>
+    </div>
+  </div>
+  <div class="gap">공모가와 첫 거래가의 차 <b>28.5달러</b>는 회사가 못 받고, <b>공모에서 미리 받은 쪽이 가져간 몫</b>이야. 수요가 7배였다는 건 값을 낮게 매겼다는 뜻이기도 해.</div>
+
+  <div class="section-title">② 몸값이 1.5조 또는 2조로 갈리는 이유</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <h3>공모가(83달러) 기준</h3>
+      <div class="num">약 1조 5,000억 달러</div>
+      <p>실제로 돈이 오간 값에 <b>지금 있는 주식 수</b>를 곱한 금액.</p>
+    </div>
+    <div class="vs hl">
+      <h3>첫 거래가 × 완전희석 기준</h3>
+      <div class="num">약 2조 달러</div>
+      <p><b>완전희석</b> = 임직원 스톡옵션처럼 <b>나중에 주식이 될 것까지 전부 주식으로 세는 방식</b>. 세는 주식이 늘고 값도 올랐으니 몸값이 커져.</p>
+    </div>
+  </div>
+  <div class="note"><b>그래서 기사 제목이 서로 다르게 보여</b>같은 날 같은 회사인데 5,000억 달러가 왔다 갔다 해. 숫자가 틀린 게 아니라 <b>어떤 자를 댔는지</b>가 다른 거야.</div>
+
+  <div class="section-title">③ 돈이 도는 길 — 어제 본 순환 금융이 여기도 있어</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>칩·설비 공급사 7곳</b><span class="mdesc">공모와 별도로 사모(개별 배정)에 참여해 앤트로픽 주식을 샀어.</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>앤트로픽, 총 1,073억 달러 조달</b><span class="mdesc">공모 813억 달러 + 사모. 그 돈의 상당 부분은 다시 계산 설비로 나가.</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>그 돈이 공급사 매출로 돌아와</b><span class="mdesc">대준 쪽과 파는 쪽이 같으면, 매출의 크기보다 <b>출처</b>를 따져야 해. 성장 속도가 느려지는 순간 양쪽이 같이 흔들려.</span></div>
+    </div>
+  </div>
+
+  <div class="foot">출처: 뉴시스·아주경제·AI타임스·서울경제·재경일보(2026.11.19~20 보도). 몸값·조달액은 기준에 따라 매체마다 수치가 달라.</div>
+</div>
+</body>
+</html>
