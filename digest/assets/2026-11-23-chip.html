@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>규제의 과녁이 '제품'에서 '목적지'로 옮겨갔어</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.before{background:var(--surface2);color:#6B6863}
+  .badge.after{background:var(--red-soft);color:#C6493E}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:8px}
+
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  .num-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .num{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .num .label{font-size:12.5px;color:var(--text2);margin-bottom:4px}
+  .num .val{font-size:19px;font-weight:700;line-height:1.2}
+  .num .delta{font-size:12.5px;font-weight:700;margin-top:2px;color:#C6493E}
+  .num.fx .delta{color:#B06426}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 150px;min-width:140px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1{background:var(--red-soft);color:#B23F34}
+  .step.s2,.step.s3,.step.s4{background:var(--orange-soft);color:#9A5620}
+  .step.s5{background:var(--red-soft);color:#B23F34}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    .num-row{grid-template-columns:1fr 1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.23 데일리 뉴스 · 시각자료</div>
+  <h1>🔌 과녁이 '제품'에서 '목적지'로 옮겨갔어</h1>
+  <div class="sub">미국의 새 수출통제가 왜 한국 공장까지 멈춰 세우고, 그게 어떻게 코스피 5% 폭락으로 이어졌는지 한 장으로 보기</div>
+
+  <div class="section-title">무엇이 바뀌었나 — 기준선 하나가 움직였다</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge before">이전 · 제품 기준</span>
+      <h3>"이 사양을 넘는 칩은 중국에 못 판다"</h3>
+      <p>통제 대상이 <b>칩의 성능</b>이었어. 그래서 성능을 규정 밑으로 낮춘 '중국 전용' 칩을 따로 만들거나, 제3국 법인을 한 번 거쳐 들여가는 길이 남아 있었지.</p>
+      <p>규제는 또렷하지만 <b>빠져나갈 틈</b>이 함께 있었던 셈.</p>
+    </div>
+    <div class="vs">
+      <span class="badge after">이후 · 목적지 기준 (11/16 BIS)</span>
+      <h3>"끝에서 중국이 쓰면 허가를 받아라"</h3>
+      <p>미국 기술로 첨단 칩을 만드는 회사는, <b>최종 납품처가 중국</b>인 제품을 팔 때 미국 정부에 허가를 신청해야 해. 성능이 아니라 <b>도착지</b>가 기준이야.</p>
+      <p>그래서 AI 칩 밖 <b>스마트폰용 범용 칩</b>까지 걸리고, 공장이 한국·대만에 있어도 미국 장비·소프트웨어를 쓰면 피할 수 없어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">그래서 금요일에 벌어진 일</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>미 상무부 산업안보국(BIS), 11월 16일 새 규정 발표</b><span class="mdesc">최종 수요자가 중국이면 허가 대상 — 우회 조달 통로를 함께 막는 설계</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>삼성전자·TSMC, 중국행 일부 출하 중단 통보</b><span class="mdesc">삼성 쪽 고객에 바이두 AI 데이터센터 부문 '쿤룬'과 바이트댄스 / TSMC는 허가 없으면 16나노 이하 첨단 주문 중단</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>'금지'가 아니라 '허가 심사' — 사라지는 게 아니라 밀린다</b><span class="mdesc">스마트폰용 칩은 승인 가능성이 높다고 보지만, 심사 대기 동안 출하가 멈춰 완제품 생산 일정이 어긋남</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>반도체 주가부터 꺾임</b><span class="mdesc">삼성전자 −7.01% · SK하이닉스 −5.92%</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">5</div>
+      <div class="mtxt"><b>지수 전체가 같이 내려앉음</b><span class="mdesc">두 종목이 코스피에서 차지하는 비중이 워낙 커서, 반도체 하락이 곧 지수 하락이 됨</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 하루에 겹친 트리거 세 개</b>앤트로픽 상장 뒤 차익실현 + AMD 공매도 보고서 + 대중 수출통제. 서로 다른 뉴스처럼 보이지만 걸려 있는 줄은 하나야 — <b>AI 반도체</b>.</div>
+  </div>
+
+  <div class="section-title">11월 20일 '검은 금요일' 숫자</div>
+  <div class="num-row">
+    <div class="num"><div class="label">코스피</div><div class="val">4,869.96</div><div class="delta">−267.93p (−5.21%)</div></div>
+    <div class="num"><div class="label">코스닥</div><div class="val">−5.71%</div><div class="delta">10개월 만에 최저</div></div>
+    <div class="num"><div class="label">외국인 순매도</div><div class="val">1조 1,340억</div><div class="delta">6거래일 연속 매도</div></div>
+    <div class="num fx"><div class="label">원·달러 환율</div><div class="val">1,336.2원</div><div class="delta">+6.2원</div></div>
+  </div>
+
+  <div class="section-title">나한테 오는 길</div>
+  <div class="flow">
+    <div class="step s1">중국행 출하 중단<small>허가 심사 대기</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">반도체 수출 달러<br>유입 둔화</div>
+    <div class="arrow">→</div>
+    <div class="step s3">환율 상승 압력<small>달러가 덜 들어옴</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">기름·밀·부품<br>수입 물가 상승</div>
+    <div class="arrow">→</div>
+    <div class="step s5">금리 인상 압력<small>11/26 금통위</small></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.23 딥다이브 내용 기반 (수치는 11월 20일 종가·주간 거래 기준)</div>
+</div>
+</body>
+</html>
