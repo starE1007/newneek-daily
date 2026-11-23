@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정년 60세와 임금격차 27.8% — 같은 축에 걸린 두 뉴스</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 생애 구간 띠 */
+  .life{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .life-row{margin-bottom:16px}
+  .life-row:last-of-type{margin-bottom:0}
+  .life-cap{font-size:13.5px;color:var(--text2);margin-bottom:6px}
+  .life-cap b{color:var(--text);font-size:14px}
+  .band{display:flex;height:40px;border-radius:8px;overflow:hidden}
+  .seg{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap}
+  .seg.pay{background:#8FB8DC}
+  .seg.gap{background:var(--red)}
+  .seg.pen{background:var(--green)}
+  .ages{display:flex;margin-top:4px;font-size:12px;color:var(--text2)}
+  .ages span{flex:1 1 0;text-align:center}
+  .note{margin-top:14px;background:var(--red-soft);border-radius:8px;padding:10px 14px;font-size:13.5px;color:#B23F34}
+  .note b{font-size:14.5px}
+
+  /* 메커니즘 */
+  .mech{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .mstep{display:flex;gap:14px;align-items:flex-start;position:relative;padding-bottom:18px}
+  .mstep:last-of-type{padding-bottom:0}
+  .mstep::before{content:"";position:absolute;left:15px;top:34px;bottom:2px;width:2px;background:var(--border)}
+  .mstep:last-of-type::before{display:none}
+  .mnum{flex:0 0 32px;width:32px;height:32px;border-radius:50%;background:var(--blue-soft);color:#1B6BB8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+  .mstep.hot .mnum{background:var(--red-soft);color:#C6493E}
+  .mtxt{padding-top:4px;font-size:14.5px}
+  .mtxt b{font-size:15px}
+  .mtxt .mdesc{display:block;font-size:13.5px;color:var(--text2);margin-top:2px}
+  .paradox{margin-top:16px;background:var(--orange-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#9A5620}
+  .paradox b{display:block;margin-bottom:2px;font-size:14.5px}
+
+  /* 쟁점 2장 */
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.labor{background:var(--blue-soft);color:#1B6BB8}
+  .badge.biz{background:var(--orange-soft);color:#B06426}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:8px}
+
+  /* 막대 비교 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--canvas)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .bar-row:last-of-type{margin-bottom:0}
+  .bar-label{flex:0 0 96px;font-size:13px;color:var(--text2);text-align:right;line-height:1.35}
+  .bar-label b{display:block;color:var(--text);font-size:13.5px}
+  .bar-track{flex:1 1 auto;background:var(--surface2);border-radius:6px;height:30px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:13px;font-weight:700;color:#fff;white-space:nowrap}
+  .bar-fill.old{background:#C9D6E2;color:#4A6B86}
+  .bar-fill.mid{background:#9CB9D4}
+  .bar-fill.now{background:var(--red)}
+  .bar-fill.other{background:#B9B6B1}
+  .bars-note{margin-top:12px;font-size:13px;color:var(--text2)}
+
+  /* 공통 뿌리 */
+  .root{margin-top:16px;background:var(--blue-soft);border-radius:10px;padding:14px 18px;font-size:14.5px;color:#1B6BB8}
+  .root b{display:block;margin-bottom:4px;font-size:15px}
+
+  /* 일정 */
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 200px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.next{background:var(--blue-soft);border-color:#CBE3F8}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+    .seg{font-size:11.5px}
+    .bar-label{flex:0 0 78px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.24 데일리 뉴스 · 시각자료</div>
+  <h1>⏳ 정년 60세와 💰 임금격차 27.8%</h1>
+  <div class="sub">따로 나온 두 뉴스가 '근속연수에 붙은 임금'이라는 같은 축에서 만나는 이유</div>
+
+  <div class="section-title">① 월급도 연금도 없는 구간 — '소득 크레바스'</div>
+  <div class="life">
+    <div class="life-row">
+      <div class="life-cap"><b>지금 (1961~64년생)</b> · 정년 60세 → 연금 63세부터</div>
+      <div class="band">
+        <div class="seg pay" style="width:38.5%">월급 (~60세)</div>
+        <div class="seg gap" style="width:23.1%">공백 3년</div>
+        <div class="seg pen" style="width:38.4%">국민연금 (63세~)</div>
+      </div>
+      <div class="ages"><span>55세</span><span>58세</span><span>61세</span><span>64세</span><span>67세</span></div>
+    </div>
+    <div class="life-row">
+      <div class="life-cap"><b>2033년부터 (1969년생~)</b> · 정년 그대로 60세 → 연금 65세부터</div>
+      <div class="band">
+        <div class="seg pay" style="width:38.5%">월급 (~60세)</div>
+        <div class="seg gap" style="width:38.5%">공백 5년</div>
+        <div class="seg pen" style="width:23%">연금 (65세~)</div>
+      </div>
+      <div class="ages"><span>55세</span><span>58세</span><span>61세</span><span>64세</span><span>67세</span></div>
+    </div>
+    <div class="note"><b>왜 벌어져?</b> 1998년 연금개혁으로 수급 나이가 2013년부터 5년에 한 살씩 올라가는데(60→65세), 법정 정년은 2016년 60세에서 멈춰 있어. 제도 둘이 서로 다른 속도로 움직여서 생긴 구멍이야.</div>
+  </div>
+
+  <div class="section-title">② 왜 20년째 못 메웠나 — 연공급이라는 걸림돌</div>
+  <div class="mech">
+    <div class="mstep">
+      <div class="mnum">1</div>
+      <div class="mtxt"><b>한국 임금은 '무슨 일'보다 '몇 년 다녔나'에 붙어 있어</b><span class="mdesc">연공급(근속에 따라 자동으로 오르는 임금체계) — 같은 일을 해도 오래 다닌 사람이 더 받아</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">2</div>
+      <div class="mtxt"><b>정년을 5년 늘리면 가장 비싼 구간이 5년 더 붙어</b><span class="mdesc">임금 곡선의 꼭대기가 길어지는 셈이라 기업 인건비가 가파르게 늘어</span></div>
+    </div>
+    <div class="mstep">
+      <div class="mnum">3</div>
+      <div class="mtxt"><b>그래서 경영계는 '임금체계 개편'을 묶자고 해</b><span class="mdesc">재고용으로 조건을 새로 정하거나, 임금 곡선을 눕히는 쪽</span></div>
+    </div>
+    <div class="mstep hot">
+      <div class="mnum">4</div>
+      <div class="mtxt"><b>노동계는 '삭감 없는 연장'을 요구해 — 10개월째 제자리</b><span class="mdesc">임금체계를 건드리면 지금 받는 돈이 깎인다고 보기 때문</span></div>
+    </div>
+    <div class="paradox"><b>⚠️ 핵심은 '몇 살까지'가 아니라 '임금을 무엇에 붙이나'</b>나이 숫자만 고치면 인건비 문제가 그대로 남고, 임금체계를 고치면 지금 일하는 사람의 돈이 흔들려. 그래서 결론이 안 나는 거야.</div>
+  </div>
+
+  <div class="section-title">③ 27일 테이블에 올라가는 두 안</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge labor">노동계</span>
+      <h3>법정 정년을 65세로 일괄 연장</h3>
+      <p>연금 받는 나이에 맞춰 <b>법으로</b> 정년을 올려 공백을 없애자는 안. 선별 재고용과 임금체계 개편에는 반대야.</p>
+      <p>장점은 공백이 확실히 사라진다는 것, 부담은 <b>인건비가 한꺼번에</b> 늘어난다는 것.</p>
+    </div>
+    <div class="vs">
+      <span class="badge biz">경영계</span>
+      <h3>재고용 등 '계속고용' 방식 선택권</h3>
+      <p>정년 뒤 <b>조건을 새로 정해 다시 뽑는</b> 방식을 고를 수 있게 해달라는 안. 임금체계 개편을 함께 요구해.</p>
+      <p>부담은 줄지만, 누가 남고 누가 못 남는지를 <b>회사가 고르게</b> 돼서 고용이 불안해져.</p>
+    </div>
+  </div>
+
+  <div class="section-title">④ 같은 축의 뒷면 — 남녀 임금격차 OECD 1위</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label"><b>2015년</b></div>
+      <div class="bar-track"><div class="bar-fill old" style="width:93%">37.2%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><b>2020년</b></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:78.8%">31.5%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><b>2023년</b></div>
+      <div class="bar-track"><div class="bar-fill mid" style="width:73.3%">29.3%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><b>지난해</b><span>한국</span></div>
+      <div class="bar-track"><div class="bar-fill now" style="width:69.5%">27.8%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><b>지난해</b><span>일본 (2위)</span></div>
+      <div class="bar-track"><div class="bar-fill other" style="width:50.3%">20.1%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><b>지난해</b><span>미국 (3위)</span></div>
+      <div class="bar-track"><div class="bar-fill other" style="width:44.8%">17.9%</div></div>
+    </div>
+    <div class="bars-note">11년에 걸쳐 9.4%포인트 줄었지만, 2000년 이후 한 번도 1위를 벗어난 적이 없어. 2위 일본과도 7.7%포인트 차이. (OECD 소득통계, 지난해 기준 13개국 공개)</div>
+    <div class="root"><b>왜 유독 한국이 큰가</b>임금이 근속에 붙어 있으니 <b>줄이 한 번 끊기면 되돌리기 어렵다</b>. 출산·육아로 쉬었다 돌아오면 연차가 0부터 다시 시작이고, 자리도 임금이 낮은 쪽으로 밀려. 정년 논의에서 '근속이 아니라 직무로 임금을 매기자'는 쪽으로 가면 이 격차의 뿌리도 같이 흔들려.</div>
+  </div>
+
+  <div class="section-title">⑤ 확인할 날짜</div>
+  <div class="timeline">
+    <div class="t-item next"><div class="when">11/27 (금)</div><div class="what"><b>정년연장 특위 노사정 소위</b> — 10개월 만의 첫 회의. 불발되면 정부안 발표</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">연내</div><div class="what">입법 목표 — 연장 방식·임금체계 조항이 핵심</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">2033년</div><div class="what">연금 수급 65세 완성 — 그때까지 정년이 그대로면 공백 5년</div></div>
+  </div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.24 데일리 내용 기반 (연금 수급 나이는 출생연도별로 달라 구간은 대표값으로 그렸어)</div>
+</div>
+</body>
+</html>
