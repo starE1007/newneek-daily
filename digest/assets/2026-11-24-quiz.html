@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026.11.23 오늘의 뉴스 퀴즈</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.24 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+
+const MC_BANK = [
+  { id:'price-vs-volume', variants:[
+    { q:'11월 1~20일 반도체 수출액이 1년 전보다 294% 늘었어. 이 숫자를 읽는 방법으로 가장 알맞은 것은?',
+      opts:['수출 통계는 금액 기준이라, 판 개수가 비슷해도 단가가 크게 오르면 금액이 그만큼 뛴다',
+            '공장에서 생산한 칩의 개수가 1년 만에 약 4배로 늘어났다는 뜻이다',
+            '반도체 생산 설비가 294% 늘어났다는 뜻이다',
+            '수출 물량과 단가가 각각 비슷한 비율로 함께 늘어났다는 뜻이다'],
+      answer:0,
+      explain:'설비는 1년 만에 네 배가 될 수 없어. 이번 신기록의 정체는 거의 다 <b>값</b>에 있어 — AI 데이터센터 수요로 서버용 D램 평균판매가가 1년 새 몇 배로 올랐거든.' },
+    { q:'“수출 금액은 역대 최대인데 반도체 업황을 걱정하는 목소리가 나온다”는 말이 성립하는 이유로 가장 알맞은 것은?',
+      opts:['금액 증가가 주로 단가 상승에서 나왔다면, 단가가 꺾이는 순간 금액도 같이 꺾일 수 있기 때문에',
+            '수출 금액이 늘면 업황은 항상 나빠지기 때문에',
+            '수출 통계가 물량만 집계하고 가격은 반영하지 않기 때문에',
+            '반도체 수출 비중이 줄어들고 있기 때문에'],
+      answer:0,
+      explain:'금액 = 물량 × 단가야. 단가가 떠받친 기록은 <b>단가가 버티는 동안만</b> 유지돼. 그래서 시장은 금액보다 가격의 방향을 먼저 봐.' },
+  ]},
+  { id:'spot-vs-contract', variants:[
+    { q:'메모리 반도체의 현물가격(spot)과 계약가격(contract)의 관계로 가장 알맞은 것은?',
+      opts:['현물가격이 그날그날 먼저 움직이고, 계약가격이 몇 달 뒤 그 방향을 따라간다',
+            '계약가격이 먼저 움직이고 현물가격이 그대로 따라간다',
+            '두 가격은 항상 같은 날 같은 폭으로 움직인다',
+            '현물가격은 대형 고객용, 계약가격은 소매용 가격이다'],
+      answer:0,
+      explain:'현물가는 시장에서 매일 매겨지는 값이라 가장 민감해. 계약가는 대형 고객과 분기 단위로 미리 정하니 <b>늦게</b> 반영돼. 그래서 현물가가 신호등 역할을 해.' },
+    { q:'최근 한 달 D램·낸드 현물가격은 내렸는데 계약가격은 아직 오르고 있어. 이 상태를 해석하는 방법으로 가장 알맞은 것은?',
+      opts:['먼저 움직이는 가격은 이미 돌아섰고, 늦게 따라오는 가격에는 그 변화가 아직 도달하지 않았다',
+            '두 가격 중 하나는 잘못 집계된 것이므로 무시해야 한다',
+            '계약가격이 오르는 동안에는 현물가격 하락이 실적에 영향을 줄 수 없다',
+            '현물가격 하락은 계약가격이 내린 뒤에 나타나는 뒤늦은 반응이다'],
+      answer:0,
+      explain:'시차가 있다는 게 핵심이야. 지금 실적에 찍히는 건 계약가 쪽인데, <b>몇 달 뒤 실적</b>은 지금의 현물가 방향을 따라갈 가능성이 커.' },
+  ]},
+  { id:'stats-lag', variants:[
+    { q:'같은 날 「수출 사상 최대」와 「코스피 급락」이 함께 나왔는데, 둘이 모순이 아닌 이유로 가장 알맞은 것은?',
+      opts:['수출 통계는 이미 끝난 거래의 기록이고, 주가는 앞으로 올 실적에 대한 기대를 반영하기 때문에',
+            '수출 통계와 주가는 서로 아무 관련이 없는 지표이기 때문에',
+            '수출 통계가 발표되면 주가는 항상 반대로 움직이기 때문에',
+            '주가는 수출 통계가 발표된 다음 달 수치를 미리 집계한 것이기 때문에'],
+      answer:0,
+      explain:'둘은 <b>보는 시점</b>이 달라. 통계는 뒤를, 주가는 앞을 봐. 그래서 "좋은 숫자"가 나온 날에도 주가는 내릴 수 있어.' },
+    { q:'수출 통계가 가격·실적 신호 중 가장 늦게 도착하는 지표인 이유로 가장 알맞은 것은?',
+      opts:['통관까지 끝난 거래를 집계하므로, 가격 변화가 계약·생산·선적을 거친 뒤에야 반영되기 때문에',
+            '관세청이 집계를 1년에 한 번만 발표하기 때문에',
+            '수출 통계는 기업이 아니라 소비자를 대상으로 조사하기 때문에',
+            '수출 통계가 미래 수출 계약을 미리 추정한 값이기 때문에'],
+      answer:0,
+      explain:'가격이 바뀌어도 계약 → 생산 → 선적 → 통관을 지나야 통계에 찍혀. 그래서 수출 통계는 <b>지나간 일의 기록</b>이야.' },
+  ]},
+  { id:'buyback', variants:[
+    { q:'금융위가 24일부터 상장사의 1일 자기주식 매수주문 한도를 풀었어. 이 조치의 성격으로 가장 알맞은 것은?',
+      opts:['쓸 수 있는 돈의 총액은 그대로 두고, 하루에 주문할 수 있는 속도 제한만 풀어 준 것',
+            '기업이 자사주 매입에 쓸 수 있는 재원 총액을 새로 늘려 준 것',
+            '기업이 자사주를 반드시 매입하도록 의무화한 것',
+            '정부가 기업 대신 주식을 사 주기로 한 것'],
+      answer:0,
+      explain:'상법상 <b>배당가능이익</b> 한도는 그대로야. 즉 총알이 늘어난 게 아니라 <b>연사 속도</b>만 빨라진 거라, 살 돈이 없는 회사엔 효과가 없어.' },
+    { q:'자사주 매입 한도 완화가 주가를 떠받칠 수 있다고 보는 경로로 가장 알맞은 것은?',
+      opts:['기업이 자기 주식을 사면 그만큼 시장에 사는 쪽이 생겨, 쏟아지는 매도 물량을 일부 받아낸다',
+            '자사주를 매입하면 기업의 영업이익이 즉시 늘어난다',
+            '자사주 매입이 외국인의 의무 매수를 유발한다',
+            '자사주를 매입하면 발행주식 수가 늘어나 주가가 오른다'],
+      answer:0,
+      explain:'원리는 <b>수요를 하나 더 만드는 것</b>이야. 다만 올해 외국인 순매도가 200조 원대인 것에 비하면 받아낼 수 있는 양에는 한계가 있어.' },
+  ]},
+  { id:'rates', variants:[
+    { q:'26일 금통위의 금리 인상 전망과 미국의 12월 인상 전망이 함께 거론될 때, 주식시장에 작용하는 방향으로 가장 알맞은 것은?',
+      opts:['금리가 오르면 안전한 예금·채권의 매력이 커지고 기업 이자 부담도 늘어, 주식에는 역풍으로 작용한다',
+            '금리가 오르면 주식의 기대수익이 함께 올라 주식에 순풍으로 작용한다',
+            '금리는 환율에만 영향을 주고 주식시장과는 무관하다',
+            '금리가 오르면 기업의 이자 부담이 줄어 주가가 오른다'],
+      answer:0,
+      explain:'금리는 <b>돈의 값</b>이야. 값이 오르면 위험을 감수할 이유가 줄어. 그래서 증시를 받치는 대책과 금리 인상이 서로 반대로 당기는 상황이 돼.' },
+    { q:'한국은행이 금리를 올릴 것으로 보면서도 일부 전문가가 동결 가능성을 완전히 배제하지 않는 근거로 가장 알맞은 것은?',
+      opts:['주가 급락으로 가계의 금융자산이 줄어드는 상황에서 금리까지 올리면 소비가 더 위축될 수 있어서',
+            '물가가 이미 목표치 아래로 내려왔기 때문에',
+            '한국은행 기준금리가 이미 미국보다 높기 때문에',
+            '금리를 올리면 환율이 반드시 더 오르기 때문에'],
+      answer:0,
+      explain:'금리 결정은 물가만 보는 게 아니라 <b>경기·자산가격</b>까지 같이 봐. 지금은 물가·성장은 올리라고 하고, 증시는 멈추라고 하는 상황이야.' },
+  ]},
+  { id:'subway', variants:[
+    { q:'서울 지하철 노사 교섭에서 서울시의 입장이 최대 변수로 꼽히는 이유로 가장 알맞은 것은?',
+      opts:['교섭 당사자는 공사인데, 정원과 채용을 승인하는 권한은 서울시에 있기 때문에',
+            '서울시가 노조를 대신해 교섭에 직접 참여하기 때문에',
+            '파업 돌입 여부를 서울시가 단독으로 결정하기 때문에',
+            '임금 인상률을 노조가 아니라 서울시가 요구하고 있기 때문에'],
+      answer:0,
+      explain:'쟁점이 임금이 아니라 <b>인력</b>이라 그래. 공사는 "우리가 정할 수 없는 사안"이고, 돈과 정원을 쥔 쪽은 서울시라 교섭 테이블 밖에서 결정이 나.' },
+    { q:'파업 전 단계로 진행 중인 「준법투쟁」의 작동 방식으로 가장 알맞은 것은?',
+      opts:['규정을 글자 그대로 지켜 운행하면서 열차 지연을 발생시켜 압박하는 방식',
+            '일부 노선의 운행을 완전히 중단하는 방식',
+            '규정을 위반해 운행 속도를 높이는 방식',
+            '노조가 사측 업무를 대신 수행해 협상력을 높이는 방식'],
+      answer:0,
+      explain:'규정을 어기는 게 아니라 <b>정확히 지키는 것</b>이 수단이야. 평소 운행이 규정보다 빡빡하게 돌아간다는 점을 드러내는 방식이지.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'수출 금액이 크게 늘어도 업황을 걱정하게 되는 이유는, 그 증가가 물량이 아니라 무엇에서 나왔기 때문이야? (두 글자)',
+    accept:['가격','단가','값'],
+    explain:'정답은 <b>가격</b>(단가). 금액 = 물량 × 단가라서, 단가가 떠받친 기록은 단가가 꺾이면 같이 꺾여.' },
+  { q:'메모리 가격 중 그날그날 시장에서 매겨져 가장 먼저 움직이는 쪽을 뭐라고 해? (세 글자)',
+    accept:['현물가','현물가격','스팟','spot','현물'],
+    explain:'정답은 <b>현물가</b>(spot). 신호등 역할을 해서 시장이 여기를 먼저 봐.' },
+  { q:'대형 고객과 분기 단위로 미리 정해 두는 메모리 가격을 뭐라고 해? (세 글자)',
+    accept:['계약가','계약가격','contract'],
+    explain:'정답은 <b>계약가</b>(contract). 현물가를 몇 달 늦게 따라가고, 지금 실적에 찍히는 건 이쪽이야.' },
+  { q:'11월 1~20일 수출에서 반도체가 차지한 비중은 약 몇 %야? (소수점 한 자리까지)',
+    accept:['49.7','49.7%','약 49.7','49'],
+    explain:'정답은 <b>49.7%</b>. 수출의 절반이 한 품목이라는 뜻이라, 그 품목의 가격이 꺾이면 전체가 흔들려.' },
+  { q:'올해 한국 누적 수출액이 사상 처음 넘어선 금액은 얼마야? (단위까지)',
+    accept:['1조 달러','1조달러','1조','1조 76억 달러','1조달러 돌파'],
+    explain:'정답은 <b>1조 달러</b>. 11월 19일에 처음 넘었고, 20일까지 누적은 1조 76억 달러야.' },
+  { q:'기업이 시장에서 자기 회사 주식을 사들이는 것을 뭐라고 해? (세 글자)',
+    accept:['자사주','자기주식','자사주매입','자사주 매입'],
+    explain:'정답은 <b>자사주</b>(자기주식) 매입. 24일부터 하루 주문 한도가 3개월간 풀렸어 — 다만 쓸 수 있는 재원 총액은 그대로야.' },
+  { q:'자사주 매입 한도를 풀어도 기업이 쓸 수 있는 돈의 총액은 늘지 않아. 그 한도를 정하는 상법상 기준을 뭐라고 해?',
+    accept:['배당가능이익','배당 가능 이익','배당가능 이익'],
+    explain:'정답은 <b>배당가능이익</b>. 그래서 이번 조치는 총알을 늘린 게 아니라 연사 속도만 올린 거야.' },
+  { q:'11월 23일 코스피 종가는 몇이야? (숫자만, 소수점 포함)',
+    accept:['4708.54','4,708.54','4708'],
+    explain:'정답은 <b>4,708.54</b>(−3.31%). 증안펀드 준비 소식이 나온 다음 거래일에도 더 내렸어.' },
+  { q:'규정을 글자 그대로 지켜 운행해 지연을 일으키며 압박하는 노조 쟁의 방식을 뭐라고 해? (네 글자)',
+    accept:['준법투쟁','준법 투쟁'],
+    explain:'정답은 <b>준법투쟁</b>. 어기는 게 아니라 정확히 지키는 것이 수단이라는 점이 핵심이야.' },
+  { q:'20일 뉴욕에서 엔비디아 주가를 14% 끌어내린 보도의 내용은, 미 증권거래위원회가 이 회사의 무엇을 조사한다는 것이었어? (세 글자)',
+    accept:['회계','회계처리','회계 처리','회계장부'],
+    explain:'정답은 <b>회계</b> 처리 조사 보도(로이터). AI 투자 수익성 의심에 기름을 부어 나스닥이 5.3% 빠졌어.' },
+];
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
