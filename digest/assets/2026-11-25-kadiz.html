@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>울릉도 코앞까지 — 영공과 방공식별구역은 다른 선</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .card{border:1px solid var(--border);border-radius:12px;background:var(--canvas);overflow:hidden}
+  .map-scroll{overflow-x:auto}
+  .map-scroll svg{display:block;min-width:720px;width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:var(--soft);font-size:13px;color:var(--text2)}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .dash-kadiz{display:inline-block;width:34px;height:0;border-top:2px dashed #2783DE}
+  .dash-route{display:inline-block;width:34px;height:0;border-top:3px dashed var(--red)}
+  .dash-air{display:inline-block;width:18px;height:18px;border:2px dashed var(--red);border-radius:50%}
+  .section-title{font-size:17px;font-weight:700;margin:28px 0 12px}
+  .vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .vs{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .vs .badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+  .badge.hard{background:var(--red-soft);color:#C6493E}
+  .badge.soft{background:var(--blue-soft);color:#1B6BB8}
+  .vs h3{font-size:15.5px;margin-bottom:6px}
+  .vs p{font-size:13.5px;color:var(--text2)}
+  .vs p b{color:var(--text)}
+  .vs p + p{margin-top:8px}
+  .timeline{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+  .t-item{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .t-item .when{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:2px}
+  .t-item .what{font-size:14px}
+  .t-item.now{background:var(--red-soft);border-color:#F6D5D1}
+  .t-item.now .when{color:#C6493E}
+  .t-arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    .vs-grid{grid-template-columns:1fr}
+    h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.25 데일리 뉴스 · 시각자료</div>
+  <h1>🛩️ 울릉도 코앞까지 — 어디를 지나갔나</h1>
+  <div class="sub">러시아 군용기 4대가 들어온 선(KADIZ)과, 넘지 않은 선(영공)을 지도로 보기</div>
+
+  <div class="card">
+    <div class="map-scroll">
+    <svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="동해 지도: 러시아 군용기의 한국방공식별구역 진입 경로와 울릉도 위치">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#E56458"/>
+        </marker>
+        <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#9AA5B1"/>
+        </marker>
+      </defs>
+
+      <rect x="0" y="0" width="900" height="600" fill="#D8E9F7"/>
+
+      <!-- 러시아 연해주 -->
+      <path d="M300,0 L900,0 L900,120 L760,150 L600,120 L470,95 L380,60 L300,0 Z" fill="#F0EFED" stroke="#C9C6C1" stroke-width="1.5"/>
+      <!-- 한반도 -->
+      <path d="M0,40 L300,0 L380,60 L340,120 L290,150 L300,230 L270,300 L285,380 L250,470 L200,520 L150,540 L120,500 L140,420 L120,330 L80,250 L40,170 L0,130 Z" fill="#F0EFED" stroke="#C9C6C1" stroke-width="1.5"/>
+      <path d="M62,215 L300,232" stroke="#B9B6B1" stroke-width="2" stroke-dasharray="6 4"/>
+      <!-- 일본 -->
+      <path d="M620,600 L700,470 L820,420 L900,400 L900,600 Z" fill="#F0EFED" stroke="#C9C6C1" stroke-width="1.5"/>
+
+      <!-- KADIZ 북쪽 경계 -->
+      <path d="M95,268 C260,250 420,236 600,215 C720,202 820,194 900,190" fill="none" stroke="#2783DE" stroke-width="2.5" stroke-dasharray="10 7"/>
+      <text x="690" y="176" font-size="13" font-weight="700" fill="#1B6BB8" font-family="inherit">KADIZ 북쪽 경계 (개략)</text>
+
+      <!-- 진입 / 이탈 -->
+      <path d="M800,120 C700,170 600,230 520,290" fill="none" stroke="#E56458" stroke-width="3.5" stroke-dasharray="9 7" marker-end="url(#ar)"/>
+      <path d="M520,345 C620,360 720,345 820,300" fill="none" stroke="#9AA5B1" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#ag)"/>
+      <text x="660" y="384" font-size="12.5" fill="#7D7A75" font-family="inherit">우리 군 대응 후 동해 쪽으로 이탈</text>
+
+      <!-- 울릉도 + 영공 -->
+      <circle cx="470" cy="350" r="52" fill="none" stroke="#E56458" stroke-width="2" stroke-dasharray="5 5"/>
+      <circle cx="470" cy="350" r="11" fill="#9A9792" stroke="#FFFFFF" stroke-width="2.5"/>
+      <text x="470" y="334" font-size="14" font-weight="700" fill="#2C2C2B" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4" font-family="inherit">울릉도</text>
+      <text x="470" y="424" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle" paint-order="stroke" stroke="#D8E9F7" stroke-width="4" font-family="inherit">점선 = 영공 (여기는 안 넘었어)</text>
+      <circle cx="575" cy="398" r="6" fill="#9A9792" stroke="#FFFFFF" stroke-width="2"/>
+      <text x="596" y="402" font-size="12.5" fill="#7D7A75" font-family="inherit">독도</text>
+
+      <g fill="#7D7A75" font-weight="600" text-anchor="middle" paint-order="stroke" stroke="#F0EFED" stroke-width="4" font-family="inherit">
+        <text x="640" y="56" font-size="16">러시아 (연해주)</text>
+        <text x="160" y="130" font-size="14">북한</text>
+        <text x="175" y="330" font-size="14">한국</text>
+        <text x="800" y="520" font-size="14">일본</text>
+      </g>
+      <text x="300" y="470" font-size="15" font-style="italic" fill="#5B87B5" text-anchor="middle" font-family="inherit">동  해</text>
+
+      <g font-family="inherit">
+        <line x1="300" y1="300" x2="420" y2="340" stroke="#9AA5B1" stroke-width="1.5"/>
+        <rect x="88" y="258" width="228" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="202" y="278" font-size="13.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">오전 7시 52분 경계경보</text>
+        <text x="202" y="296" font-size="12.5" font-weight="700" fill="#C6493E" text-anchor="middle">울릉군 · 3~4분 뒤 해제</text>
+      </g>
+      <g font-family="inherit">
+        <rect x="596" y="246" width="216" height="48" rx="8" fill="#FFFFFF" stroke="#E6E5E3"/>
+        <text x="704" y="266" font-size="13.5" font-weight="700" fill="#2C2C2B" text-anchor="middle">군용기 4대 (폭격기 포함)</text>
+        <text x="704" y="284" font-size="12.5" font-weight="700" fill="#D5803B" text-anchor="middle">F-15K 등 전투기 출격</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="dash-kadiz"></span> KADIZ 경계 — '들어오면 알려 달라'는 선</span>
+      <span class="item"><span class="dash-air"></span> 영공 — 넘으면 주권 침해</span>
+      <span class="item"><span class="dash-route"></span> 24일 진입 경로</span>
+    </div>
+  </div>
+
+  <div class="section-title">두 선이 어떻게 다른가</div>
+  <div class="vs-grid">
+    <div class="vs">
+      <span class="badge hard">넘지 않았어</span>
+      <h3>영공 — 국제법상 '내 하늘'</h3>
+      <p>해안에서 <b>12해리</b>(약 22km)까지가 영해고, 그 위 하늘이 영공이야. 허락 없이 들어오면 <b>주권 침해</b>라서 경고사격·강제퇴거 같은 조치의 근거가 생겨.</p>
+      <p>이번엔 울릉도 북방 <b>영공 바로 앞</b>까지만 왔어 — 그래서 "침범은 없었다"가 돼.</p>
+    </div>
+    <div class="vs">
+      <span class="badge soft">여기로 들어왔어</span>
+      <h3>KADIZ — 각국이 임의로 그은 '식별' 구역</h3>
+      <p>방공식별구역은 영공 밖까지 넓게 그어 둔 구역이야. 국제법상 영토가 아니라서 사전 통보 없이 들어와도 <b>불법은 아니야</b>.</p>
+      <p>그래서 할 수 있는 건 전투기를 띄워 따라붙는 전술조치와 외교 항의 — 24일엔 주한 러시아 국방무관을 불렀어.</p>
+    </div>
+  </div>
+
+  <div class="section-title">반복되고 있다는 게 핵심</div>
+  <div class="timeline">
+    <div class="t-item"><div class="when">11월 중순</div><div class="what">동해 KADIZ 무단 진입</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item"><div class="when">11/17 새벽</div><div class="what">또 진입 — 일주일 간격</div></div>
+    <div class="t-arrow">→</div>
+    <div class="t-item now"><div class="when">11/24 오전</div><div class="what">울릉도 영공 근접 · <b>KADIZ 진입으로 경계경보를 낸 첫 사례</b></div></div>
+  </div>
+
+  <div class="foot">※ 지도는 이해를 돕기 위한 개략도(해안선·경계선은 실제와 다름) · 2026.11.25 데일리 내용 기반</div>
+</div>
+</body>
+</html>
