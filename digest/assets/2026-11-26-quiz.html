@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026.11.26 오늘의 뉴스 퀴즈</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.26 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+  { id:'bad-yen', variants:[
+    { q:'일본의 아베노믹스는 엔저로 수출기업을 밀어주려던 전략인데, 요즘은 "나쁜 엔저"라는 말이 나와. 그 이유로 가장 알맞은 것은?',
+      opts:['엔저로 수입 에너지·식료품 물가가 올라, 수출이 잘 돼도 가계의 실질소득·소비가 줄기 때문에',
+            '엔저가 길어지면 일본은행이 자동으로 기준금리를 인상하게 되는 규정 때문에',
+            '엔저 상태에서는 외국인이 일본 국채를 살 수 없게 법으로 막혀 있기 때문에',
+            '엔저가 되면 수출기업의 해외 매출이 세금 계산에서 제외되기 때문에'],
+      answer:0,
+      explain:'수출기업 실적은 좋아져도, 수입하는 에너지·식량 값이 오르면 가계의 <b>실질소득이 줄어 소비가 꺾여</b>. 그래서 수출이 잘 되는데도 경제엔 손해로 남는 거야.' },
+    { q:'"좋은 엔저"와 "나쁜 엔저"를 가르는 기준으로 가장 알맞은 것은?',
+      opts:['엔저로 생긴 수출 이득이 임금·소비로 이어지는지, 아니면 수입물가 상승에 다 먹히는지',
+            '엔화 환율이 달러당 100엔보다 낮은지 높은지의 숫자 기준',
+            '엔저가 발표 즉시 나타나는지, 시차를 두고 나타나는지의 속도 차이',
+            '엔저의 원인이 중앙은행 정책인지 민간 거래인지의 구분'],
+      answer:0,
+      explain:'환율 숫자 자체가 아니라 <b>그 효과가 어디로 흘러가는지</b>가 기준이야. 수출 이득이 임금 상승으로 퍼지면 좋은 엔저, 수입물가 상승에 다 먹히면 나쁜 엔저.' },
+  ]},
+  { id:'gdp-type', variants:[
+    { q:'일본의 "실질 GDP −0.02%"와 "세계 명목 GDP 비중 18%→3%대"는 서로 다른 걸 말해. 그 차이로 가장 알맞은 것은?',
+      opts:['실질GDP는 물가효과를 뺀 생산활동의 증감이고, 명목GDP 비중은 다른 나라와 비교한 경제 규모의 상대적 크기다',
+            '실질GDP는 수출만, 명목GDP는 내수만 반영하는 지표라서 다르다',
+            '실질GDP는 분기 단위로만, 명목GDP는 연간 단위로만 집계되는 지표라서 다르다',
+            '실질GDP는 민간 기관 통계고 명목GDP는 정부 공식 통계라서 다르다'],
+      answer:0,
+      explain:'<b>실질GDP</b>는 경제성장률을 볼 때, <b>명목GDP</b>는 경제규모(순위)를 비교할 때 쓰는 지표야. 역성장(실질)과 비중 축소(명목)는 같은 숫자가 아니라 서로 다른 질문에 대한 답이야.' },
+    { q:'일본 명목GDP의 세계 비중이 줄어든 걸 "일본 경제가 쪼그라들었다"로만 읽으면 놓치는 게 있어. 가장 알맞은 설명은?',
+      opts:['엔저로 달러로 환산한 금액이 작아진 효과도 섞여 있어, 비중 축소가 전부 생산력 저하를 뜻하진 않는다',
+            '명목GDP 비중은 인구 수로만 결정되기 때문에 생산과는 무관하다',
+            '비중이 줄면 실질GDP도 항상 똑같은 비율로 같이 줄어야 한다',
+            '다른 나라들이 통계 기준을 바꿔서 생긴 착시일 뿐이다'],
+      answer:0,
+      explain:'명목GDP는 보통 <b>달러로 환산</b>해서 나라끼리 비교해. 엔저가 심할수록 같은 엔화 생산도 달러로는 작게 찍혀 — 비중 축소에는 "환율 효과"와 "실제 생산력 저하"가 섞여 있어.' },
+  ]},
+  { id:'boj-dilemma', variants:[
+    { q:'일본은행이 기준금리를 놓고 "올려도, 낮춰도" 고민인 이유로 가장 알맞은 것은?',
+      opts:['올리면 가라앉은 경기가 더 꺾이고, 낮추면 엔저·수입물가 상승이 계속되기 때문에',
+            '금리를 조정할 법적 권한이 올해부터 재무성으로 넘어갔기 때문에',
+            '금리를 내리면 국채 발행이 전면 금지되는 규정이 있기 때문에',
+            '금리를 올리면 엔화가 자동으로 달러에 고정되는 환율제도 때문에'],
+      answer:0,
+      explain:'물가를 잡으려 금리를 올리면 안 그래도 약한 소비·투자가 더 식고, 경기를 살리려 낮추면 엔저·수입물가 상승이 이어져. <b>양쪽 다 부작용이 있는 딜레마</b>야.' },
+  ]},
+  { id:'ico-law', variants:[
+    { q:'디지털자산기본법 제정안의 핵심인 "국내 코인 발행(ICO) 허용"이 뜻하는 것으로 가장 알맞은 것은?',
+      opts:['2017년부터 막혀 있던 국내에서의 코인 발행을 다시 합법화해 제도권 규제 아래 두는 것',
+            '앞으로 해외 거래소에서 한국 코인을 사고파는 것을 전부 금지하는 것',
+            '기존에 발행된 모든 가상자산을 국가가 매입해 소각하는 것',
+            '가상자산 투자로 번 돈에 붙는 세금을 전액 면제해 주는 것'],
+      answer:0,
+      explain:'2017년 전면 금지됐던 <b>국내 ICO를 9년 만에 다시 허용</b>하는 게 핵심이야. 금지가 아니라 "규제 아래 허용"으로 틀을 바꾸는 거라, 그동안 발행만 해외로 돌리던 관행에 제동이 걸려.' },
+  ]},
+  { id:'dv-law', variants:[
+    { q:'가정폭력처벌법을 "피해자 의사와 무관하게 가해자를 처벌할 수 있게" 바꾸려는 배경으로 가장 알맞은 것은?',
+      opts:['가해자와 계속 같이 살거나 보복이 두려워 피해자가 처벌 의사를 거두는 경우가 많다는 문제 때문에',
+            '가정폭력 사건은 증거가 전혀 남지 않아 피해자 진술 없이는 수사 자체가 불가능하기 때문에',
+            '피해자가 처벌을 원하면 가해자의 형량이 법으로 자동 상한에 걸리기 때문에',
+            '현재 법은 가정폭력을 민사 사건으로만 다뤄 형사처벌이 원천적으로 불가능하기 때문에'],
+      answer:0,
+      explain:'가정폭력은 가해자와 피해자가 <b>같은 공간에서 계속 지내는 관계</b>라, 신고 뒤에도 보복이 두려워 의사를 거두는 일이 잦아. 그 틈을 막으려는 게 이번 개정의 취지야.' },
+  ]},
+  { id:'rail-protest', variants:[
+    { q:'철도노조가 "규정을 더 철저히 지키는" 준법투쟁으로도 열차를 지연시킬 수 있는 이유로 가장 알맞은 것은?',
+      opts:['평소엔 인력 부족을 메우려 감속분을 회복운전으로 메꿨는데, 이번엔 그걸 하지 않고 제한속도까지만 달리기 때문에',
+            '준법투쟁 기간에는 철도 신호 시스템을 전부 수동으로 전환해야 하기 때문에',
+            '규정상 준법투쟁 중에는 모든 열차가 한 시간에 한 대씩만 출발해야 하기 때문에',
+            '준법투쟁 기간에는 승객 신분 확인 절차가 추가로 생기기 때문에'],
+      answer:0,
+      explain:'평소에는 늦어진 시간을 "회복운전"으로 당겨서 맞췄는데, 이번엔 그 초과 운행을 하지 않고 <b>제한속도까지만</b> 달려. 규정을 어긴 게 아니라, 그동안 눈감아 주던 여유를 안 쓰는 거야.' },
+  ]},
+];
+
+const SA_BANK = [
+  { q:'일본의 3분기 실질 GDP는 전 분기 대비 몇 %였어? (기호와 숫자, 소수점 포함)',
+    accept:['-0.02%','−0.02%','-0.02','0.02%','마이너스 0.02%'],
+    explain:'정답은 <b>−0.02%</b>. 4분기 만의 역성장이야.' },
+  { q:'엔화 값을 낮춰 수출 경쟁력을 키우려던 아베 전 총리의 경제정책을 뭐라고 해? (다섯 글자)',
+    accept:['아베노믹스'],
+    explain:'정답은 <b>아베노믹스</b>. 지금은 그 전제였던 "엔저=호재"가 거꾸로 가고 있어.' },
+  { q:'수출엔 유리해도 수입물가 상승으로 가계 실질소득·소비를 깎아먹는 지금의 엔저를 뭐라고 부른다고 했어? (네 글자)',
+    accept:['나쁜 엔저','나쁜엔저'],
+    explain:'정답은 <b>나쁜 엔저</b>. 수출이 잘 돼도 가계는 손해를 보는 구조라서 붙은 이름이야.' },
+  { q:'도쿄과학대 조사에서 경제적 이유로 끼니를 제대로 못 챙긴다고 답한 일본인 비율은? (숫자와 %)',
+    accept:['43.8%','43.8'],
+    explain:'정답은 <b>43.8%</b>. 선진국인데 "먹고사는" 문제가 제일 심각해진 상황을 보여주는 숫자야.' },
+  { q:'저성장과 물가상승이 동시에 길게 이어지는 현상을 뭐라고 해? (다섯 글자)',
+    accept:['스태그플레이션'],
+    explain:'정답은 <b>스태그플레이션</b>. IMF·일본은행 모두 이게 장기화할 수 있다고 봐.' },
+  { q:'다카이치 총리가 내년부터 2년간 낮추겠다는 식료품 소비세율의 목표치는 몇 %야? (숫자만)',
+    accept:['1','1%'],
+    explain:'정답은 <b>1%</b>(현재 8%→1%). 다만 나라 빚을 더 키운다는 비판이 있어.' },
+  { q:'일본의 국가부채는 올해 말 약 얼마까지 쌓일 전망이야? (단위까지, 엔 기준)',
+    accept:['1500조 엔','1,500조 엔','1500조엔','약 1500조 엔'],
+    explain:'정답은 <b>약 1,500조 엔</b>(약 1경 3,000조 원). 고령화로 인한 노동력 부족과 함께 일본 경제의 구조적 문제로 꼽혀.' },
+  { q:'디지털자산기본법에서 9년 만에 다시 허용되는 "국내 코인 발행"을 가리키는 영문 약자는? (세 글자)',
+    accept:['ico','ICO'],
+    explain:'정답은 <b>ICO</b>. 2017년부터 금지됐던 걸 제도권 규제 아래 다시 허용하는 거야.' },
+  { q:'국내 가상자산 시장의 이용자 수는 약 몇 명이야? (숫자와 단위)',
+    accept:['1118만 명','1,118만 명','1118만명','약 1118만 명'],
+    explain:'정답은 <b>약 1,118만 명</b>. 시가총액은 53조 원 규모야.' },
+  { q:'가정폭력처벌법은 제정 이후 몇 년 만에 처벌 체계가 바뀌는 거야? (숫자만)',
+    accept:['29','29년'],
+    explain:'정답은 <b>29년</b>. 1997년 제정 이후 처음으로 "피해자 의사와 무관한 처벌"이 도입되는 거야.' },
+  { q:'2025 인구주택총조사에서 30대 비혼 비율은 몇 %야? (소수점 포함)',
+    accept:['53.1%','53.1'],
+    explain:'정답은 <b>53.1%</b>. 5년 새 10.6%p 올랐어.' },
+  { q:'철도노조의 안전운행 투쟁이 끝나는 날짜는 언제야? (월일만)',
+    accept:['12월 4일','12/4','12월4일'],
+    explain:'정답은 <b>12월 4일</b>까지야. 요구가 안 받아들여지면 12월 10일부터 무기한 총파업이 예고돼 있어.' },
+  { q:'철도노조 요구가 받아들여지지 않으면 무기한 총파업에 들어가는 날짜는? (월일만)',
+    accept:['12월 10일','12/10','12월10일'],
+    explain:'정답은 <b>12월 10일</b>. 그 전까지는 "안전운행 투쟁"으로 지연만 생기는 단계야.' },
+  { q:'최태원 회장 측이 노소영 관장 측에 제시한 재산분할금 화해안의 금액은? (단위까지)',
+    accept:['9440억 원','9,440억 원','9440억','9,440억'],
+    explain:'정답은 <b>9,440억 원</b>(전액 현금 지급 제안). 노 관장 측은 이 제안을 공식 거부했어.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>
