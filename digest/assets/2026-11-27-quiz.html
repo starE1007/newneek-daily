@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026.11.27 오늘의 뉴스 퀴즈</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 20px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:21px;line-height:1.3;margin-bottom:4px}
+  .sub{font-size:14px;color:var(--text2);margin-bottom:18px}
+
+  .qcard{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--soft);margin-bottom:14px}
+  .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .qnum{font-size:12.5px;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .qtype{font-size:12px;color:var(--text2)}
+  .qtext{font-size:15px;font-weight:600;margin-bottom:12px}
+
+  .opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--canvas);cursor:pointer;font-size:14px;transition:border-color .15s,background .15s}
+  .opt:hover{border-color:var(--blue)}
+  .opt input{accent-color:var(--blue)}
+  .opt.picked{border-color:var(--blue);background:var(--blue-soft)}
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .sa-input{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit}
+  .sa-input:focus{outline:none;border-color:var(--blue)}
+  .sa-input.correct{border-color:var(--green);background:var(--green-soft)}
+  .sa-input.wrong{border-color:var(--red);background:var(--red-soft)}
+
+  .explain{display:none;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px}
+  .explain.show{display:block}
+  .explain b{color:var(--text)}
+
+  .btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14.5px;font-weight:700;border-radius:99px;padding:11px 20px;border:none;cursor:pointer}
+  #submitBtn{background:var(--blue);color:#fff}
+  #submitBtn:disabled{background:#B9D4EC;cursor:default}
+  #retryBtn{background:var(--surface2);color:var(--text)}
+
+  .score{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;background:var(--blue-soft);font-size:15px;font-weight:700;color:#1B6BB8}
+  .score.show{display:block}
+  .score span{font-weight:400;font-size:13px;color:var(--text2);display:block;margin-top:4px}
+
+  @media (max-width:640px){
+    .wrap{padding:16px 14px 24px}
+    h1{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.27 데일리 뉴스 · 퀴즈</div>
+  <h1>🧠 오늘의 뉴스 퀴즈</h1>
+  <div class="sub">암기 말고 이해! 객관식 4문제 + 주관식 1문제. 제출하면 바로 채점 · 해설이 떠.</div>
+
+  <div id="quizArea"></div>
+
+  <div class="btnrow">
+    <button id="submitBtn">제출하고 채점하기</button>
+    <button id="retryBtn">🔄 새 문제 출제</button>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+<script>
+
+// 문제은행 — 개념(concept)별 변형 문제. 오답은 그럴듯하지만 한 군데가 틀린 쪽으로 짰고,
+// 정답 위치는 render 단계에서 보기를 셔플해 매번 달라진다.
+
+const MC_BANK = [
+
+  { id:'price-not-volume', variants:[
+    { q:'10월 수출은 금액이 전년보다 93.9% 늘었는데, 수출 중량은 2.5% 줄었어. 이 두 숫자를 같이 놓고 읽을 때 가장 알맞은 해석은?',
+      opts:['내보낸 양은 오히려 줄었고, 금액 증가는 주로 단가(가격)가 올라서 생긴 것이다',
+            '중량 통계는 금액 통계보다 한 달 늦게 집계되기 때문에 둘을 비교할 수 없다',
+            '수출 금액이 늘면 중량은 통계 규칙상 줄어들게 계산되기 때문에 생긴 착시다',
+            '중량이 줄었다는 건 수출 품목에서 반도체가 빠졌다는 뜻이다'],
+      answer:0,
+      explain:'금액 ÷ 중량 = 단가야. <b>양은 줄었는데 금액이 늘었다면 올라간 건 가격</b>이지. 10월 반도체 수출이 ＋257.5%로 뛴 것도 물량보다 값이 끌어올린 쪽이야.' },
+    { q:'"가격이 올려준 성장"과 "물량이 늘어서 생긴 성장"의 차이로 가장 알맞은 것은?',
+      opts:['가격이 만든 성장은 값이 돌아설 때 같은 속도로 되돌아가서, 물량이 만든 성장보다 흔들리기 쉽다',
+            '가격이 만든 성장은 GDP 통계에 반영되지 않아 성장률에는 안 잡힌다',
+            '물량이 만든 성장은 수출에서만, 가격이 만든 성장은 내수에서만 생긴다',
+            '가격이 만든 성장은 집계 규칙상 물가상승률보다 낮게 찍힌다'],
+      answer:0,
+      explain:'설비를 늘려 <b>양</b>이 커진 성장은 쉽게 되돌지 않지만, <b>값</b>이 올라 생긴 성장은 값이 꺾이면 바로 줄어. 한은이 비관 시나리오를 3.4%까지 벌려 둔 이유가 여기 있어.' },
+  ]},
+
+  { id:'forecast-band', variants:[
+    { q:'한은은 내년 성장률 중심값을 4.1%로 올리면서 낙관 4.6% · 비관 3.4%를 같이 제시했어. 이 1.2%p 간격이 알려주는 것으로 가장 알맞은 것은?',
+      opts:['전망이 올라간 이유와 틀어질 이유가 모두 반도체라서, 중심값에 걸린 불확실성이 그만큼 크다는 뜻',
+            '한은이 세 숫자 중 하나를 나중에 골라 공식 전망으로 확정한다는 뜻',
+            '간격이 넓을수록 중심값이 맞을 확률이 높아진다는 통계 규칙을 따른 것',
+            '낙관·비관은 외부 기관 수치를 참고로 옮긴 것이라 한은 전망과는 무관하다'],
+      answer:0,
+      explain:'시나리오 폭은 <b>전망이 무엇에 걸려 있는지, 그 무게</b>를 보여줘. 반도체 업황 하나가 ±0.5%p 이상을 흔든다는 뜻이니 4.1%를 확정된 미래로 읽으면 안 돼.' },
+    { q:'내년 전망 상향 폭 1.2%p가 2008년 이후 가장 컸다는 사실에서 읽을 수 있는 것으로 가장 알맞은 것은?',
+      opts:['3개월 전 전망으로는 설명되지 않을 만큼 큰 변화가 특정 산업에서 일어났다는 뜻',
+            '한은의 전망 모델이 올해부터 새것으로 교체됐다는 뜻',
+            '상향 폭이 클수록 실제 성장률이 전망보다 높게 나온다는 뜻',
+            '2008년 이후로는 한은이 전망을 올린 적이 없었다는 뜻'],
+      answer:0,
+      explain:'전망은 보통 조금씩 고쳐. 한 번에 1.2%p를 올렸다는 건 <b>3분기 GDP가 예상(0.3%)의 세 배(1.0%)로 나온 것처럼 모델 밖의 변화</b>가 생겼다는 신호야.' },
+  ]},
+
+  { id:'growth-to-rate', variants:[
+    { q:'성장률 전망을 올린 바로 그날 한은이 기준금리도 올린 이유로 가장 알맞은 것은?',
+      opts:['경기가 예상보다 세고 물가 압력도 남아 있으면, 긴축을 미룰 명분이 줄어들기 때문에',
+            '성장률 전망을 올리면 금리를 함께 올려야 한다는 한국은행법 조항이 있기 때문에',
+            '금리를 올리면 그만큼 성장률 전망치가 통계상 다시 낮아지기 때문에',
+            '성장률이 4%를 넘을 때는 금리를 자동으로 조정하는 규칙이 적용되기 때문에'],
+      answer:0,
+      explain:'금리는 "경기를 식혀야 하나, 살려야 하나"의 판단이야. 경기가 약하면 금리를 올리기 어렵지만, 경기가 세게 나오고 물가도 목표를 넘으면 <b>올려도 된다는 근거가 생겨</b>. 의결문도 물가가 상당 기간 목표를 웃돈다고 적었어.' },
+    { q:'이번 금통위 결정에서 "찬성 5 · 동결 의견 2"가 나왔다는 사실의 의미로 가장 알맞은 것은?',
+      opts:['인상 자체에 이견이 있었다는 뜻이고, 다음 결정도 자동으로 정해진 건 아니라는 신호다',
+            '동결 의견이 2명이면 결정이 보류되고 다음 회의로 넘어간다는 뜻이다',
+            '소수의견이 나오면 그 다음 회의에서는 반드시 반대 방향으로 결정된다는 뜻이다',
+            '금통위 결정은 만장일치만 효력이 있으므로 이번 인상은 임시 조치라는 뜻이다'],
+      answer:0,
+      explain:'금통위는 <b>다수결</b>이고 소수의견도 공개돼. 7명 중 2명(황건일·이수형)이 3.00% 유지를 주장했다는 건 "더 올릴지"가 아직 열려 있다는 뜻이야 — 그래서 점도표를 같이 봐야 해.' },
+  ]},
+
+  { id:'gdp-vs-consumption', variants:[
+    { q:'3분기에 GDP는 전 분기보다 1.0% 늘었는데 민간소비는 0.2% 줄었어. 두 숫자가 동시에 가능한 이유로 가장 알맞은 것은?',
+      opts:['GDP는 수출·투자·소비를 모두 합한 나라 전체의 합계라서, 한 부분이 줄어도 다른 부분이 더 크게 늘면 전체는 늘어난다',
+            'GDP에는 민간소비가 포함되지 않고 기업 활동만 들어가기 때문이다',
+            '민간소비는 명목 기준, GDP는 실질 기준이라 애초에 비교할 수 없는 숫자이기 때문이다',
+            '소비가 줄면 GDP 통계에서 그만큼을 수출로 옮겨 계산하기 때문이다'],
+      answer:0,
+      explain:'GDP는 <b>합계</b>이자 <b>평균</b>이야. 반도체 수출·설비투자가 크게 늘면 소비가 뒷걸음해도 전체는 플러스가 돼. 그래서 "성장률이 올랐다"가 "내 지갑이 나아졌다"와 같은 말이 아니야.' },
+    { q:'"성장률 숫자가 내 체감과 다르다"를 통계적으로 설명할 때 가장 알맞은 것은?',
+      opts:['성장률은 나라 전체의 평균이라, 한 산업이 평균을 끌어올리면 그 산업 밖에 있는 가계의 체감과는 어긋날 수 있다',
+            '성장률은 체감경기 설문을 바탕으로 만들기 때문에 응답자에 따라 다르게 나온다',
+            '성장률은 상위 소득층만 표본으로 삼아 계산하기 때문에 평균이 높게 나온다',
+            '성장률은 물가를 포함한 명목 기준이라 실제 생산과는 관계가 없다'],
+      answer:0,
+      explain:'10월 수출의 <b>49.1%가 반도체</b>였어. 한 품목이 평균을 끌어올린 셈이니, 그 산업과 멀리 있는 가계에는 온기가 늦게 와. 한은도 내수로 퍼지는 건 "내년부터"라고 말해.' },
+  ]},
+
+  { id:'overcapacity-tariff', variants:[
+    { q:'미국 USTR이 예고한 "과잉생산 관세"가 기존 품목별 관세와 다른 점으로 가장 알맞은 것은?',
+      opts:['특정 제품이 아니라, 그 나라가 산업을 키워 온 방식(산업정책·정책금융)을 문제 삼는다는 점',
+            '관세를 수출국이 아니라 수입업자에게만 부과한다는 점',
+            '무역법이 아니라 유엔 결의를 근거로 삼는다는 점',
+            '세율을 미국 의회가 아니라 WTO가 정한다는 점'],
+      answer:0,
+      explain:'무역법 <b>301조</b> 조사 결과로, 한국은 제조업 육성 정책과 <b>국책은행의 우대 대출</b>이 지목됐어. 과녁이 "무엇을 팔았나"에서 <b>"어떻게 키웠나"</b>로 옮겨간 거야 — 제품을 바꿔도 피하기 어려운 종류지.' },
+    { q:'한국에 적용될 과잉생산 관세가 15% 상한으로 유지된 것과, 7월 강제노동 관세 12.5%의 관계로 가장 알맞은 것은?',
+      opts:['두 관세가 겹칠 때는 더 높은 쪽만 적용되므로 최종 세율은 15%가 된다',
+            '두 관세를 더해 27.5%가 최종 세율이 된다',
+            '먼저 부과된 12.5%가 우선해 과잉생산 관세는 적용되지 않는다',
+            '두 관세의 평균인 13.75%가 적용된다'],
+      answer:0,
+      explain:'미국 무역 법규상 이 둘은 <b>합산이 아니라 둘 중 높은 것만</b> 적용돼. 그래서 12.5%와 15%가 겹쳐도 최종은 15%야. 다만 협의가 만족스럽지 않으면 상한을 <b>25%</b>로 올리는 안도 열려 있어.' },
+  ]},
+
+  { id:'dotplot', variants:[
+    { q:'이번에 공개된 점도표에서 6개월 뒤 금리 전망의 중간값이 3.25%에서 3.50%로 올라갔어. 이게 뜻하는 것으로 가장 알맞은 것은?',
+      opts:['금통위원 다수가 앞으로 반년 안에 한 차례 더 올릴 가능성을 보고 있다는 뜻',
+            '다음 회의에서 3.50%로 올리는 것이 이미 의결됐다는 뜻',
+            '시장 참가자들의 설문 결과를 한은이 그대로 옮겨 적은 것이라는 뜻',
+            '중간값이 올라가면 그만큼 성장률 전망도 자동으로 올라간다는 뜻'],
+      answer:0,
+      explain:'점도표는 <b>약속이 아니라 현재 시점의 생각</b>을 점으로 찍은 거야. 중간값이 3.50%로 올라갔고 일부는 3.75%를 가리켰으니, "이번이 마지막 인상"으로 보기 어렵다는 신호로 읽혀.' },
+  ]},
+
+];
+const SA_BANK = [
+
+  { q:'한은이 이번에 내놓은 내년 성장률 전망치는 몇 %야? (숫자와 %)',
+    accept:['4.1%','4.1'],
+    explain:'정답은 <b>4.1%</b>. 8월 전망 2.9%에서 1.2%p 올렸고, 6년 만의 4%대 전망이야.' },
+  { q:'내년 성장률 전망 상향 폭은 몇 %p였어? (숫자와 단위)',
+    accept:['1.2%p','1.2%','1.2'],
+    explain:'정답은 <b>1.2%p</b>. 한은이 이듬해 전망을 내기 시작한 2008년 12월 이후 가장 큰 상향 폭이야.' },
+  { q:'10월 수출 중량은 전년 같은 달보다 몇 % 줄었어? (숫자와 %)',
+    accept:['2.5%','-2.5%','−2.5%','2.5'],
+    explain:'정답은 <b>2.5% 감소</b>(7개월 연속 감소). 금액은 ＋93.9%인데 양은 줄었다 — 올라간 건 가격이라는 증거야.' },
+  { q:'이번 금통위가 결정한 기준금리는 몇 %야? (숫자와 %)',
+    accept:['3.25%','3.25'],
+    explain:'정답은 <b>3.25%</b>(3.00%에서 0.25%p 인상). 올해 세 번째 인상이야.' },
+  { q:'10월 전체 수출에서 반도체가 차지한 비중은 몇 %야? (숫자와 %)',
+    accept:['49.1%','49.1','49%'],
+    explain:'정답은 <b>49.1%</b>. 수출의 절반이 한 품목이라는 뜻이고, 그래서 전망의 신뢰도도 그 품목에 쏠려.' },
+  { q:'3분기 민간소비는 전 분기 대비 몇 %였어? (기호와 숫자)',
+    accept:['-0.2%','−0.2%','-0.2','0.2% 감소','마이너스 0.2%'],
+    explain:'정답은 <b>−0.2%</b>. GDP는 ＋1.0%인데 소비는 뒷걸음 — 성장률과 체감이 갈리는 자리야.' },
+  { q:'과잉생산 관세의 근거가 된 미국 무역법 조항은 몇 조야? (숫자만)',
+    accept:['301','301조'],
+    explain:'정답은 <b>301조</b>. 상대국의 불공정 관행을 조사해 보복 관세를 매길 수 있게 한 조항이야.' },
+  { q:'과잉생산 관세에서 한국에 유지된 세율 상한은 몇 %야? (숫자와 %)',
+    accept:['15%','15'],
+    explain:'정답은 <b>15%</b>. 지난해 한미 무역합의로 정한 상한이고, 협의가 만족스럽지 않으면 25%까지 올리는 안이 남아 있어.' },
+  { q:'기준금리 인상에 찬성한 금통위원은 7명 중 몇 명이야? (숫자만)',
+    accept:['5','5명'],
+    explain:'정답은 <b>5명</b>. 황건일·이수형 위원은 3.00% 유지 의견을 냈어 — 다음 결정이 정해진 게 아니라는 신호야.' },
+  { q:'금액 ÷ 중량으로 구하는, 수출 한 단위의 값을 가리키는 말은? (두 글자)',
+    accept:['단가','가격'],
+    explain:'정답은 <b>단가</b>. 중량은 줄고 금액은 늘었다면 올라간 건 단가야 — 이번 성장의 실체가 거기 있어.' },
+  { q:'성장률 전망이 올라간 이유와 흔들릴 이유가 똑같이 걸려 있는 산업은? (세 글자)',
+    accept:['반도체'],
+    explain:'정답은 <b>반도체</b>. 올해 상향 폭 0.6%p 중 0.75%p를 반도체 호조가 만들었고, 그래서 값이 꺾이면 비관 시나리오(3.4%)로 바로 내려와.' },
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let current = [];
+
+function buildQuiz(){
+  current = [];
+  const pickedConcepts = shuffle(MC_BANK).slice(0,4);
+  pickedConcepts.forEach(c=>{
+    const variant = c.variants[Math.floor(Math.random()*c.variants.length)];
+    const optOrder = shuffle(variant.opts.map((text,idx)=>({text,idx})));
+    current.push({
+      type:'mc',
+      q: variant.q,
+      opts: optOrder.map(o=>o.text),
+      answerIdx: optOrder.findIndex(o=>o.idx===variant.answer),
+      explain: variant.explain,
+    });
+  });
+  const sa = SA_BANK[Math.floor(Math.random()*SA_BANK.length)];
+  current.push({ type:'sa', q: sa.q, accept: sa.accept, explain: sa.explain });
+
+  render();
+}
+
+function render(){
+  const area = document.getElementById('quizArea');
+  area.innerHTML = '';
+  current.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = i;
+    let inner = `<div class="qhead"><span class="qnum">Q${i+1}</span><span class="qtype">${item.type==='mc' ? '객관식' : '주관식 · 단답형'}</span></div>`;
+    inner += `<div class="qtext">${item.q}</div>`;
+    if(item.type==='mc'){
+      item.opts.forEach((opt,oi)=>{
+        inner += `<label class="opt" data-oi="${oi}"><input type="radio" name="q${i}" value="${oi}">${opt}</label>`;
+      });
+    } else {
+      inner += `<input type="text" class="sa-input" placeholder="답을 입력해줘">`;
+    }
+    inner += `<div class="explain"></div>`;
+    card.innerHTML = inner;
+    area.appendChild(card);
+  });
+
+  area.querySelectorAll('.opt').forEach(label=>{
+    label.addEventListener('click', ()=>{
+      const card = label.closest('.qcard');
+      card.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+      label.classList.add('picked');
+    });
+  });
+
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('score').classList.remove('show');
+}
+
+function grade(){
+  let correctCount = 0;
+  const cards = document.querySelectorAll('.qcard');
+  cards.forEach((card,i)=>{
+    const item = current[i];
+    const explainEl = card.querySelector('.explain');
+    if(item.type==='mc'){
+      const picked = card.querySelector('.opt.picked');
+      const pickedIdx = picked ? parseInt(picked.dataset.oi) : -1;
+      card.querySelectorAll('.opt').forEach(o=>{
+        const oi = parseInt(o.dataset.oi);
+        if(oi === item.answerIdx) o.classList.add('correct');
+        else if(oi === pickedIdx) o.classList.add('wrong');
+      });
+      if(pickedIdx === item.answerIdx) correctCount++;
+    } else {
+      const input = card.querySelector('.sa-input');
+      const val = input.value.trim().toLowerCase().replace(/\s+/g,' ');
+      const ok = val.length>0 && item.accept.some(a=>{
+        const t = a.toLowerCase();
+        return val.includes(t) || t.includes(val);
+      });
+      input.classList.add(ok ? 'correct' : 'wrong');
+      input.disabled = true;
+      if(ok) correctCount++;
+    }
+    explainEl.innerHTML = `<b>해설.</b> ${item.explain}`;
+    explainEl.classList.add('show');
+  });
+
+  document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');
+  document.getElementById('submitBtn').disabled = true;
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.innerHTML = `${correctCount} / ${current.length} 문제 정답!<span>다시 풀고 싶으면 '새 문제 출제'를 눌러봐 — 보기 순서와 문제가 바뀌어.</span>`;
+  scoreEl.classList.add('show');
+}
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('retryBtn').addEventListener('click', buildQuiz);
+
+buildQuiz();
+</script>
+</body>
+</html>

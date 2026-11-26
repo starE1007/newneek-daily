@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>성장률 4.1%는 무엇으로 만들어졌나</title>
+<style>
+  :root{
+    --text:#2C2C2B; --text2:#7D7A75; --canvas:#FFFFFF; --soft:#F9F8F7; --surface2:#F0EFED;
+    --border:#E6E5E3; --blue:#2783DE; --blue-soft:#E5F2FC; --orange:#D5803B; --orange-soft:#FBEBDE;
+    --red:#E56458; --red-soft:#FCE9E7; --green:#46A171; --green-soft:#E8F1EC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",Roboto,sans-serif;color:var(--text);background:var(--canvas);line-height:1.5;font-size:16px}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 24px 32px}
+  .eyebrow{font-size:13px;font-weight:600;color:var(--blue);letter-spacing:.04em;margin-bottom:6px}
+  h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+  .sub{font-size:15px;color:var(--text2);margin-bottom:20px}
+  .section-title{font-size:17px;font-weight:700;margin:26px 0 12px}
+  .section-title:first-of-type{margin-top:0}
+
+  /* 막대 비교 */
+  .bars{border:1px solid var(--border);border-radius:12px;padding:18px 20px;background:var(--soft)}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-label{flex:0 0 140px;font-size:13.5px;font-weight:600}
+  .bar-label small{display:block;font-weight:500;font-size:12px;color:var(--text2)}
+  .bar-track{flex:1 1 auto;background:var(--surface2);border-radius:99px;height:26px;position:relative;overflow:hidden}
+  .bar-fill{height:100%;border-radius:99px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:12.5px;font-weight:700;color:#fff;white-space:nowrap}
+  .f-old{background:#CFCCC7;color:#5E5B57}
+  .f-new{background:var(--blue)}
+  .f-up{background:var(--green)}
+  .f-down{background:var(--orange)}
+  .bar-out{font-size:12.5px;font-weight:700;color:var(--text2);margin-left:6px}
+  .divider{border-top:1px dashed var(--border);margin:14px 0}
+
+  /* 개념 박스 행 */
+  .tax-row{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+  .tax-box{flex:1 1 180px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--soft)}
+  .tax-box b{display:block;font-size:14.5px;margin-bottom:2px}
+  .tax-box span{font-size:13px;color:var(--text2)}
+  .tax-box.up{background:var(--green-soft);border-color:#CFE4D8}
+  .tax-box.down{background:var(--orange-soft);border-color:#F2DEC9}
+  .tax-box.result{background:var(--blue-soft);border-color:#CBE3F8}
+  .tax-op{align-self:center;font-size:20px;font-weight:700;color:#B9B6B1}
+  .tax-note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .tax-note b{color:var(--text)}
+
+  /* 단계 흐름도 */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .step{flex:1 1 140px;min-width:130px;border-radius:10px;padding:12px;font-size:13.5px;font-weight:600;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .step small{font-weight:500;font-size:12px;opacity:.85}
+  .step.s1,.step.s2{background:var(--green-soft);color:#2F7A52}
+  .step.s3,.step.s4{background:var(--blue-soft);color:#1B6BB8}
+  .step.s5,.step.s6{background:var(--orange-soft);color:#9A5620}
+  .arrow{align-self:center;color:#B9B6B1;font-size:16px;font-weight:700}
+  .note{margin-top:10px;font-size:13px;color:var(--text2)}
+  .note b{color:var(--text)}
+  .paradox{margin-top:16px;background:var(--blue-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#1B6BB8}
+  .paradox b{color:#15528C}
+  .paradox > b:first-child{display:block;margin-bottom:2px;font-size:14.5px;color:#1B6BB8}
+  .warn{margin-top:12px;background:var(--red-soft);border-radius:10px;padding:12px 16px;font-size:14px;color:#B23F34}
+  .warn b{color:#8E2F26}
+  .warn > b:first-child{display:block;margin-bottom:2px;font-size:14.5px;color:#B23F34}
+
+  .foot{margin-top:20px;font-size:12.5px;color:var(--text2)}
+  @media (max-width:640px){
+    .wrap{padding:16px 16px 24px}
+    h1{font-size:21px}
+    .bar-label{flex:0 0 108px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">2026.11.27 데일리 뉴스 · 시각자료</div>
+  <h1>📈 내년 성장률 4.1% — 무엇으로 만들어진 숫자야?</h1>
+  <div class="sub">한은이 3개월 만에 전망을 1.2%p 올렸어. 그 숫자를 만든 건 '많이 팔아서'가 아니라 '비싸게 팔아서'야 — 그래서 금리가 올랐고, 그래서 흔들리기도 쉬워</div>
+
+  <div class="section-title">① 3개월 만에 이만큼 뛰었어 (한은 성장률 전망)</div>
+  <div class="bars">
+    <div class="bar-row">
+      <div class="bar-label">올해 · 8월 전망<small>직전 숫자</small></div>
+      <div class="bar-track"><div class="bar-fill f-old" style="width:66%">3.3%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">올해 · 11월 전망<small>＋0.6%p</small></div>
+      <div class="bar-track"><div class="bar-fill f-new" style="width:78%">3.9%</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="bar-row">
+      <div class="bar-label">내년 · 8월 전망<small>직전 숫자</small></div>
+      <div class="bar-track"><div class="bar-fill f-old" style="width:58%">2.9%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">내년 · 11월 전망<small>＋1.2%p · 2008년 이후 최대 상향</small></div>
+      <div class="bar-track"><div class="bar-fill f-new" style="width:82%">4.1%</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="bar-row">
+      <div class="bar-label">내년 · 낙관 시나리오<small>반도체 호황이 내수로 퍼지면</small></div>
+      <div class="bar-track"><div class="bar-fill f-up" style="width:92%">4.6%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">내년 · 비관 시나리오<small>반도체 값이 꺾이면</small></div>
+      <div class="bar-track"><div class="bar-fill f-down" style="width:68%">3.4%</div></div>
+    </div>
+  </div>
+  <div class="note">같은 날 내놓은 낙관·비관의 간격이 <b>1.2%p</b>야. 중심값 4.1%를 "확정된 미래"로 읽으면 안 되는 이유가 이 폭에 있어 — 전망이 올라간 이유와 흔들릴 이유가 <b>똑같이 반도체</b>라서.</div>
+
+  <div class="section-title">② 그 성장은 '물량'이 아니라 '값'이야 (10월 수출 확정치)</div>
+  <div class="tax-row">
+    <div class="tax-box up"><b>수출 금액 ＋93.9%</b><span>1,154억 달러 · 10월 기준 역대 최대</span></div>
+    <div class="tax-op">vs</div>
+    <div class="tax-box down"><b>수출 중량 −2.5%</b><span>7개월 연속 감소 — 짐은 덜 실어 보냈어</span></div>
+    <div class="tax-op">=</div>
+    <div class="tax-box result"><b>단가가 올려준 성장</b><span>같은 양을 훨씬 비싸게 판 결과라는 뜻</span></div>
+  </div>
+  <div class="tax-note">갈라 보면 <b>반도체 567억 달러(＋257.5%)</b> 하나가 전체 수출의 <b>49.1%</b>야. 수출의 절반이 한 품목이고, 그 품목이 금액으로 커진 건 주로 가격이야. 가격으로 커진 성장은 <b>가격이 돌아설 때 같은 속도로 줄어</b> — 물량으로 커진 성장보다 되돌림이 빨라.</div>
+
+  <div class="section-title">③ 반도체 값이 내 대출이자까지 오는 길</div>
+  <div class="flow">
+    <div class="step s1">AI용 메모리 단가 급등<small>반도체 수출 ＋257.5%</small></div>
+    <div class="arrow">→</div>
+    <div class="step s2">3분기 GDP ＋1.0%<small>한은 예상은 0.3%였어</small></div>
+    <div class="arrow">→</div>
+    <div class="step s3">한은, 전망 대폭 상향<small>내년 2.9% → 4.1%</small></div>
+    <div class="arrow">→</div>
+    <div class="step s4">"경기가 세고 물가도 세다"<small>긴축을 미룰 명분이 사라져</small></div>
+    <div class="arrow">→</div>
+    <div class="step s5">기준금리 3.00% → 3.25%<small>찬성 5 · 동결 2</small></div>
+    <div class="arrow">→</div>
+    <div class="step s6">대출이자↑ · 환율↓<small>가계대출 평균 4.96% · 1,340원 아래</small></div>
+  </div>
+  <div class="note">앞칸(반도체 단가)은 내가 손댈 수 없고, <b>끝칸(이자·환율)은 내 통장에 바로 찍혀.</b> 그래서 "성장률이 올라갔다"는 뉴스는 나한테는 보통 <b>"빌린 돈이 비싸진다"</b>로 번역돼서 도착해.</div>
+
+  <div class="warn"><b>⚠️ 같은 분기에 반대로 간 숫자</b>3분기 민간소비는 <b>−0.2%</b>였어. GDP는 ＋1.0%인데 소비는 뒷걸음한 거야 — 성장률은 <b>나라 전체의 평균</b>이고, 그 평균을 한 산업이 끌어올리면 내 체감과 어긋나는 게 당연해. 한은도 온기가 내수로 퍼지는 건 "내년부터"라고 말해.</div>
+
+  <div class="paradox"><b>🔎 그래서 볼 자리</b>앞으로는 성장률 숫자보다 <b>① 메모리 현물가격 ② 수출 중량</b>을 먼저 보면 돼. 값이 아니라 양이 늘기 시작하면 그때가 호황이 내 쪽으로 번지는 신호야. 금리 쪽은 점도표 — 6개월 뒤 전망 중간값이 <b>3.25% → 3.50%</b>로 올라갔어(21개 점 중 8개가 3.50%, 7개는 3.75%).</div>
+
+  <div class="foot">※ 이해를 돕기 위한 개략도 · 2026.11.27 데일리 딥다이브 내용 기반. 성장률·점도표는 한국은행 11월 수정 경제전망·통화정책방향(11/26), 수출은 관세청 10월 확정치, 가계대출 금리는 예금은행 신규취급액 기준 9월치야. 막대 길이는 5%를 100%로 둔 상대 비교.</div>
+</div>
+</body>
+</html>
